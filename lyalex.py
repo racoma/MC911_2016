@@ -7,7 +7,10 @@
 
 #Para testar as expressoes regulares: https://regex101.com/
 
+import sys
 import ply.lex as lex
+
+f = open(sys.argv[-1])
 
 reserved = {
    'if' : 'IF',
@@ -122,3 +125,13 @@ def t_error(t):
 
 #Build the lexer
 lexer = lex.lex()
+
+lex.input(f.read())
+
+for tok in iter(lex.token, None):
+    print repr(tok.type), repr(tok.value)
+    
+    
+    
+    
+    
