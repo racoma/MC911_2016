@@ -40,34 +40,96 @@ reserved = {
    'return' : 'RETURN', 
    'returns' : 'RETURNS',
    'syn' : 'SYN', 
-   'to' : 'TO'
+   'to' : 'TO',
 }
 
 # List of token names.
 tokens = [
+
+# Literals
+   'ICONST',
+   'CCONST',
+   'SCONST',
    'ID',
+
+# Operators
    'PLUS',
    'MINUS',
    'TIMES',
    'DIVIDE',
+   'AND',
+   'OR',
+   'NOT',
+   'EQ',
+   'NEQ',
+   'GT',
+   'GE',
+   'LT',
+   'LE',
+   'MOD',
+   'ARROW',
+   'CONCAT',
+   
+# Assignments
    'ASSIGN',
+   'TIMESEQUAL',
+   'DIVEQUAL',
+   'MODEQUAL',
+   'PLUSEQUAL',
+   'MINUSEQUAL',
+   'CONCATEQUAL',
+
+
+# Delimiters
    'SEMI',
+   'COMMA',
+   'COLON',
    'LPAREN',
    'RPAREN',
-   'ICONST',
-   'CCONST',
-   'SCONST',
+   'LBRACKET',
+   'RBRACKET',
+   'LBRACE',
+   'RBRACE',
 ] + list(reserved.values())
 
-# Regular expression rules for simple tokens
+# Operators
 t_PLUS    = r'\+'
 t_MINUS   = r'-'
 t_TIMES   = r'\*'
 t_DIVIDE  = r'/'
+t_AND  	  = r'&&'
+t_OR      = r'\|\|'
+t_NOT     = r'!'
+t_EQ      = r'=='
+t_NEQ     = r'!='
+t_GT      = r'>'
+t_GE      = r'>='
+t_LT      = r'<'
+t_LE      = r'<='
+t_IN      = r'IN'
+t_MOD     = r'%'
+t_ARROW   = r'->'
+t_CONCAT  = r'&'
+
+
+# Assignments
 t_ASSIGN  = r'='
+t_TIMESEQUAL = r'\*='
+t_DIVEQUAL = r'\/='
+t_MODEQUAL = r'\%='
+t_PLUSEQUAL = r'\+='
+t_MINUSEQUAL = r'\-='
+t_CONCATEQUAL = r'\&='
+
+# Dividers
 t_SEMI    = r';'
+t_COMMA   = r'\,'
+t_COLON  = r'\:'
 t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
+t_LBRACKET = r'\['
+t_RBRACKET = r'\]'
+
 
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
