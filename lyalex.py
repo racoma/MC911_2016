@@ -178,11 +178,29 @@ def find_column(input,token):
     column = (token.lexpos - last_cr) + 1
     return column
 
+#Error Unterminated string
+def t_error_USTRING(t):
+    r'\"([^\\\n]|(\\.))*?'
+    print("%s: Unterminated string" % t.lineno)
+    t.lexer.skip(1)
+
+#Error Unterminated comment
+def t_error_USLEFT(t):
+    r'\/\*(.|[\r\n])*?'
+    print("%s: Unterminated comment" % t.lineno)
+    t.lexer.skip(1)
+
+def t_error_USRIGHT(t):
+    r'(.|[\r\n])*?\*\/'
+    print("%s: Unterminated comment" % t.lineno)
+    t.lexer.skip(1)
 
 #Error handling rule
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
+    
+
 
 
 #Build the lexer
