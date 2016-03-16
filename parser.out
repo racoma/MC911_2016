@@ -1,0 +1,178 @@
+Created by PLY version 3.8 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    DO
+    DIVEQUAL
+    RETURN
+    LPAREN
+    LOC
+    THEN
+    LBRACKET
+    WHILE
+    COLON
+    PRINT
+    FI
+    REF
+    MINUS
+    CONCAT
+    NEQ
+    LE
+    RPAREN
+    MODEQUAL
+    SCONST
+    BY
+    TO
+    LT
+    PLUS
+    ARRAY
+    CCONST
+    GT
+    END
+    DIVIDE
+    FOR
+    OD
+    RBRACE
+    TIMES
+    PLUSEQUAL
+    GE
+    ICONST
+    RESULT
+    ARROW
+    IN
+    ELSE
+    EQ
+    IF
+    AND
+    DOWN
+    LBRACE
+    CHARS
+    PROC
+    MINUSEQUAL
+    CONCATEQUAL
+    ELSIF
+    RETURNS
+    EXIT
+    NOT
+    RBRACKET
+    TIMESEQUAL
+    OR
+    MOD
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> statement_list
+Rule 2     statement_list -> statement
+Rule 3     statement_list -> statement_list statement
+Rule 4     statement -> declaration_statement
+Rule 5     statement -> synonym_statement
+Rule 6     statement -> newmode_statement
+Rule 7     statement -> procedure_statement
+Rule 8     statement -> action_statement
+Rule 9     declaration_statement -> DCL declaration_list SEMI
+Rule 10    declaration_list -> declaration
+Rule 11    declaration_list -> declaration_list COMMA declaration
+Rule 12    declaration -> identifier_list mode initialization_opt
+Rule 13    initialization -> ASSIGN expression
+Rule 14    identifier_list -> identifier
+Rule 15    identifier_list -> identifier_list COMMA identifier
+Rule 16    identifier -> ID
+Rule 17    synonym_statement -> SYN synonym_list SEMI
+Rule 18    synonym_list -> synonym_definition
+Rule 19    synonym_list -> synonym_list COMMA synonym_definition
+Rule 20    synonym_definition -> identifier_list mode_opt ASSIGN constant_expression
+Rule 21    constant_expression -> expression
+Rule 22    newmode_statement -> TYPE newmode_list
+
+Terminals, with rules where they appear
+
+AND                  : 
+ARRAY                : 
+ARROW                : 
+ASSIGN               : 13 20
+BY                   : 
+CCONST               : 
+CHARS                : 
+COLON                : 
+COMMA                : 11 15 19
+CONCAT               : 
+CONCATEQUAL          : 
+DCL                  : 9
+DIVEQUAL             : 
+DIVIDE               : 
+DO                   : 
+DOWN                 : 
+ELSE                 : 
+ELSIF                : 
+END                  : 
+EQ                   : 
+EXIT                 : 
+FI                   : 
+FOR                  : 
+GE                   : 
+GT                   : 
+ICONST               : 
+ID                   : 16
+IF                   : 
+IN                   : 
+LBRACE               : 
+LBRACKET             : 
+LE                   : 
+LOC                  : 
+LPAREN               : 
+LT                   : 
+MINUS                : 
+MINUSEQUAL           : 
+MOD                  : 
+MODEQUAL             : 
+NEQ                  : 
+NOT                  : 
+OD                   : 
+OR                   : 
+PLUS                 : 
+PLUSEQUAL            : 
+PRINT                : 
+PROC                 : 
+RBRACE               : 
+RBRACKET             : 
+REF                  : 
+RESULT               : 
+RETURN               : 
+RETURNS              : 
+RPAREN               : 
+SCONST               : 
+SEMI                 : 9 17
+SYN                  : 17
+THEN                 : 
+TIMES                : 
+TIMESEQUAL           : 
+TO                   : 
+TYPE                 : 22
+WHILE                : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+action_statement     : 8
+constant_expression  : 20
+declaration          : 10 11
+declaration_list     : 9 11
+declaration_statement : 4
+expression           : 13 21
+identifier           : 14 15
+identifier_list      : 12 15 20
+initialization       : 
+initialization_opt   : 12
+mode                 : 12
+mode_opt             : 20
+newmode_list         : 22
+newmode_statement    : 6
+procedure_statement  : 7
+program              : 0
+statement            : 2 3
+statement_list       : 1 3
+synonym_definition   : 18 19
+synonym_list         : 17 19
+synonym_statement    : 5
+
