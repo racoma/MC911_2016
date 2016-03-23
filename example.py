@@ -7,4 +7,5 @@ do while m <= n;
   s += m * n;
   print(m,s);
   m += 1;
+  4:3;
 od;

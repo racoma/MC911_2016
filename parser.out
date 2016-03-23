@@ -5,20 +5,16 @@ Unused terminals:
     DO
     DIVEQUAL
     RETURN
-    LPAREN
     LOC
     THEN
     LBRACKET
     WHILE
-    COLON
     PRINT
     FI
-    REF
     MINUS
     CONCAT
     NEQ
     LE
-    RPAREN
     MODEQUAL
     SCONST
     BY
@@ -36,7 +32,6 @@ Unused terminals:
     TIMES
     PLUSEQUAL
     GE
-    ICONST
     RESULT
     ARROW
     IN
@@ -84,18 +79,47 @@ Rule 19    synonym_list -> synonym_list COMMA synonym_definition
 Rule 20    synonym_definition -> identifier_list mode_opt ASSIGN constant_expression
 Rule 21    constant_expression -> expression
 Rule 22    newmode_statement -> TYPE newmode_list
+Rule 23    newmode_list -> mode_definition
+Rule 24    newmode_list -> newmode_list COMMA mode_definition
+Rule 25    mode_definition -> identifier_list ASSIGN mode
+Rule 26    mode -> mode_name
+Rule 27    mode -> discrete_mode
+Rule 28    mode -> reference_mode
+Rule 29    mode -> composite_mode
+Rule 30    discrete_mode -> integer_name
+Rule 31    discrete_mode -> boolean_mode
+Rule 32    discrete_mode -> character_mode
+Rule 33    discrete_mode -> discrete_range_mode
+Rule 34    integer_mode -> INT
+Rule 35    boolean_mode -> BOOL
+Rule 36    character_mode -> CHAR
+Rule 37    discrete_range_mode -> discrete_mode_name LPAREN literal_range RPAREN
+Rule 38    discrete_range_mode -> discrete_mode LPAREN literal_range RPAREN
+Rule 39    discrete_mode_name -> identifier
+Rule 40    literal_range -> lower_bound COLON upper_bound
+Rule 41    lower_bound -> integer_literal
+Rule 42    upper_bound -> integer_literal
+Rule 43    reference_mode -> REF mode
+Rule 44    composite_mode -> string_mode
+Rule 45    composite_mode -> array_mode
+Rule 46    string_mode -> REF mode
+Rule 47    integer_literal -> digit_sequence
+Rule 48    digit_sequence -> ICONST
+Rule 49    digit_sequence -> USCORE
+Rule 50    digit_sequence -> digit_sequence ICONST
+Rule 51    digit_sequence -> digit_sequence USCORE
 
 Terminals, with rules where they appear
 
 AND                  : 
 ARRAY                : 
 ARROW                : 
-ASSIGN               : 13 20
+ASSIGN               : 13 20 25
 BY                   : 
 CCONST               : 
 CHARS                : 
-COLON                : 
-COMMA                : 11 15 19
+COLON                : 40
+COMMA                : 11 15 19 24
 CONCAT               : 
 CONCATEQUAL          : 
 DCL                  : 9
@@ -112,7 +136,7 @@ FI                   :
 FOR                  : 
 GE                   : 
 GT                   : 
-ICONST               : 
+ICONST               : 48 50
 ID                   : 16
 IF                   : 
 IN                   : 
@@ -120,7 +144,7 @@ LBRACE               :
 LBRACKET             : 
 LE                   : 
 LOC                  : 
-LPAREN               : 
+LPAREN               : 37 38
 LT                   : 
 MINUS                : 
 MINUSEQUAL           : 
@@ -136,11 +160,11 @@ PRINT                :
 PROC                 : 
 RBRACE               : 
 RBRACKET             : 
-REF                  : 
+REF                  : 43 46
 RESULT               : 
 RETURN               : 
 RETURNS              : 
-RPAREN               : 
+RPAREN               : 37 38
 SCONST               : 
 SEMI                 : 9 17
 SYN                  : 17
@@ -149,30 +173,52 @@ TIMES                :
 TIMESEQUAL           : 
 TO                   : 
 TYPE                 : 22
+USCORE               : 49 51
 WHILE                : 
 error                : 
 
 Nonterminals, with rules where they appear
 
+BOOL                 : 35
+CHAR                 : 36
+INT                  : 34
 action_statement     : 8
+array_mode           : 45
+boolean_mode         : 31
+character_mode       : 32
+composite_mode       : 29
 constant_expression  : 20
 declaration          : 10 11
 declaration_list     : 9 11
 declaration_statement : 4
+digit_sequence       : 47 50 51
+discrete_mode        : 27 38
+discrete_mode_name   : 37
+discrete_range_mode  : 33
 expression           : 13 21
-identifier           : 14 15
-identifier_list      : 12 15 20
+identifier           : 14 15 39
+identifier_list      : 12 15 20 25
 initialization       : 
 initialization_opt   : 12
-mode                 : 12
+integer_literal      : 41 42
+integer_mode         : 
+integer_name         : 30
+literal_range        : 37 38
+lower_bound          : 40
+mode                 : 12 25 43 46
+mode_definition      : 23 24
+mode_name            : 26
 mode_opt             : 20
-newmode_list         : 22
+newmode_list         : 22 24
 newmode_statement    : 6
 procedure_statement  : 7
 program              : 0
+reference_mode       : 28
 statement            : 2 3
 statement_list       : 1 3
+string_mode          : 44
 synonym_definition   : 18 19
 synonym_list         : 17 19
 synonym_statement    : 5
+upper_bound          : 40
 

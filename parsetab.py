@@ -5,9 +5,9 @@ _tabversion = '3.8'
 
 _lr_method = 'LALR'
 
-_lr_signature = '04D6D301073BF3F55F0A2F02383A9640'
+_lr_signature = 'E345B0502379CE9E5385BCB7B5013CD3'
     
-_lr_action_items = {'DCL':([0,1,2,3,4,5,8,9,10,11,13,16,17,20,],[1,-9,-5,-8,-10,-7,-2,-4,1,-11,-6,-3,-12,-13,]),'PROC':([15,],[18,]),'SYN':([0,1,2,3,4,5,8,9,10,11,13,16,17,20,],[4,-9,-5,-8,-10,-7,-2,-4,4,-11,-6,-3,-12,-13,]),'LBRACKET':([19,],[20,]),'COLON':([6,12,14,],[15,-16,-15,]),'LPAREN':([18,],[19,]),'TYPE':([0,1,2,3,4,5,8,9,10,11,13,16,17,20,],[11,-9,-5,-8,-10,-7,-2,-4,11,-11,-6,-3,-12,-13,]),'ID':([0,1,2,3,4,5,8,9,10,11,13,16,17,20,],[14,-9,-5,-8,-10,-7,-2,-4,14,-11,-6,-3,-12,-13,]),'$end':([1,2,3,4,5,7,8,9,10,11,13,16,17,20,],[-9,-5,-8,-10,-7,0,-2,-4,-1,-11,-6,-3,-12,-13,]),}
+_lr_action_items = {'DCL':([0,1,2,4,5,],[2,2,-4,-2,-3,]),'$end':([1,2,3,4,5,],[-1,-4,0,-2,-3,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'synonym_statement':([0,10,],[2,2,]),'action_statement':([0,10,],[3,3,]),'procedure_statement':([0,10,],[5,5,]),'label_id':([0,10,],[6,6,]),'program':([0,],[7,]),'statement':([0,10,],[8,16,]),'declaration_statement':([0,10,],[9,9,]),'statement_list':([0,],[10,]),'procedure_definition':([15,],[17,]),'identifier':([0,10,],[12,12,]),'newmode_statement':([0,10,],[13,13,]),}
+_lr_goto_items = {'statement_list':([0,],[1,]),'program':([0,],[3,]),'statement':([0,1,],[4,5,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,21 +26,14 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
-  ('program -> statement_list','program',1,'p_program','lyayacc.py',9),
-  ('statement_list -> statement','statement_list',1,'p_statement_list','lyayacc.py',13),
-  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','lyayacc.py',14),
-  ('statement -> declaration_statement','statement',1,'p_statement','lyayacc.py',19),
-  ('statement -> synonym_statement','statement',1,'p_statement','lyayacc.py',20),
-  ('statement -> newmode_statement','statement',1,'p_statement','lyayacc.py',21),
-  ('statement -> procedure_statement','statement',1,'p_statement','lyayacc.py',22),
-  ('statement -> action_statement','statement',1,'p_statement','lyayacc.py',23),
-  ('declaration_statement -> DCL','declaration_statement',1,'p_declaration_statement','lyayacc.py',28),
-  ('synonym_statement -> SYN','synonym_statement',1,'p_synonym_statement','lyayacc.py',32),
-  ('newmode_statement -> TYPE','newmode_statement',1,'p_newmode_statement','lyayacc.py',36),
-  ('procedure_statement -> label_id COLON procedure_definition','procedure_statement',3,'p_procedure_statement','lyayacc.py',40),
-  ('procedure_definition -> PROC LPAREN LBRACKET','procedure_definition',3,'p_procedure_definition','lyayacc.py',44),
-  ('action_statement -> DCL','action_statement',1,'p_action_statement','lyayacc.py',48),
-  ('identifier -> ID','identifier',1,'p_identifier','lyayacc.py',52),
-  ('label_id -> identifier','label_id',1,'p_label_id','lyayacc.py',56),
-  ('empty -> <empty>','empty',0,'p_empty','lyayacc.py',60),
+  ('program -> statement_list','program',1,'p_program','lyayacc.py',12),
+  ('statement_list -> statement','statement_list',1,'p_statement_list','lyayacc.py',16),
+  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','lyayacc.py',17),
+  ('statement -> DCL','statement',1,'p_statement','lyayacc.py',22),
+  ('lower_bound -> integer_literal','lower_bound',1,'p_lower_bound','lyayacc.py',142),
+  ('integer_literal -> digit_sequence','integer_literal',1,'p_integer_literal','lyayacc.py',146),
+  ('digit_sequence -> ICONST','digit_sequence',1,'p_digit_sequence','lyayacc.py',150),
+  ('digit_sequence -> USCORE','digit_sequence',1,'p_digit_sequence','lyayacc.py',151),
+  ('digit_sequence -> digit_sequence ICONST','digit_sequence',2,'p_digit_sequence','lyayacc.py',152),
+  ('digit_sequence -> digit_sequence USCORE','digit_sequence',2,'p_digit_sequence','lyayacc.py',153),
 ]

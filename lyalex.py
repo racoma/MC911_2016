@@ -46,6 +46,8 @@ reserved = {
 # List of token names.
 tokens = [
 
+'ACC',
+
 # Literals
    'ICONST',
    'CCONST',
@@ -90,7 +92,10 @@ tokens = [
    'RBRACKET',
    'LBRACE',
    'RBRACE',
+   'USCORE',
 ] + list(reserved.values())
+
+t_ACC  = r'\^'
 
 # Operators
 t_PLUS    = r'\+'
@@ -129,6 +134,7 @@ t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
+t_USCORE  = r'_'
 
 
 def t_ID(t):
