@@ -1,9 +1,9 @@
-# ------------------------------------------------------------
-#                            Lexer
-#              
-#                Raissa Machado e Andre Brandao
-#
-# ------------------------------------------------------------
+# ------------------------------------------------------------ #
+#                            Lexer                             #
+#                                                              #
+#                Raissa Machado e Andre Brandao                #
+#                                                              #
+# ------------------------------------------------------------ #
 
 #Para testar as expressoes regulares: https://regex101.com/
 
@@ -41,6 +41,7 @@ reserved = {
    'returns' : 'RETURNS',
    'syn' : 'SYN', 
    'to' : 'TO',
+   'lower': 'LOWER',
 }
 
 # List of token names.
