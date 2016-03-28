@@ -1,12 +1,15 @@
-# Yacc example
+# ------------------------------------------------------------ #
+#                           Parser                             #
+#                                                              #
+#                Raissa Machado e Andre Brandao                #
+#                                                              #
+# ------------------------------------------------------------ #
 
 import ply.yacc as yacc
-
-# Get the token map from the lexer.  This is required.
 from lyalex import tokens
 
 
-######################################################
+########################  BLOCO 1  #############################
 
 def p_program(p):
   """ program : statement_list """
@@ -27,7 +30,7 @@ def p_statement(p):
   """
   p[0] = p[1]
 
-######################################################
+########################  BLOCO 2  #############################
 
 def p_declaration_statement(p):
   ' declaration_statement : DCL declaration_list SEMI'
@@ -59,7 +62,7 @@ def p_identifier(p):
   ' identifier : ID '
   p[0] = ID(p[1])
 
-# ######################################################
+########################  BLOCO 3  #############################
 
 def p_synonym_statement(p):
   ' synonym_statement : SYN synonym_list SEMI'
@@ -74,7 +77,6 @@ def p_synonym_list(p):
 def p_synonym_definition(p):
   """ synonym_definition : identifier_list mode ASSIGN constant_expression
                          | identifier_list ASSIGN constant_expression
-
   """
   p[0] = [p[1], p[2], p[4]] if len(p) == 5 else [p[1], p[3]]
 
@@ -82,7 +84,7 @@ def p_constant_expression(p):
   ' constant_expression : expression'
   p[0] = p[1]
 
-# ######################################################
+########################  BLOCO 4  #############################
 
 def p_newmode_statement(p):
   ' newmode_statement : TYPE newmode_list'
@@ -190,7 +192,7 @@ def p_element_mode(p):
   p[0] = p[1]
 
 
-# ######################################################
+########################  BLOCO 5  #############################
 
 def p_location(p):
   """ location : location_name
@@ -214,7 +216,7 @@ def p_string_element(p):
   p[0] = [p[1], p[3], p[5]]
 
 def p_start_element(p):
-  """ start_element : integer_expression
+  """ start_element : ICONST
   """
   p[0] = p[1]
 
@@ -224,12 +226,12 @@ def p_string_slice(p):
   p[0] = [p[1], p[3], p[5]]
 
 def p_left_element(p):
-  """ left_element : integer_expression
+  """ left_element : ICONST
   """
   p[0] = p[1]
 
 def p_right_element(p):
-  """ right_element : integer_expression
+  """ right_element : ICONST
   """
   p[0] = p[1]
 
@@ -283,7 +285,7 @@ def p_value_enumeration_name(p):
   """
   p[0] = p[1]
 
-# ######################################################
+########################  BLOCO 6  #############################
 
 def p_literal(p):
   """  literal : integer_literal
@@ -319,7 +321,7 @@ def p_character_string_literal(p):
   """
   p[0] = p[1]
 
-# ######################################################
+########################  BLOCO 7  #############################
 
 def p_value_array_element(p):
   """ value_array_element : array_primitive_value LBRACKET expression_list RBRACKET
@@ -376,7 +378,7 @@ def p_elsif_expression(p):
 
 
 
-# ######################################################
+########################  BLOCO 8  #############################
 
 def p_operand0(p):
   """ operand0 : operand1
@@ -390,8 +392,392 @@ def p_operator1(p):
   """
   p[0] = p[1]
 
+def p_relational_operator(p):
+  """ relational_operator : AND
+                          | OR
+                          | EQ
+                          | NEQ
+                          | GT
+                          | GE
+                          | LT
+                          | LE
+  """
+  p[0] = p[1]
+
+def p_membership_operator(p):
+  """ membership_operator : IN
+  """
+  p[0] = p[1]
+
+def p_operand1(p):
+  """ operand1 : operand2
+               | operand1 operator2 operand2
+  """
+  if len(p) == 2
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[2], p[3]]
+
+def p_operator2(p):
+  """ operator2 : arithmetic_additive_operator
+                | string_concatenation_operator
+  """
+  p[0] = p[1]
+  
+def p_arithmetic_additive_operator(p):
+  """ arithmetic_additive_operator : PLUS
+                                   | MINUS
+  """
+  p[0] = p[1]
+
+def p_string_concatenation_operator(p):
+  """ string_concatenation_operator : CONCAT
+  """
+  p[0] = p[1]
+
+def p_operand2(p):
+  """ operand2 : operand3
+               | operand2 arithmetic_multiplicative_operator operand3
+  """
+  if len(p) == 2
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[2], p[3]]
+
+def p_arithmetic_multiplicative_operator(p):
+  """ arithmetic_multiplicative_operator : TIMES
+                                         | DIVIDE
+                                         | MOD
+  """
+  p[0] = p[1]
+
+def p_operand3(p):
+  """ operand3 : monadic_operator operand4
+               | integer_literal
+  """
+  if len(p) == 2
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[2]]
+
+def p_monadic_operator(p):
+  """ monadic_operator : MINUS
+                       | NOT
+  """
+  p[0] = p[1]
+
+def p_operand4(p):
+  """ operand4 : location
+               | referenced_location
+               | primitive_value
+  """
+  p[0] = p[1]
+
+def p_referenced_location(p):
+  """ referenced_location : ARROW location
+  """
+  p[0] = p[2]
+########################### BLOCO 9 ##################################
+def p_action_statement(p):
+  """ action_statement : label_id COLON action SEMI
+                       | action SEMI
+  """
+  if len(p) == 3
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[3]]
+
+def p_label_id(p):
+  """ label_id : identifier
+  """
+  p[0] = p[1]
+
+def p_action(p):
+  """ action : bracketed_action
+             | assignment_action
+             | call_action
+             | exit_action
+             | return_action
+             | result_action
+  """
+  p[0] = p[1]
+
+def p_bracketed_action(p):
+  """ bracketed_action : if_action 
+                       | do_action
+  """
+  p[0] = p[1]
+
+def p_assignment_action(p):
+  """ assignment_action : location assigning_operator expression
+  """
+  p[0] = [p[1], p[2], p[3]]
+
+def p_assigning_operator(p):
+  """ assigning_operator : closed_dyadic_operator assignment_symbol
+  """
+  p[0] = [p[1], p[2]]
+
+def p_closed_dyadic_operator(p):
+  """ assigning_operator : arithmetic_additive_operator
+                         | arithmetic_multiplicative_operator
+                         | string_concatenation_operator
+  """
+  p[0] = p[1]
+
+########################### BLOCO 10 ##################################
+def p_if_action(p):
+  """ if_action : IF boolean_expression then_clause else_clause FI
+                | IF boolean_expression then_clause FI
+  """
+  if len(p) == 6
+    p[0] = [p[2], p[3], p[4]]
+  else
+    p[0] = [p[2], p[3]]
+    
+def p_then_clause(p):
+  """ then_clause : THEN action_statement_list
+  """
+  p[0] = p[2]
+  
+def p_else_clause(p):
+  """ else_clause : ELSE action_statement_list
+                  | ELSIF boolean_expression then_clause else_clause
+                  | ELSIF boolean_expression then_clause
+  """
+  if len(p) == 3
+    p[0] = p[2]
+  elif len(p) == 5
+    p[0] = [p[2], p[3], p[4]]
+  else
+    p[0] = [p[2], p[3]]
+
+########################### BLOCO 11 ##################################
+def p_do_action(p):
+  """ do_action : DO control_part SEMI action_statement_list OD
+                | DO action_statement_list OD
+  """
+  if len(p) == 4
+    p[0] = p[2]
+  else 
+    p[0] = [p[2], p[4]]
+
+def p_control_part(p):
+  """ control_part : for_control while_control
+                   | while_control
+  """
+  if len(p) == 2
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[2]]
+
+def p_for_control(p):
+  """ for_control : FOR iteration
+  """
+  p[0] = p[2]
+  
+def p_iteration(p):
+  """ iteration : step_enumeration
+                | range_enumeration
+  """  
+  p[0] = p[1]
+
+def p_step_enumeration(p):
+  """ step_enumeration : loop_counter ASSIGN start_value step_value DOWN end_value 
+                       | loop_counter ASSIGN start_value DOWN end_value
+                       | loop_counter ASSIGN start_value step_value end_value
+                       | loop_counter ASSIGN start_value end_value
+  """
+  if len(p) == 5
+    p[0] = [p[1], p[2], p[3], p[4]]
+  elif(p[4] == 'DOWN' and len(p) == 5)
+    p[0] = [p[1], p[2], p[3], p[5]]
+  elif len(p) == 5
+    p[0] = [p[1], p[2], p[3], p[4], p[5]]
+  else
+    p[0] = [p[1], p[2], p[3], p[4], p[6]]
+
+def p_loop_counter(p):
+  """ loop_counter : identifier
+  """
+  p[0] = p[1]
+
+def p_start_value(p):
+  """ start_value : discrete_expression
+  """ 
+  p[0] = p[1]
+
+def p_step_value(p):
+  """ step_value : BY ICONST
+  """ 
+  p[0] = p[2]
+
+def p_end_value(p):
+  """ end_value : TO discrete_expression
+  """
+  p[0] = p[2]
+  
+def p_discrete_expression(p):
+  """ discrete_expression : expression
+  """  
+  p[0] = p[1]
+  
+def p_range_enumeration(p):
+  """ range_enumeration : loop_counter DOWN IN discrete_mode_name
+                        | loop_counter IN discrete_mode_name
+  """  
+  if len(p) == 5
+    p[0] = [p[1], p[4]]
+  else
+    p[0] = [p[1], p[3]]
+    
+def p_while_control(p):
+  """ while_control : WHILE boolean_expression
+  """
+  p[0] = p[2]
+  
+########################### BLOCO 12 ##################################
+def p_call_action(p):
+  """ call_action : procedure_call
+                  | builtin_call
+  """
+  p[0] = p[1]
+
+def p_procedure_call(p):
+  """ procedure_call : procedure_name LPAREN parameter_list RPAREN
+                     | procedure_name LPAREN RPAREN
+  """
+  if len(p) == 4 
+    p[0] = [p[1], p[3]]
+  else 
+    p[0] = p[1]
+
+def p_parameter_list(p):
+  """ parameter_list : parameter
+                     | parameter_list COMMA parameter
+  """ 
+  p[0] = p[1]
+
+def p_parameter(p):
+  """ parameter : expression """
+  p[0] = p[1]
+
+def p_exit_action(p):
+  """ exit_action : EXIT label_id """
+  p[0] = p[2]
+
+def p_return_action(p):
+  """ return_action : RETURN result 
+                    | RETURN
+  """
+  if len(p) == 2 
+	p[0] = none
+  else 
+	p[0] = p[2]
+
+def p_result_action(p):
+  """ result_action : RESULT result """
+  p[0] = p[2]
+
+def p_result(p):
+  """ result : expression """
+  p[0] = p[1]
+
+def p_builtin_call(p):
+  """ builtin_call : builtin_name LPAREN parameter_list RPAREN
+                   | builtin_name LPAREN RPAREN
+  """
+  if len(p) == 4
+    p[0] = p[1]
+  else
+    p[0] = [p[1], p[3]]
+
+def p_builtin_name(p):
+  """ builtin_name : NUM
+                   | PRED
+                   | SUCC
+                   | UPPER
+                   | LOWER
+                   | LENGTH
+                   | READ
+                   | PRINT
+  """
+
+  p[0] = p[1]
+
+########################### BLOCO 13 ##################################
+def p_procedure_statement(p):
+  """ procedure_statement: label_id COLON procedure_definition SEMI """
+  p[0] = [p[1], p[3]]
+
+def p_procedure_definition(p):
+  """ procedure_definition: PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement action_statement_list END 
+                          | PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement END
+                          | PROC LPAREN RPAREN SEMI action_statement action_statement_list END
+                          | PROC LPAREN RPAREN SEMI action_statement END
+  """
+  if len(p) == 10
+    p[0] = [p[3], p[5], p[7], p[8]]
+  elif len(p) == 8
+    p[0] = [p[3], p[5], p[7]]
+  elif len(p) == 7 
+    p[0] = [p[5], p[6]]
+  else 
+    p[0] = p[5]
+
+def p_action_statement_list(p):
+  """ action_statement_list: action_statement
+                           | action_statement_list COMMA action_statement
+  """
+  if len(p) == 2 
+    p[0] = p[1]
+  else 
+    p[0] = [p[1], p[3]]
+
+def p_formal_parameter_list(p):
+  """ formal_parameter_list: formal_parameter
+                           | formal_parameter_list COMMA formal_parameter
+
+  """
+  if len(p) == 2 
+    p[0] = p[1]
+  else 
+    p[0] = [p[1], p[3]]
+
+def p_formal_parameter(p):
+  """ formal_parameter: identifier_list parameter_spec """
+  p[0] = [p[1], p[2]]
+
+def p_parameter_spec(p):
+  """ parameter_spec: mode attribute
+                    | mode
+  """
+  if len(p)== 2
+    p[0] = [p[1], p[2]]
+  else
+    p[0] = p[1]
+
+def p_result_spec(p):
+  """ result_spec: RETURNS LPAREN mode attribute RPAREN 
+                 | RETURNS LPAREN mode RPAREN
+  """
+  if len(p) == 4
+    p[0] = p[3]
+  else
+    p[0] = [p[3], p[4]]
+
+def p_attribute(p):
+  """ attribute: LOC """
+   p[0] = LOC(none)
 
 
+
+########################### BLOCO 14 ##################################
+#                                                                     #
+#                  No need, done in the lexer                         #
+#                                                                     #
+#######################################################################
+  
 # Error rule for syntax errors
 def p_error(p):
     print("Syntax error in input!")
