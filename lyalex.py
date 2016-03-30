@@ -192,29 +192,10 @@ t_ignore_COMMENT2 = r'\/\*(.|[\r\n])*?\*\/'
 t_ignore_COMMENT3 = r'\/\/.*'
 
 
-#Column Computation
-def find_column(input,token):
-    last_cr = input.rfind('\n',0,token.lexpos)
-    if last_cr < 0:
-	last_cr = 0
-    column = (token.lexpos - last_cr) + 1
-    return column
-
 #Error Unterminated string
 def t_error_USTRING(t):
     r'\"([^\\\n]|(\\.))*?'
     print("%s: Unterminated string" % t.lineno)
-    t.lexer.skip(1)
-
-#Error Unterminated comment
-def t_error_USLEFT(t):
-    r'\/\*(.|[\r\n])*?'
-    print("%s: Unterminated comment" % t.lineno)
-    t.lexer.skip(1)
-
-def t_error_USRIGHT(t):
-    r'(.|[\r\n])*?\*\/'
-    print("%s: Unterminated comment" % t.lineno)
     t.lexer.skip(1)
 
 #Error handling rule
@@ -222,7 +203,39 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
     
+#############################################################################
+#Check for unterminated strings
 
+states = (
+  ('COMMENT', 'exclusive'),
+)
+
+def t_COMMENT(t):
+    r'\/\*'
+    t.lexer.code_start = t.lineno   
+    t.lexer.push_state("COMMENT")
+
+def t_COMMENT_string(t):
+   r'\"([^\\\n]|(\\.))*?\"'
+   pass
+
+def t_COMMENT_char(t):
+   r'\"([^\\\n]|(\\.))*?\"'
+   pass
+
+t_COMMENT_ignore = " \t\n"
+
+def t_COMMENT_error(t):
+    t.lexer.skip(1)
+
+def t_COMMENT_end(t):
+    r'(.|[\r\n])*?\*\/'
+    t.lexer.pop_state()
+
+def t_COMMENT_eof(t):
+    print("%s: Unterminated comment" % t.lexer.code_start) 
+
+############################################################################
 
 
 #Build the lexer
