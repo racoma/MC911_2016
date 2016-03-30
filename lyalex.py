@@ -19,13 +19,12 @@ reserved = {
    'while' : 'WHILE',
    'syn' : 'SYN',
    'dcl' : 'DCL',
-   'print' : 'PRINT',
    'array' : 'ARRAY', 
    'by' : 'BY',
    'chars' : 'CHARS',
    'do' : 'DO',
    'down' : 'DOWN', 
-   'elseif' : 'ELSIF', 
+   'elsif' : 'ELSIF', 
    'end' : 'END', 
    'exit' : 'EXIT',
    'fi' : 'FI',
@@ -41,7 +40,23 @@ reserved = {
    'returns' : 'RETURNS',
    'syn' : 'SYN', 
    'to' : 'TO',
+}
+
+predefined = {
+   'bool': 'BOOL',
+   'char': 'CHAR',
+   'false': 'FALSE',
+   'int': 'INT',
+   'length': 'LENGTH',
    'lower': 'LOWER',
+   'null': 'NULL',
+   'num': 'NUM',
+   'pred': 'PRED',
+   'print': 'PRINT',
+   'read': 'READ',
+   'succ': 'SUCC',
+   'true': 'TRUE',
+   'upper': 'UPPER',
 }
 
 # List of token names.
@@ -94,7 +109,7 @@ tokens = [
    'LBRACE',
    'RBRACE',
    'USCORE',
-] + list(reserved.values())
+] + list(reserved.values()) + list(predefined.values())
 
 t_ACC  = r'\^'
 
