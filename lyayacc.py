@@ -13,13 +13,13 @@ from lyalex import tokens
 
 def p_program(p):
   """ program : statement_list """
-  p[0] = Program(p[1])
+  p[0] = p[1]
 
 def p_statement_list(p):
   """ statement_list : statement
                      | statement_list statement
   """
-  p[0] = Statement_list('none', [p[1]]) if len(p) == 2 else p[1] + [p[2]]
+  p[0] = [p[1]] if len(p) == 2 else p[1] + [p[2]]
 
 def p_statement(p):
   """ statement : declaration_statement
@@ -809,11 +809,3 @@ def p_error(p):
 # Build the parser
 parser = yacc.yacc()
 
-while True:
-   try:
-       s = raw_input('calc > ')
-   except EOFError:
-       break
-   if not s: continue
-   result = parser.parse(s)
-   print(result)
