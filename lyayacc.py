@@ -173,8 +173,8 @@ def p_string_length(p):
   p[0] = p[1]
 
 def p_array_mode(p):
-  """ array_mode : ARRAY LBRACKET index_mode RBRACKET
-                 | ARRAY LBRACKET index_mode COMMA index_mode_list RBRACKET
+  """ array_mode : ARRAY LBRACKET index_mode RBRACKET element_mode
+                 | ARRAY LBRACKET index_mode COMMA index_mode_list RBRACKET element_mode
   """
   p[0] = [p[3]] if len(p) == 5 else p[3] + [p[5]]
 
@@ -215,7 +215,7 @@ def p_dereferenced_reference(p):
   p[0] = p[1]
 
 def p_string_element(p):
-  """ string_element : string_location LBRACKET start_element COLON right_element RBRACKET
+  """ string_element : identifier LBRACKET start_element COLON ICONST RBRACKET
   """
   p[0] = [p[1], p[3], p[5]]
 
@@ -225,27 +225,12 @@ def p_start_element(p):
   p[0] = p[1]
 
 def p_string_slice(p):
-  """ string_slice : string_location LBRACKET left_element COLON right_element RBRACKET
+  """ string_slice : identifier LBRACKET ICONST COLON ICONST RBRACKET
   """
   p[0] = [p[1], p[3], p[5]]
 
-def p_string_location(p):
-  """ string_location : identifier
-  """
-  p[0] = p[1]
-
-def p_left_element(p):
-  """ left_element : ICONST
-  """
-  p[0] = p[1]
-
-def p_right_element(p):
-  """ right_element : ICONST
-  """
-  p[0] = p[1]
-
 def p_array_element(p):
-  """ array_element : string_location LBRACKET expression_list RBRACKET
+  """ array_element : identifier LBRACKET expression_list RBRACKET
   """
   p[0] = [p[1], p[3]]
 
@@ -359,7 +344,7 @@ def p_parenthesized_expression(p):
   p[0] = p[2]
 
 def p_expression(p):
-  """ expression : operand0
+  """ expression : binop
                  | conditional_expression
   """
   p[0] = p[1]
@@ -395,91 +380,42 @@ def p_elsif_expression(p):
 
 ########################  BLOCO 8  #############################
 
-def p_operand0(p):
-  """ operand0 : operand1
-               | operand0 operator1 operand1
-  """
-  p[0] = [p[1]] if len(p) == 2 else p[1] + [p[2], p[3]]
-
-def p_operator1(p):
-  """ operator1 : relational_operator
-                | membership_operator
-  """
-  p[0] = p[1]
-
-def p_relational_operator(p):
-  """ relational_operator : AND
-                          | OR
-                          | EQ
-                          | NEQ
-                          | GT
-                          | GE
-                          | LT
-                          | LE
-  """
-  p[0] = p[1]
-
-def p_membership_operator(p):
-  """ membership_operator : IN
-  """
-  p[0] = p[1]
-
-def p_operand1(p):
-  """ operand1 : operand2
-               | operand1 operator2 operand2
-  """
-  p[0] = p[1] if len(p) == 2 else [p[1], p[2], p[3]]
-
-def p_operator2(p):
-  """ operator2 : arithmetic_additive_operator
-                | string_concatenation_operator
-  """
-  p[0] = p[1]
-  
-def p_arithmetic_additive_operator(p):
-  """ arithmetic_additive_operator : PLUS
-                                   | MINUS
-  """
-  p[0] = p[1]
-
-def p_string_concatenation_operator(p):
-  """ string_concatenation_operator : CONCAT
-  """
-  p[0] = p[1]
-
-def p_operand2(p):
-  """ operand2 : operand3
-               | operand2 arithmetic_multiplicative_operator operand3
+def p_binop(p):
+  """ binop   : operand
+              | binop AND binop
+              | binop OR binop
+              | binop EQ binop
+              | binop NEQ binop
+              | binop GT binop
+              | binop GE binop
+              | binop LT binop
+              | binop LE binop
+              | binop PLUS binop
+              | binop MINUS binop
+              | binop TIMES binop
+              | binop DIVIDE binop
+              | binop MOD binop
+              | binop NOT binop
+              | binop IN binop
+              | binop CONCAT binop
   """
   if len(p) == 2:
-    p[0] = p[1]
+	p[0] = p[1]
   else:
-    p[0] = [p[1], p[2], p[3]]
+  	p[0] = [p[2], p[1], p[3]]
 
-def p_arithmetic_multiplicative_operator(p):
-  """ arithmetic_multiplicative_operator : TIMES
-                                         | DIVIDE
-                                         | MOD
-  """
-  p[0] = p[1]
-
-def p_operand3(p):
-  """ operand3 : monadic_operator operand4
-               | integer_literal
+def p_operand(p):
+  """ operand : MINUS operand1
+  	      | NOT operand1
+              | integer_literal
   """
   if len(p) == 2:
     p[0] = p[1]
   else:
     p[0] = [p[1], p[2]]
 
-def p_monadic_operator(p):
-  """ monadic_operator : MINUS
-                       | NOT
-  """
-  p[0] = p[1]
-
-def p_operand4(p):
-  """ operand4 : location
+def p_operand1(p):
+  """ operand1 : location
                | referenced_location
                | primitive_value
   """
@@ -489,6 +425,7 @@ def p_referenced_location(p):
   """ referenced_location : ARROW location
   """
   p[0] = p[2]
+  
 ########################### BLOCO 9 ##################################
 def p_action_statement(p):
   """ action_statement : label_id COLON action SEMI
@@ -505,18 +442,13 @@ def p_label_id(p):
   p[0] = p[1]
 
 def p_action(p):
-  """ action : bracketed_action
+  """ action : if_action
+  	     | do_action
              | assignment_action
              | call_action
              | exit_action
              | return_action
              | result_action
-  """
-  p[0] = p[1]
-
-def p_bracketed_action(p):
-  """ bracketed_action : if_action 
-                       | do_action
   """
   p[0] = p[1]
 
@@ -526,24 +458,17 @@ def p_assignment_action(p):
   p[0] = [p[1], p[2], p[3]]
 
 def p_assigning_operator(p):
-  """ assigning_operator : closed_dyadic_operator assignment_symbol
-                         | assignment_symbol
+  """ assigning_operator : PLUS ASSIGN
+                         | MINUS ASSIGN
+                         | TIMES ASSIGN
+                         | DIVIDE ASSIGN
+                         | MOD ASSIGN
+                         | CONCAT ASSIGN
+                         | ASSIGN
   """
   p[0] = [p[1], p[2]] if len(p) == 3 else p[1]
 
-def p_closed_dyadic_operator(p):
-  """ closed_dyadic_operator : arithmetic_additive_operator
-                         | arithmetic_multiplicative_operator
-                         | string_concatenation_operator
-  """
-  p[0] = p[1]
-
 ########################### BLOCO 10 ##################################
-
-def p_assignment_symbol(p):
-  """ assignment_symbol : ASSIGN
-  """
-  p[0] = p[2]
 
 def p_if_action(p):
   """ if_action : IF boolean_expression then_clause else_clause FI
@@ -800,6 +725,8 @@ def p_attribute(p):
 #                  No need, done in the lexer                         #
 #                                                                     #
 #######################################################################
+
+
   
 # Error rule for syntax errors
 def p_error(p):
