@@ -10,7 +10,7 @@
 import sys
 import ply.lex as lex
 
-f = open(sys.argv[-1])
+#f = open(sys.argv[-1])
 
 reserved = {
    'if' : 'IF',
@@ -40,9 +40,6 @@ reserved = {
    'returns' : 'RETURNS',
    'syn' : 'SYN', 
    'to' : 'TO',
-}
-
-predefined = {
    'bool': 'BOOL',
    'char': 'CHAR',
    'false': 'FALSE',
@@ -97,7 +94,7 @@ tokens = [
    'RPAREN',
    'LBRACKET',
    'RBRACKET',
-] + list(reserved.values()) + list(predefined.values())
+] + list(reserved.values())
 
 # Operators
 t_PLUS    = r'\+'
@@ -220,12 +217,9 @@ def t_COMMENT_eof(t):
 #Build the lexer
 lexer = lex.lex()
 
-lex.input(f.read())
 
-for tok in iter(lex.token, None):
-    print repr(tok.type), repr(tok.value)
-    
-    
-    
-    
+#lex.input(f.read())
+
+#for tok in iter(lex.token, None):
+ #  print repr(tok.type), repr(tok.value)
     
