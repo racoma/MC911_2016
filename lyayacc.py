@@ -5,8 +5,11 @@
 #                                                              #
 # ------------------------------------------------------------ #
 
+import sys
 import ply.yacc as yacc
 from lyalex import tokens
+
+f = open(sys.argv[-1])
 
 precedence = (
 	('left', 'CONCAT'),
@@ -30,7 +33,7 @@ def p_statement_list(p):
   """ statement_list : statement
                      | statement_list statement
   """
-  p[0] = [p[1]] if len(p) == 2 else p[1] + [p[2]]
+  p[0] = p[1] if len(p) == 2 else p[1] + [p[2]]
 
 def p_statement(p):
   """ statement : declaration_statement
@@ -45,7 +48,7 @@ def p_statement(p):
 
 def p_declaration_statement(p):
   ' declaration_statement : DCL declaration_list SEMI'
-  p[0] = DCL(p[2])
+  p[0] = [p[1], p[2], p[3]]
 
 def p_declaration_list(p):
   """ declaration_list : declaration
@@ -61,7 +64,7 @@ def p_declaration(p):
 
 def p_initialization(p):
   ' initialization : ASSIGN expression'
-  p[0] = ASSIGN(p[2])
+  p[0] = p[2]
 
 def p_identifier_list(p):
   """ identifier_list : identifier
@@ -71,13 +74,13 @@ def p_identifier_list(p):
 
 def p_identifier(p):
   ' identifier : ID '
-  p[0] = ID(p[1])
+  p[0] = p[1]
 
 ########################  BLOCO 3  #############################
 
 def p_synonym_statement(p):
   ' synonym_statement : SYN synonym_list SEMI'
-  p[0] = SYN(p[2])
+  p[0] = p[2]
 
 def p_synonym_list(p):
   """ synonym_list : synonym_definition
@@ -128,7 +131,7 @@ def p_discrete_mode(p):
   p[0] = p[1]
 
 def p_integer_mode(p):
-  ' integer_mode : ICONST '
+  ' integer_mode : INT '
   p[0] = p[1]
 
 def p_boolean_mode(p):
@@ -533,8 +536,8 @@ def p_procedure_call(p):
     p[0] = p[1]
 
 def p_parameter_list(p):
-  """ parameter_list : expression
-                     | parameter_list COMMA expression
+  """ parameter_list : identifier
+                     | parameter_list COMMA identifier
   """ 
   p[0] = p[1]
 
@@ -622,17 +625,28 @@ def p_parameter_spec(p):
   """ parameter_spec : mode LOC
                      | mode
   """
-  if len(p)== 2:
+  if len(p)== 3:
     p[0] = [p[1], p[2]]
   else:
     p[0] = p[1]
 
+####################################### AST ###############################################
+
+
+	 
+
+###########################################################################################
   
 # Error rule for syntax errors
 def p_error(p):
-    print("Syntax error in input!")
-
+    if p:
+    	print("Syntax error at '%s'" % repr(p))
+    	#print "Syntax error at token ", p.type
+    	print "\n"
+    	parser.errok()
+   
 
 # Build the parser
 parser = yacc.yacc()
 
+yacc.parse(f.read(),tracking=True)
