@@ -62,8 +62,6 @@ predefined = {
 # List of token names.
 tokens = [
 
-'ACC',
-
 # Literals
    'ICONST',
    'CCONST',
@@ -90,13 +88,6 @@ tokens = [
    
 # Assignments
    'ASSIGN',
-   'TIMESEQUAL',
-   'DIVEQUAL',
-   'MODEQUAL',
-   'PLUSEQUAL',
-   'MINUSEQUAL',
-   'CONCATEQUAL',
-
 
 # Delimiters
    'SEMI',
@@ -106,12 +97,7 @@ tokens = [
    'RPAREN',
    'LBRACKET',
    'RBRACKET',
-   'LBRACE',
-   'RBRACE',
-   'USCORE',
 ] + list(reserved.values()) + list(predefined.values())
-
-t_ACC  = r'\^'
 
 # Operators
 t_PLUS    = r'\+'
@@ -135,12 +121,6 @@ t_CONCAT  = r'&'
 
 # Assignments
 t_ASSIGN  = r'='
-t_TIMESEQUAL = r'\*='
-t_DIVEQUAL = r'\/='
-t_MODEQUAL = r'\%='
-t_PLUSEQUAL = r'\+='
-t_MINUSEQUAL = r'\-='
-t_CONCATEQUAL = r'\&='
 
 # Dividers
 t_SEMI    = r';'
@@ -150,7 +130,6 @@ t_LPAREN  = r'\('
 t_RPAREN  = r'\)'
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
-t_USCORE  = r'_'
 
 
 def t_ID(t):
