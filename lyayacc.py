@@ -47,7 +47,9 @@ def p_statement(p):
 ########################  BLOCO 2  #############################
 
 def p_declaration_statement(p):
-  ' declaration_statement : DCL declaration_list SEMI'
+  """ declaration_statement : DCL declaration_list SEMI
+  			    | identifier initialization SEMI
+  """
   p[0] = [p[1], p[2], p[3]]
 
 def p_declaration_list(p):
@@ -351,7 +353,8 @@ def p_binop(p):
 def p_operand(p):
   """ operand : MINUS operand1
   	      | NOT operand1
-              | ICONST
+              | primitive_value
+              | identifier
   """
   if len(p) == 2:
     p[0] = p[1]
@@ -419,16 +422,23 @@ def p_if_action(p):
     p[0] = [p[2], p[3]]
     
 def p_then_clause(p):
-  """ then_clause : THEN action_statement_list
+  """ then_clause : THEN action_statement
+  		  | THEN 
   """
-  p[0] = p[2]
+  if len(p) == 3:
+    p[0] = [p[1], p[2]]
+  else:
+    p[0] = p[1]
   
 def p_else_clause(p):
-  """ else_clause : ELSE action_statement_list
+  """ else_clause : ELSE action_statement
+  		  | ELSE
                   | ELSIF boolean_expression then_clause else_clause
                   | ELSIF boolean_expression then_clause
   """
-  if len(p) == 3:
+  if len(p) == 2:
+    p[0] = p[1]
+  elif len(p) == 3:
     p[0] = p[2]
   elif len(p) == 5:
     p[0] = [p[2], p[3], p[4]]
@@ -437,11 +447,14 @@ def p_else_clause(p):
 
 ########################### BLOCO 11 ##################################
 def p_do_action(p):
-  """ do_action : DO control_part SEMI action_statement_list OD
-                | DO action_statement_list OD
+  """ do_action : DO control_part SEMI action_statement OD
+                | DO control_part SEMI OD
+                | DO action_statement OD
   """
   if len(p) == 4:
-    p[0] = p[2]
+    p[0] = [p[1], p[2], p[3]]
+  elif len(p) == 5:
+    p[0] = [p[1], p[2], p[3], p[4]]
   else:
     p[0] = [p[2], p[4]]
 
@@ -536,8 +549,8 @@ def p_procedure_call(p):
     p[0] = p[1]
 
 def p_parameter_list(p):
-  """ parameter_list : identifier
-                     | parameter_list COMMA identifier
+  """ parameter_list : expression
+                     | parameter_list COMMA expression
   """ 
   p[0] = p[1]
 
@@ -586,22 +599,17 @@ def p_procedure_statement(p):
   p[0] = [p[1], p[3]]
 
 def p_procedure_definition(p):
-  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement_list END 
-                           | PROC LPAREN RPAREN SEMI action_statement_list END
+  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
+  			   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+                           | PROC LPAREN RPAREN SEMI statement_list END
   """
-  if len(p) == 8:
+  if len(p) == 9:
     p[0] = [p[1], p[3], p[5], p[7], p[8]]
+  elif len(p) == 8:
+    p[0] = [p[1], p[3], p[6]]
   else:
     p[0] = [p[1], p[5], p[6]]
 
-def p_action_statement_list(p):
-  """ action_statement_list : action_statement
-                            | action_statement_list COMMA action_statement
-  """
-  if len(p) == 2:
-    p[0] = p[1]
-  else:
-    p[0] = [p[1], p[3]]
 
 def p_formal_parameter_list(p):
   """ formal_parameter_list : formal_parameter
@@ -640,11 +648,21 @@ def p_parameter_spec(p):
 # Error rule for syntax errors
 def p_error(p):
     if p:
-    	print("Syntax error at '%s'" % repr(p))
+   	print("Syntax error at '%s'" % repr(p))
     	#print "Syntax error at token ", p.type
     	print "\n"
     	parser.errok()
    
+#def p_error(p):
+ #   if p:
+ #	print("Syntax error at '%s'" % repr(p))
+  #	print "\n"
+    # Read ahead looking for a terminating ";"
+   # while 1:
+    #    tok = parser.token()             # Get the next token
+     #   if not tok or tok.type == 'SEMI': break
+   # parser.errok()
+
 
 # Build the parser
 parser = yacc.yacc()
