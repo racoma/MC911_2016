@@ -8,6 +8,17 @@
 import ply.yacc as yacc
 from lyalex import tokens
 
+precedence = (
+	('left', 'CONCAT'),
+	('left', 'NOT'),
+	('left', 'IN'),
+        ('left', 'OR'),
+        ('left', 'AND'),
+        ('left', 'EQ', 'NEQ'),
+        ('left', 'GT', 'GE', 'LT', 'LE'),
+        ('left', 'PLUS', 'MINUS'),
+        ('left', 'TIMES', 'DIVIDE', 'MOD')
+    )
 
 ########################  BLOCO 1  #############################
 
@@ -143,16 +154,8 @@ def p_discrete_mode_name(p):
   p[0] = p[1]
 
 def p_literal_range(p):
-  ' literal_range : lower_bound COLON upper_bound '
+  ' literal_range : ICONST COLON ICONST '
   p[0] = [p[1], p[3]]
-
-def p_lower_bound(p):
-  ' lower_bound : integer_literal '
-  p[0] = p[1]
-
-def p_upper_bound(p):
-  ' upper_bound : integer_literal '
-  p[0] = p[1]
 
 def p_reference_mode(p):
   ' reference_mode : REF mode '
@@ -169,7 +172,7 @@ def p_string_mode(p):
   p[0] = p[3]
 
 def p_string_length(p):
-  ' string_length : integer_literal '
+  ' string_length : ICONST '
   p[0] = p[1]
 
 def p_array_mode(p):
@@ -197,10 +200,8 @@ def p_element_mode(p):
 
 
 ########################  BLOCO 5  #############################
-
 def p_location(p):
-  """ location : identifier
-               | dereferenced_reference
+  """ location : dereferenced_reference
                | string_element
                | string_slice
                | array_element
@@ -215,14 +216,9 @@ def p_dereferenced_reference(p):
   p[0] = p[1]
 
 def p_string_element(p):
-  """ string_element : identifier LBRACKET start_element COLON ICONST RBRACKET
+  """ string_element : identifier LBRACKET ICONST RBRACKET
   """
   p[0] = [p[1], p[3], p[5]]
-
-def p_start_element(p):
-  """ start_element : ICONST
-  """
-  p[0] = p[1]
 
 def p_string_slice(p):
   """ string_slice : identifier LBRACKET ICONST COLON ICONST RBRACKET
@@ -230,7 +226,7 @@ def p_string_slice(p):
   p[0] = [p[1], p[3], p[5]]
 
 def p_array_element(p):
-  """ array_element : identifier LBRACKET expression_list RBRACKET
+  """ array_element : location LBRACKET expression_list RBRACKET
   """
   p[0] = [p[1], p[3]]
 
@@ -241,24 +237,9 @@ def p_expression_list(p):
   p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
 def p_array_slice(p):
-  """ array_slice : array_location LBRACKET lower_element COLON upper_element RBRACKET
+  """ array_slice : location LBRACKET ICONST COLON
   """
   p[0] = [p[1], p[3], p[5]]
-
-def p_array_location(p):
-  """ array_location : location
-  """
-  p[0] = p[1]
-
-def p_lower_element(p):
-  """ lower_element : expression
-  """
-  p[0] = p[1]
-
-def p_upper_element(p):
-  """ upper_element : expression
-  """
-  p[0] = p[1]
 
 ########################  BLOCO 6  #############################
 
@@ -271,54 +252,14 @@ def p_primitive_value(p):
   p[0] = p[1]
 
 def p_literal(p):
-  """  literal : integer_literal
-               | boolean_literal
-               | character_literal
-               | empty_literal
-               | character_string_literal
+  """  literal : ICONST
+               | FALSE
+               | TRUE
+               | CCONST
+               | NULL
+               | SCONST
   """
   p[0] = p[1]
-
-def p_integer_literal(p):
-  ' integer_literal : ICONST '
-  p[0] = p[1]
-
-def p_boolean_literal(p):
-  """ boolean_literal : FALSE
-                      | TRUE
-  """
-  p[0] = p[1]
-
-def p_character_literal(p):
-  """ character_literal : CCONST
-  """
-  p[0] = p[1]
-
-def p_empty_literal(p):
-  """ empty_literal : NULL
-  """
-  p[0] = None
-
-def p_character_string_literal(p):
-  """ character_string_literal : SCONST
-  """
-  p[0] = p[1]
-
-# def p_location_contents(p):
-#   """ location_contents : location
-#   """
-#   p[0] = p[1]
-
-# def p_value_name(p):
-#   """ value_name : synonym_name
-#                  | value_enumeration_name
-#   """
-#   p[0] = p[1]
-
-# def p_value_enumeration_name(p):
-#   """ value_enumeration_name : identifier
-#   """
-#   p[0] = p[1]
 
 
 ########################  BLOCO 7  #############################
@@ -329,7 +270,7 @@ def p_value_array_element(p):
   p[0] = [p[1], p[3]]
 
 def p_value_array_slice(p):
-  """ value_array_slice : array_primitive_value LBRACKET lower_element COLON upper_element RBRACKET
+  """ value_array_slice : array_primitive_value LBRACKET expression COLON expression RBRACKET
   """
   p[0] = [p[1], p[3], p[5]]
 
@@ -407,7 +348,7 @@ def p_binop(p):
 def p_operand(p):
   """ operand : MINUS operand1
   	      | NOT operand1
-              | integer_literal
+              | ICONST
   """
   if len(p) == 2:
     p[0] = p[1]
@@ -428,18 +369,13 @@ def p_referenced_location(p):
   
 ########################### BLOCO 9 ##################################
 def p_action_statement(p):
-  """ action_statement : label_id COLON action SEMI
+  """ action_statement : identifier COLON action SEMI
                        | action SEMI
   """
   if len(p) == 3:
     p[0] = p[1]
   else:
     p[0] = [p[1], p[3]]
-
-def p_label_id(p):
-  """ label_id : identifier
-  """
-  p[0] = p[1]
 
 def p_action(p):
   """ action : if_action
@@ -588,8 +524,8 @@ def p_call_action(p):
   p[0] = p[1]
 
 def p_procedure_call(p):
-  """ procedure_call : procedure_name LPAREN parameter_list RPAREN
-                     | procedure_name LPAREN RPAREN
+  """ procedure_call : identifier LPAREN parameter_list RPAREN
+                     | identifier LPAREN RPAREN
   """
   if len(p) == 4:
     p[0] = [p[1], p[3]]
@@ -597,25 +533,17 @@ def p_procedure_call(p):
     p[0] = p[1]
 
 def p_parameter_list(p):
-  """ parameter_list : parameter
-                     | parameter_list COMMA parameter
+  """ parameter_list : expression
+                     | parameter_list COMMA expression
   """ 
   p[0] = p[1]
 
-def p_parameter(p):
-  """ parameter : expression """
-  p[0] = p[1]
-
-def p_procedure_name(p):
-  """ procedure_name : identifier """
-  p[0] = p[1]
-
 def p_exit_action(p):
-  """ exit_action : EXIT label_id """
-  p[0] = p[2]
+  """ exit_action : EXIT identifier """
+  p[0] = [p[1], p[2]]
 
 def p_return_action(p):
-  """ return_action : RETURN result 
+  """ return_action : RETURN expression 
                     | RETURN
   """
   if len(p) == 2:
@@ -624,12 +552,8 @@ def p_return_action(p):
 	p[0] = p[2]
 
 def p_result_action(p):
-  """ result_action : RESULT result """
-  p[0] = p[2]
-
-def p_result(p):
-  """ result : expression """
-  p[0] = p[1]
+  """ result_action : RESULT expression """
+  p[0] = [p[1], p[2]]
 
 def p_builtin_call(p):
   """ builtin_call : builtin_name LPAREN parameter_list RPAREN
@@ -655,27 +579,21 @@ def p_builtin_name(p):
 
 ########################### BLOCO 13 ##################################
 def p_procedure_statement(p):
-  """ procedure_statement : label_id COLON procedure_definition SEMI """
+  """ procedure_statement : identifier COLON procedure_definition SEMI """
   p[0] = [p[1], p[3]]
 
 def p_procedure_definition(p):
-  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement action_statement_list END 
-                          | PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement END
-                          | PROC LPAREN RPAREN SEMI action_statement action_statement_list END
-                          | PROC LPAREN RPAREN SEMI action_statement END
+  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI action_statement_list END 
+                           | PROC LPAREN RPAREN SEMI action_statement_list END
   """
-  if len(p) == 10:
-    p[0] = [p[3], p[5], p[7], p[8]]
-  elif len(p) == 8:
-    p[0] = [p[3], p[5], p[7]]
-  elif len(p) == 7:
-    p[0] = [p[5], p[6]]
+  if len(p) == 8:
+    p[0] = [p[1], p[3], p[5], p[7], p[8]]
   else:
-    p[0] = p[5]
+    p[0] = [p[1], p[5], p[6]]
 
 def p_action_statement_list(p):
   """ action_statement_list : action_statement
-                           | action_statement_list COMMA action_statement
+                            | action_statement_list COMMA action_statement
   """
   if len(p) == 2:
     p[0] = p[1]
@@ -684,7 +602,7 @@ def p_action_statement_list(p):
 
 def p_formal_parameter_list(p):
   """ formal_parameter_list : formal_parameter
-                           | formal_parameter_list COMMA formal_parameter
+                            | formal_parameter_list COMMA formal_parameter
 
   """
   if len(p) == 2:
@@ -696,36 +614,18 @@ def p_formal_parameter(p):
   """ formal_parameter : identifier_list parameter_spec """
   p[0] = [p[1], p[2]]
 
+def p_result_spec(p):
+  """ result_spec : RETURNS LPAREN parameter_spec RPAREN """
+  p[0] = [p[1], p[3]]
+    
 def p_parameter_spec(p):
-  """ parameter_spec : mode attribute
-                    | mode
+  """ parameter_spec : mode LOC
+                     | mode
   """
   if len(p)== 2:
     p[0] = [p[1], p[2]]
   else:
     p[0] = p[1]
-
-def p_result_spec(p):
-  """ result_spec : RETURNS LPAREN mode attribute RPAREN 
-                 | RETURNS LPAREN mode RPAREN
-  """
-  if len(p) == 4:
-    p[0] = p[3]
-  else:
-    p[0] = [p[3], p[4]]
-
-def p_attribute(p):
-  """ attribute : LOC """
-  p[0] = LOC(None)
-
-
-
-########################### BLOCO 14 ##################################
-#                                                                     #
-#                  No need, done in the lexer                         #
-#                                                                     #
-#######################################################################
-
 
   
 # Error rule for syntax errors
