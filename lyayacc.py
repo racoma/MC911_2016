@@ -8,6 +8,7 @@
 import sys
 import ply.yacc as yacc
 from lyalex import tokens
+import ast
 
 f = open(sys.argv[-1])
 
@@ -27,13 +28,17 @@ precedence = (
 
 def p_program(p):
   """ program : statement_list """
-  p[0] = p[1]
+  p[0] = Program(p[1])
 
 def p_statement_list(p):
   """ statement_list : statement
                      | statement_list statement
   """
-  p[0] = p[1] if len(p) == 2 else p[1] + [p[2]]
+  if len(p) == 2:
+    p[0] = Statement_list([p[1]])
+  else:
+    p[1].statements.append(p[2])
+    p[0] = p[1]
 
 def p_statement(p):
   """ statement : declaration_statement
@@ -50,7 +55,7 @@ def p_declaration_statement(p):
   """ declaration_statement : DCL declaration_list SEMI
   			    | identifier initialization SEMI
   """
-  p[0] = [p[1], p[2], p[3]]
+  p[0] = DCL_statement([p[1], p[2], p[3]])
 
 def p_declaration_list(p):
   """ declaration_list : declaration
@@ -62,7 +67,7 @@ def p_declaration(p):
   """ declaration : identifier_list mode initialization
                   | identifier_list mode
   """
-  p[0] = [p[1], p[2]] if len(p) == 3 else [p[1], p[2], p[3]]
+  p[0] = Declaration(p[1], p[2]) if len(p) == 3 else Declaration(p[1], p[2], p[3])
 
 def p_initialization(p):
   ' initialization : ASSIGN expression'
@@ -664,7 +669,173 @@ def p_error(p):
    # parser.errok()
 
 
+class Node(object):
+    __slots__ = ()
+    """ Abstract base class for AST nodes.
+    """
+    def children(self):
+        """ A sequence of all children that are Nodes
+        """
+        pass
+
+    def show(self, buf=sys.stdout, offset=0, attrnames=False, nodenames=False, showcoord=False, _my_node_name=None):
+        """ Pretty print the Node and all its attributes and
+            children (recursively) to a buffer.
+
+            buf:
+                Open IO buffer into which the Node is printed.
+
+            offset:
+                Initial offset (amount of leading spaces)
+
+            attrnames:
+                True if you want to see the attribute names in
+                name=value pairs. False to only see the values.
+
+            nodenames:
+                True if you want to see the actual node names
+                within their parents.
+
+            showcoord:
+                Do you want the coordinates of each Node to be
+                displayed.
+        """
+        lead = ' ' * offset
+        if nodenames and _my_node_name is not None:
+            buf.write(lead + self.__class__.__name__+ ' <' + _my_node_name + '>: ')
+        else:
+            buf.write(lead + self.__class__.__name__+ ': ')
+
+        if self.attr_names:
+            if attrnames:
+                nvlist = [(n, getattr(self,n)) for n in self.attr_names]
+                attrstr = ', '.join('%s=%s' % nv for nv in nvlist)
+            else:
+                vlist = [getattr(self, n) for n in self.attr_names]
+                attrstr = ', '.join('%s' % v for v in vlist)
+            buf.write(attrstr)
+
+        if showcoord:
+            buf.write(' (at %s)' % self.coord)
+        buf.write('\n')
+
+        for (child_name, child) in self.children():
+            child.show(
+                buf,
+                offset=offset + 2,
+                attrnames=attrnames,
+                nodenames=nodenames,
+                showcoord=showcoord,
+                _my_node_name=child_name)
+
+
+class NodeVisitor(object):
+    """ A base NodeVisitor class for visiting c_ast nodes.
+        Subclass it and define your own visit_XXX methods, where
+        XXX is the class name you want to visit with these
+        methods.
+
+        For example:
+
+        class ConstantVisitor(NodeVisitor):
+            def __init__(self):
+                self.values = []
+
+            def visit_Constant(self, node):
+                self.values.append(node.value)
+
+        Creates a list of values of all the constant nodes
+        encountered below the given node. To use it:
+
+        cv = ConstantVisitor()
+        cv.visit(node)
+
+        Notes:
+
+        *   generic_visit() will be called for AST nodes for which
+            no visit_XXX method was defined.
+        *   The children of nodes for which a visit_XXX was
+            defined will not be visited - if you need this, call
+            generic_visit() on the node.
+            You can use:
+                NodeVisitor.generic_visit(self, node)
+        *   Modeled after Python's own AST visiting facilities
+            (the ast module of Python 3.0)
+    """
+
+    def visit(self, node):
+        """ Visit a node.
+        """
+        method = 'visit_' + node.__class__.__name__
+        visitor = getattr(self, method, self.generic_visit)
+        return visitor(node)
+
+    def generic_visit(self, node):
+        """ Called if no explicit visitor function exists for a
+            node. Implements preorder visiting of the node.
+        """
+        for c_name, c in node.children():
+            self.visit(c)
+
+
+class Expr: pass
+
+class Program(Node):
+    def __init__(self, statement_list):
+        self.type = "program"
+        self.statement_list = statement_list
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
+      return tuple(nodelist)
+
+class Statement_list(Node):
+    def __init__(self, statements):
+        self.type = "statement_list"
+        self.statements = statements
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.statements or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+        
+class Statement(Node):
+    def __init__(self, statement):
+        self.type = "statement"
+        self.statement = statement
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.statement is not None: nodelist.append(("statement", self.statement))
+      return tuple(nodelist)
+        
+class DCL_statement(Node):
+    def __init__(self, declaration_list):
+        self.type = "DCL_statement"
+        self.declaration_list = declaration_list
+    attr_names = ()
+        
+class DCL_list(Node):
+    def __init__(self, declaration_list, declaration):
+        self.type = "DCL_list"
+        self.declaration_list = declaration_list
+        self.declaration = declaration
+
+class Declaration(Node):
+    def __init__(self, identifier_list, mode, initialization=None):
+        self.type = "Declaration"
+        self.identifier_list = identifier_list
+        self.mode = mode
+        self.initialization = initialization
+
 # Build the parser
 parser = yacc.yacc()
 
-yacc.parse(f.read(),tracking=True)
+p = parser.parse(f.read(),tracking=True)
+
+p.show()
