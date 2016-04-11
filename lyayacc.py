@@ -53,9 +53,11 @@ def p_statement(p):
 
 def p_declaration_statement(p):
   """ declaration_statement : DCL declaration_list SEMI
-  			    | identifier initialization SEMI
   """
-  p[0] = DCL_statement([p[1], p[2], p[3]])
+  if len(p) == 4:
+    p[0] = DCL_statement(p[2])
+  else:
+    p[0] = DCL_statement(p[2])
 
 def p_declaration_list(p):
   """ declaration_list : declaration
@@ -81,7 +83,7 @@ def p_identifier_list(p):
 
 def p_identifier(p):
   ' identifier : ID '
-  p[0] = p[1]
+  p[0] = ID(p[1])
 
 ########################  BLOCO 3  #############################
 
@@ -103,7 +105,7 @@ def p_synonym_definition(p):
 
 def p_constant_expression(p):
   ' constant_expression : expression'
-  p[0] = p[1]
+  p[0] = Constant(p[1])
 
 ########################  BLOCO 4  #############################
 
@@ -118,8 +120,8 @@ def p_newmode_list(p):
   p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
 def p_mode_definition(p):
-  ' mode_definition : identifier_list ASSIGN mode '
-  p[0] = [p[1], p[3]]
+  ' mode_definition : identifier_list mode '
+  p[0] = [p[1], p[2]]
 
 def p_mode(p):
   """ mode : mode_name
@@ -127,7 +129,7 @@ def p_mode(p):
            | reference_mode
            | composite_mode
   """
-  p[0] = p[1]
+  p[0] = Mode(p[1])
 
 def p_discrete_mode(p):
   """ discrete_mode : integer_mode
@@ -135,7 +137,7 @@ def p_discrete_mode(p):
                     | character_mode
                     | discrete_range_mode
   """
-  p[0] = p[1]
+  p[0] = DiscreteMode(p[1])
 
 def p_integer_mode(p):
   ' integer_mode : INT '
@@ -247,7 +249,7 @@ def p_expression_list(p):
   p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
 def p_array_slice(p):
-  """ array_slice : location LBRACKET ICONST COLON
+  """ array_slice : location LBRACKET ICONST COLON ICONST RBRACKET
   """
   p[0] = [p[1], p[3], p[5]]
 
@@ -269,7 +271,7 @@ def p_literal(p):
                | NULL
                | SCONST
   """
-  p[0] = p[1]
+  p[0] = Constant(p[1])
 
 
 ########################  BLOCO 7  #############################
@@ -298,7 +300,7 @@ def p_expression(p):
   """ expression : binop
                  | conditional_expression
   """
-  p[0] = p[1]
+  p[0] = Expr(p[1])
 
 def p_conditional_expression(p):
   """ conditional_expression : IF boolean_expression then_expression else_expression FI
@@ -351,9 +353,9 @@ def p_binop(p):
               | binop CONCAT binop
   """
   if len(p) == 2:
-	p[0] = p[1]
+	 p[0] = p[1]
   else:
-  	p[0] = [p[2], p[1], p[3]]
+  	p[0] = Binop(p[2], p[1], p[3])
 
 def p_operand(p):
   """ operand : MINUS operand1
@@ -384,9 +386,9 @@ def p_action_statement(p):
                        | action SEMI
   """
   if len(p) == 3:
-    p[0] = p[1]
+    p[0] = ActionStmt(None, p[1])
   else:
-    p[0] = [p[1], p[3]]
+    p[0] = ActionStmt(p[1], p[3])
 
 def p_action(p):
   """ action : if_action
@@ -401,8 +403,9 @@ def p_action(p):
 
 def p_assignment_action(p):
   """ assignment_action : location assigning_operator expression
+                        | identifier assigning_operator expression
   """
-  p[0] = [p[1], p[2], p[3]]
+  p[0] = Assignment(p[1], p[2], p[3])
 
 def p_assigning_operator(p):
   """ assigning_operator : PLUS ASSIGN
@@ -601,19 +604,19 @@ def p_builtin_name(p):
 ########################### BLOCO 13 ##################################
 def p_procedure_statement(p):
   """ procedure_statement : identifier COLON procedure_definition SEMI """
-  p[0] = [p[1], p[3]]
+  p[0] = Procedure(p[1], p[3])
 
 def p_procedure_definition(p):
   """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
-  			   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+  			                   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
-    p[0] = [p[1], p[3], p[5], p[7], p[8]]
+    p[0] = ProcDef(p[3], p[5], p[7])
   elif len(p) == 8:
-    p[0] = [p[1], p[3], p[6]]
+    p[0] = ProcDef(p[3], None, p[6])
   else:
-    p[0] = [p[1], p[5], p[6]]
+    p[0] = ProcDef(None, p[5], None)
 
 
 def p_formal_parameter_list(p):
@@ -622,13 +625,13 @@ def p_formal_parameter_list(p):
 
   """
   if len(p) == 2:
-    p[0] = p[1]
+    p[0] = [p[1]]
   else:
-    p[0] = [p[1], p[3]]
+    p[0] = p[1] + p[3]
 
 def p_formal_parameter(p):
   """ formal_parameter : identifier_list parameter_spec """
-  p[0] = [p[1], p[2]]
+  p[0] = FormalParam(p[1], p[2])
 
 def p_result_spec(p):
   """ result_spec : RETURNS LPAREN parameter_spec RPAREN """
@@ -778,7 +781,7 @@ class NodeVisitor(object):
             self.visit(c)
 
 
-class Expr: pass
+# class Expr: pass
 
 class Program(Node):
     def __init__(self, statement_list):
@@ -815,16 +818,17 @@ class Statement(Node):
       return tuple(nodelist)
         
 class DCL_statement(Node):
-    def __init__(self, declaration_list):
+    def __init__(self, declarations):
         self.type = "DCL_statement"
-        self.declaration_list = declaration_list
+        self.declarations = declarations
     attr_names = ()
-        
-class DCL_list(Node):
-    def __init__(self, declaration_list, declaration):
-        self.type = "DCL_list"
-        self.declaration_list = declaration_list
-        self.declaration = declaration
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.declarations or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+      
 
 class Declaration(Node):
     def __init__(self, identifier_list, mode, initialization=None):
@@ -832,6 +836,151 @@ class Declaration(Node):
         self.identifier_list = identifier_list
         self.mode = mode
         self.initialization = initialization
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.identifier_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      if self.initialization is not None: nodelist.append(("initialization", self.initialization))
+      if self.mode is not None: nodelist.append(("mode", self.mode))
+      return tuple(nodelist)
+
+class ID(Node):
+    def __init__(self, char):
+        self.type = "ID"
+        self.char = char
+    attr_names = ("char",)
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+class Mode(Node):
+    def __init__(self, mode):
+        self.type = "Mode"
+        self.mode = mode
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.mode is not None: nodelist.append(("mode", self.mode))
+        return tuple(nodelist)
+
+class DiscreteMode(Node):
+    def __init__(self, mode):
+        self.type = "DiscreteMode"
+        self.mode = mode
+    attr_names = ("mode",)
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+class Expr(Node):
+    def __init__(self, exp):
+        self.type = "Expr"
+        self.exp = exp
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.exp is not None: nodelist.append(("exp", self.exp))
+        return tuple(nodelist)
+
+class Constant(Node):
+    def __init__(self, exp):
+        self.type = "Constant"
+        self.exp = exp
+    attr_names = ("exp",)
+
+    def children(self):
+        nodelist = []
+        return tuple(nodelist)
+
+class Procedure(Node):
+    def __init__(self, identifier, procedure):
+        self.type = "Procedure"
+        self.identifier = identifier
+        self.procedure = procedure
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.identifier is not None: nodelist.append(("identifier", self.identifier))
+        if self.procedure is not None: nodelist.append(("procedure", self.procedure))
+        return tuple(nodelist)
+
+class ProcDef(Node):
+    def __init__(self, formal_parameter_list, result_spec, statement_list):
+        self.type = "Procedure"
+        self.formal_parameter_list = formal_parameter_list
+        self.result_spec = result_spec
+        self.statement_list = statement_list
+
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
+        for i, child in enumerate(self.formal_parameter_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+        return tuple(nodelist)
+
+class FormalParam(Node):
+    def __init__(self, id_list, param_spec):
+        self.type = "formal_param"
+        self.id_list = id_list
+        self.param_spec = param_spec
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.id_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      if self.param_spec is not None: nodelist.append(("param_spec", self.param_spec))
+      return tuple(nodelist)
+
+class ActionStmt(Node):
+    def __init__(self, identifier, action):
+        self.type = "action_statement"
+        self.identifier = identifier
+        self.action = action
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.identifier is not None: nodelist.append(("identifier", self.identifier))
+      if self.action is not None: nodelist.append(("action", self.action))
+      return tuple(nodelist)
+
+class Assignment(Node):
+    def __init__(self, location, op, expr):
+        self.type = "assignment"
+        self.location = location
+        self.op = op
+        self.expr = expr
+    attr_names = ("op",)
+
+    def children(self):
+      nodelist = []
+      if self.location is not None: nodelist.append(("location", self.location))
+      if self.expr is not None: nodelist.append(("expr", self.expr))
+      return tuple(nodelist)
+
+class Binop(Node):
+    def __init__(self, op, left, right):
+        self.type = "assignment"
+        self.left = left
+        self.op = op
+        self.right = right
+    attr_names = ("op",)
+
+    def children(self):
+      nodelist = []
+      if self.left is not None: nodelist.append(("left", self.left))
+      if self.right is not None: nodelist.append(("right", self.right))
+      return tuple(nodelist)
 
 # Build the parser
 parser = yacc.yacc()

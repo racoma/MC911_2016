@@ -8,22 +8,3 @@ g: proc (t int);
    z = z + x + y;
    print(z);
 end;
-
-h: proc (y int);
-  dcl x int;  
-  f: proc (y int);
-    dcl t int;
-    t = z + x + y;
-    g(t);
-    z = t;
-  end;  
-  x = y + 1;
-  f(x);
-  g(z + x);
-end;
-
-z = 1;
-x = 3;
-h(x);
-g(x);
-print(x,z);
