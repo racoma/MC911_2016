@@ -110,8 +110,8 @@ def p_constant_expression(p):
 ########################  BLOCO 4  #############################
 
 def p_newmode_statement(p):
-  ' newmode_statement : TYPE newmode_list'
-  p[0] = TYPE(p[1])
+  ' newmode_statement : TYPE newmode_list SEMI'
+  p[0] = p[1]
 
 def p_newmode_list(p):
   """ newmode_list : mode_definition
@@ -120,8 +120,8 @@ def p_newmode_list(p):
   p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
 def p_mode_definition(p):
-  ' mode_definition : identifier_list mode '
-  p[0] = [p[1], p[2]]
+  ' mode_definition : identifier_list ASSIGN mode '
+  p[0] = [p[1], p[2], p[3]]
 
 def p_mode(p):
   """ mode : mode_name
@@ -166,7 +166,7 @@ def p_discrete_mode_name(p):
   p[0] = p[1]
 
 def p_literal_range(p):
-  ' literal_range : ICONST COLON ICONST '
+  ' literal_range : lower_bound COLON upper_bound '
   p[0] = Range(p[1], p[3])
 
 def p_reference_mode(p):
@@ -216,34 +216,22 @@ def p_element_mode(p):
 
 ########################  BLOCO 5  #############################
 def p_location(p):
-  """ location : dereferenced_reference
-               | string_element
-               | string_slice
-               | array_element
-               | array_slice
+  """ location : identifier
+               | identifier LBRACKET expression RBRACKET
+               | location LBRACKET lower_bound COLON upper_bound RBRACKET
+               | location ARROW
+               | location LBRACKET expression_list RBRACKET
                | call_action
   """
   p[0] = p[1]
 
-def p_dereferenced_reference(p):
-  """ dereferenced_reference : location ARROW
-  """
-  p[0] = p[1]
-
-def p_string_element(p):
-  """ string_element : identifier LBRACKET ICONST RBRACKET
-  """
-  p[0] = [p[1], p[3]]
-
-def p_string_slice(p):
-  """ string_slice : identifier LBRACKET ICONST COLON ICONST RBRACKET
-  """
-  p[0] = [p[1], p[3], p[5]]
-
-def p_array_element(p):
-  """ array_element : location LBRACKET expression_list RBRACKET
-  """
-  p[0] = Array(p[1], p[3])
+def p_lower_bound(p):
+  """ lower_bound : expression """
+  p[0] = [p[1]]
+  
+def p_upper_bound(p):
+  """ upper_bound : expression """
+  p[0] = [p[1]]
 
 def p_expression_list(p):
   """ expression_list : expression
@@ -251,10 +239,6 @@ def p_expression_list(p):
   """
   p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
 
-def p_array_slice(p):
-  """ array_slice : location LBRACKET ICONST COLON ICONST RBRACKET
-  """
-  p[0] = [p[1], p[3], p[5]]
 
 ########################  BLOCO 6  #############################
 
@@ -362,10 +346,8 @@ def p_binop(p):
 
 def p_operand(p):
   """ operand : MINUS operand1
-  	          | NOT operand1
-              | location
-              | primitive_value
-              | identifier
+  	      | NOT operand1
+              | operand1
   """
   if len(p) == 2:
     p[0] = p[1]
@@ -386,13 +368,18 @@ def p_referenced_location(p):
   
 ########################### BLOCO 9 ##################################
 def p_action_statement(p):
-  """ action_statement : identifier COLON action SEMI
+  """ action_statement : label_id COLON action SEMI
                        | action SEMI
   """
   if len(p) == 3:
     p[0] = ActionStmt(None, p[1])
   else:
     p[0] = ActionStmt(p[1], p[3])
+    
+def p_label_id(p):
+  """ label_id : identifier
+  """
+  p[0] = p[1]  
 
 def p_action_statement_list(p):
   """ action_statement_list : action_statement
@@ -416,7 +403,6 @@ def p_action(p):
 
 def p_assignment_action(p):
   """ assignment_action : location assigning_operator expression
-                        | identifier assigning_operator expression
   """
   p[0] = Assignment(p[1], p[2], p[3])
 
@@ -444,7 +430,7 @@ def p_if_action(p):
     
 def p_then_clause(p):
   """ then_clause : THEN action_statement_list
-  		            | THEN
+  		  | THEN
   """
   if len(p) == 3:
     p[0] = ThenClause(p[2])
@@ -453,7 +439,7 @@ def p_then_clause(p):
   
 def p_else_clause(p):
   """ else_clause : ELSE action_statement_list
-  		            | ELSE
+  		  | ELSE
   """
   if len(p) == 2:
     p[0] = ElseClause(None)
@@ -475,7 +461,7 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
-  	               | for_control
+  	           | for_control
                    | while_control
   """
   if len(p) == 2:
@@ -556,8 +542,8 @@ def p_call_action(p):
   p[0] = p[1]
 
 def p_procedure_call(p):
-  """ procedure_call : identifier LPAREN parameter_list RPAREN
-                     | identifier LPAREN RPAREN
+  """ procedure_call : discrete_mode_name LPAREN parameter_list RPAREN
+                     | discrete_mode_name LPAREN RPAREN
   """
   if len(p) == 5:
     p[0] = ProcCall(p[1], p[3])
@@ -617,7 +603,7 @@ def p_builtin_name(p):
 
 ########################### BLOCO 13 ##################################
 def p_procedure_statement(p):
-  """ procedure_statement : identifier COLON procedure_definition SEMI """
+  """ procedure_statement : label_id COLON procedure_definition SEMI """
   p[0] = Procedure(p[1], p[3])
 
 def p_procedure_definition(p):
@@ -660,31 +646,16 @@ def p_parameter_spec(p):
   else:
     p[0] = p[1]
 
-####################################### AST ###############################################
-
-
-	 
-
 ###########################################################################################
   
 # Error rule for syntax errors
 def p_error(p):
     if p:
    	print("Syntax error at '%s'" % repr(p))
-    	#print "Syntax error at token ", p.type
     	print "\n"
     	parser.errok()
    
-#def p_error(p):
- #   if p:
- #	print("Syntax error at '%s'" % repr(p))
-  #	print "\n"
-    # Read ahead looking for a terminating ";"
-   # while 1:
-    #    tok = parser.token()             # Get the next token
-     #   if not tok or tok.type == 'SEMI': break
-   # parser.errok()
-
+####################################### AST ###############################################
 
 class Node(object):
     __slots__ = ()
@@ -1086,7 +1057,7 @@ class Param(Node):
 
 class IfAction(Node):
     def __init__(self, bool_exp, then_c, else_c=None):
-        self.type = "param"
+        self.type = "ifaction"
         self.bool_exp = bool_exp
         self.then_c = then_c
         self.else_c = else_c
@@ -1101,7 +1072,7 @@ class IfAction(Node):
 
 class ThenClause(Node):
     def __init__(self, action_list):
-        self.type = "param"
+        self.type = "thenclause"
         self.action_list = action_list
     attr_names = ()
 
@@ -1113,7 +1084,7 @@ class ThenClause(Node):
 
 class Result(Node):
     def __init__(self, expr):
-        self.type = "param"
+        self.type = "result"
         self.expr = expr
     attr_names = ()
 
@@ -1124,7 +1095,7 @@ class Result(Node):
 
 class ElseClause(Node):
     def __init__(self, action_list):
-        self.type = "param"
+        self.type = "elseclause"
         self.action_list = action_list
     attr_names = ()
 
@@ -1136,7 +1107,7 @@ class ElseClause(Node):
 
 class DoAction(Node):
     def __init__(self, control, action_list):
-        self.type = "param"
+        self.type = "doaction"
         self.action_list = action_list
         self.control = control
     attr_names = ()
@@ -1150,7 +1121,7 @@ class DoAction(Node):
 
 class ForControl(Node):
     def __init__(self, iteration):
-        self.type = "param"
+        self.type = "forcontrol"
         self.iteration = iteration
     attr_names = ()
 
@@ -1161,7 +1132,7 @@ class ForControl(Node):
 
 class WhileControl(Node):
     def __init__(self, bool_exp):
-        self.type = "param"
+        self.type = "whilecontrol"
         self.bool_exp = bool_exp
     attr_names = ()
 
@@ -1172,7 +1143,7 @@ class WhileControl(Node):
 
 class Returns(Node):
     def __init__(self, param):
-        self.type = "param"
+        self.type = "returns"
         self.param = param
     attr_names = ()
 
@@ -1183,7 +1154,7 @@ class Returns(Node):
 
 class Return(Node):
     def __init__(self, param):
-        self.type = "param"
+        self.type = "return"
         self.param = param
     attr_names = ()
 
@@ -1194,7 +1165,7 @@ class Return(Node):
 
 class Operand(Node):
     def __init__(self, op, ident):
-        self.type = "param"
+        self.type = "operand"
         self.op = op
         self.ident = ident
     attr_names = ("op",)
@@ -1204,22 +1175,9 @@ class Operand(Node):
       if self.ident is not None: nodelist.append(("ident", self.ident))
       return tuple(nodelist)
 
-class ArraySlice(Node):
-    def __init__(self, ident, i1, i2):
-        self.type = "param"
-        self.ident = ident
-        self.i1 = i1
-        self.i2 = i2
-    attr_names = ("i1", "i2")
-
-    def children(self):
-      nodelist = []
-      if self.ident is not None: nodelist.append(("ident", self.ident))
-      return tuple(nodelist)
-
 class ArrayMode(Node):
     def __init__(self, index_mode, element_mode):
-        self.type = "param"
+        self.type = "arraymode"
         self.index_mode = index_mode
         self.element_mode = element_mode
     attr_names = ()
@@ -1232,7 +1190,7 @@ class ArrayMode(Node):
 
 class Range(Node):
     def __init__(self, i1, i2):
-        self.type = "param"
+        self.type = "range"
         self.i1 = i1
         self.i2 = i2
     attr_names = ("i1", "i2")
@@ -1243,7 +1201,7 @@ class Range(Node):
 
 class StepEnum(Node):
     def __init__(self, loop, assign, start, end, step=None):
-        self.type = "param"
+        self.type = "stepenum"
         self.loop = loop
         self.assign = assign
         self.start = start
@@ -1258,7 +1216,7 @@ class StepEnum(Node):
       if self.end is not None: nodelist.append(("end", self.end))
       if self.step is not None: nodelist.appstep(("step", self.end))
       return tuple(nodelist)
-
+      
 # Build the parser
 parser = yacc.yacc()
 
