@@ -468,6 +468,7 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
+  	           | for_control
                    | while_control
   """
   if len(p) == 2:
