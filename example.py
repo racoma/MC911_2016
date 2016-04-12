@@ -1,10 +1,10 @@
-/* example1: */
-dcl m,n,s int;
+/* Bubble sort code: */
+ 
+dcl v array[1:100] int;
+dcl n, c, d, swap  int;
 
-read(m,n);
-s = 0;
-do while m <= n;
-  s += m * n;
-  print(m,s);
-  m += 1;
-od;
+print("Enter number of elements: ");
+read(n);
+print("Enter ", n, " integers\n");
+v[c] = x;
+

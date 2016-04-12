@@ -167,7 +167,7 @@ def p_discrete_mode_name(p):
 
 def p_literal_range(p):
   ' literal_range : ICONST COLON ICONST '
-  p[0] = [p[1], p[3]]
+  p[0] = Range(p[1], p[3])
 
 def p_reference_mode(p):
   ' reference_mode : REF mode '
@@ -191,7 +191,10 @@ def p_array_mode(p):
   """ array_mode : ARRAY LBRACKET index_mode RBRACKET element_mode
                  | ARRAY LBRACKET index_mode COMMA index_mode_list RBRACKET element_mode
   """
-  p[0] = [p[3]] if len(p) == 5 else p[3] + [p[5]]
+  if len(p) == 6:
+    p[0] = ArrayMode(p[3], p[5])
+  else: 
+    p[0] =  + ArrayMode(p[3]+[p[5]], p[7])
 
 def p_index_mode_list(p):
   """ index_mode_list : index_mode
@@ -230,7 +233,7 @@ def p_dereferenced_reference(p):
 def p_string_element(p):
   """ string_element : identifier LBRACKET ICONST RBRACKET
   """
-  p[0] = [p[1], p[3], p[5]]
+  p[0] = [p[1], p[3]]
 
 def p_string_slice(p):
   """ string_slice : identifier LBRACKET ICONST COLON ICONST RBRACKET
@@ -240,7 +243,7 @@ def p_string_slice(p):
 def p_array_element(p):
   """ array_element : location LBRACKET expression_list RBRACKET
   """
-  p[0] = [p[1], p[3]]
+  p[0] = Array(p[1], p[3])
 
 def p_expression_list(p):
   """ expression_list : expression
@@ -367,7 +370,7 @@ def p_operand(p):
   if len(p) == 2:
     p[0] = p[1]
   else:
-    p[0] = [p[1], p[2]]
+    p[0] = Operand(p[1], p[2])
 
 def p_operand1(p):
   """ operand1 : location
@@ -464,11 +467,11 @@ def p_do_action(p):
                 | DO action_statement_list OD
   """
   if len(p) == 4:
-    p[0] = [p[1], p[2], p[3]]
+    p[0] = DoAction(None, p[2])
   elif len(p) == 5:
-    p[0] = [p[1], p[2], p[3], p[4]]
+    p[0] = DoAction(p[2], None)
   else:
-    p[0] = [p[2], p[4]]
+    p[0] = DoAction(p[2], p[4])
 
 def p_control_part(p):
   """ control_part : for_control while_control
@@ -483,7 +486,7 @@ def p_control_part(p):
 def p_for_control(p):
   """ for_control : FOR iteration
   """
-  p[0] = p[2]
+  p[0] = ForControl(p[2])
   
 def p_iteration(p):
   """ iteration : step_enumeration
@@ -498,13 +501,13 @@ def p_step_enumeration(p):
                        | loop_counter ASSIGN start_value end_value
   """
   if len(p) == 5:
-    p[0] = [p[1], p[2], p[3], p[4]]
+    p[0] = StepEnum(p[1], p[2], p[3], p[4])
   elif(p[4] == 'DOWN' and len(p) == 5):
-    p[0] = [p[1], p[2], p[3], p[5]]
-  elif len(p) == 5:
-    p[0] = [p[1], p[2], p[3], p[4], p[5]]
+    p[0] = StepEnum(p[1], p[2], p[3], p[5])
+  elif len(p) == 6:
+    p[0] = StepEnum(p[1], p[2], p[3], p[5], p[4])
   else:
-    p[0] = [p[1], p[2], p[3], p[4], p[6]]
+    p[0] = StepEnum(p[1], p[2], p[3], p[6], p[4])
 
 def p_loop_counter(p):
   """ loop_counter : identifier
@@ -543,7 +546,7 @@ def p_range_enumeration(p):
 def p_while_control(p):
   """ while_control : WHILE boolean_expression
   """
-  p[0] = p[2]
+  p[0] = WhileControl(p[2])
   
 ########################### BLOCO 12 ##################################
 def p_call_action(p):
@@ -582,9 +585,9 @@ def p_return_action(p):
                     | RETURN
   """
   if len(p) == 2:
-	p[0] = none
+	p[0] = Return(None)
   else:
-	p[0] = p[2]
+	p[0] = Return(p[2])
 
 def p_result_action(p):
   """ result_action : RESULT expression"""
@@ -646,7 +649,7 @@ def p_formal_parameter(p):
 
 def p_result_spec(p):
   """ result_spec : RETURNS LPAREN parameter_spec RPAREN """
-  p[0] = [p[1], p[3]]
+  p[0] = Returns(p[3])
     
 def p_parameter_spec(p):
   """ parameter_spec : mode LOC
@@ -972,6 +975,7 @@ class ProcDef(Node):
     def children(self):
         nodelist = []
         if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
+        if self.result_spec is not None: nodelist.append(("result_spec", self.result_spec))
         for i, child in enumerate(self.formal_parameter_list or []):
           nodelist.append(("exprs[%d]" % i, child))
         return tuple(nodelist)
@@ -1128,6 +1132,131 @@ class ElseClause(Node):
       nodelist = []
       for i, child in enumerate(self.action_list or []):
           nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+class DoAction(Node):
+    def __init__(self, control, action_list):
+        self.type = "param"
+        self.action_list = action_list
+        self.control = control
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.control is not None: nodelist.append(("control", self.control))
+      for i, child in enumerate(self.action_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+class ForControl(Node):
+    def __init__(self, iteration):
+        self.type = "param"
+        self.iteration = iteration
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.iteration is not None: nodelist.append(("iteration", self.iteration))
+      return tuple(nodelist)
+
+class WhileControl(Node):
+    def __init__(self, bool_exp):
+        self.type = "param"
+        self.bool_exp = bool_exp
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.bool_exp is not None: nodelist.append(("bool_exp", self.bool_exp))
+      return tuple(nodelist)
+
+class Returns(Node):
+    def __init__(self, param):
+        self.type = "param"
+        self.param = param
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.param is not None: nodelist.append(("param", self.param))
+      return tuple(nodelist)
+
+class Return(Node):
+    def __init__(self, param):
+        self.type = "param"
+        self.param = param
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.param is not None: nodelist.append(("param", self.param))
+      return tuple(nodelist)
+
+class Operand(Node):
+    def __init__(self, op, ident):
+        self.type = "param"
+        self.op = op
+        self.ident = ident
+    attr_names = ("op",)
+
+    def children(self):
+      nodelist = []
+      if self.ident is not None: nodelist.append(("ident", self.ident))
+      return tuple(nodelist)
+
+class ArraySlice(Node):
+    def __init__(self, ident, i1, i2):
+        self.type = "param"
+        self.ident = ident
+        self.i1 = i1
+        self.i2 = i2
+    attr_names = ("i1", "i2")
+
+    def children(self):
+      nodelist = []
+      if self.ident is not None: nodelist.append(("ident", self.ident))
+      return tuple(nodelist)
+
+class ArrayMode(Node):
+    def __init__(self, index_mode, element_mode):
+        self.type = "param"
+        self.index_mode = index_mode
+        self.element_mode = element_mode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.index_mode is not None: nodelist.append(("index_mode", self.index_mode))
+      if self.element_mode is not None: nodelist.append(("element_mode", self.element_mode))
+      return tuple(nodelist)
+
+class Range(Node):
+    def __init__(self, i1, i2):
+        self.type = "param"
+        self.i1 = i1
+        self.i2 = i2
+    attr_names = ("i1", "i2")
+
+    def children(self):
+      nodelist = []
+      return tuple(nodelist)
+
+class StepEnum(Node):
+    def __init__(self, loop, assign, start, end, step=None):
+        self.type = "param"
+        self.loop = loop
+        self.assign = assign
+        self.start = start
+        self.end = end
+        self.step = step
+    attr_names = ('assign',)
+
+    def children(self):
+      nodelist = []
+      if self.loop is not None: nodelist.append(("loop", self.loop))
+      if self.start is not None: nodelist.append(("start", self.start))
+      if self.end is not None: nodelist.append(("end", self.end))
+      if self.step is not None: nodelist.appstep(("step", self.end))
       return tuple(nodelist)
 
 # Build the parser
