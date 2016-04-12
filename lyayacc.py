@@ -311,17 +311,17 @@ def p_conditional_expression(p):
 def p_boolean_expression(p):
   """ boolean_expression : expression
   """
-  p[0] = p[1]
+  p[0] = BoolExpr(p[1])
 
 def p_then_expression(p):
   """ then_expression : THEN expression
   """
-  p[0] = p[1]
+  p[0] = p[2]
 
 def p_else_expression(p):
   """ else_expression : ELSE expression
   """
-  p[0] = p[1]
+  p[0] = p[2]
 
 def p_elsif_expression(p):
   """ elsif_expression : ELSIF boolean_expression then_expression
@@ -359,7 +359,8 @@ def p_binop(p):
 
 def p_operand(p):
   """ operand : MINUS operand1
-  	      | NOT operand1
+  	          | NOT operand1
+              | location
               | primitive_value
               | identifier
   """
@@ -390,9 +391,18 @@ def p_action_statement(p):
   else:
     p[0] = ActionStmt(p[1], p[3])
 
+def p_action_statement_list(p):
+  """ action_statement_list : action_statement
+                            | action_statement_list action_statement
+  """
+  if len(p) == 2:
+    p[0] = [p[1]]
+  else:
+    p[0] = p[1] + [p[2]]
+
 def p_action(p):
   """ action : if_action
-  	     | do_action
+  	         | do_action
              | assignment_action
              | call_action
              | exit_action
@@ -425,39 +435,33 @@ def p_if_action(p):
                 | IF boolean_expression then_clause FI
   """
   if len(p) == 6:
-    p[0] = [p[2], p[3], p[4]]
+    p[0] = IfAction(p[2], p[3], p[4])
   else:
-    p[0] = [p[2], p[3]]
+    p[0] = IfAction(p[2], p[3])
     
 def p_then_clause(p):
-  """ then_clause : THEN action_statement
-  		  | THEN 
+  """ then_clause : THEN action_statement_list
+  		            | THEN
   """
   if len(p) == 3:
-    p[0] = [p[1], p[2]]
+    p[0] = ThenClause(p[2])
   else:
-    p[0] = p[1]
+    p[0] = ThenClause(None)
   
 def p_else_clause(p):
-  """ else_clause : ELSE action_statement
-  		  | ELSE
-                  | ELSIF boolean_expression then_clause else_clause
-                  | ELSIF boolean_expression then_clause
+  """ else_clause : ELSE action_statement_list
+  		            | ELSE
   """
   if len(p) == 2:
-    p[0] = p[1]
-  elif len(p) == 3:
-    p[0] = p[2]
-  elif len(p) == 5:
-    p[0] = [p[2], p[3], p[4]]
+    p[0] = ElseClause(None)
   else:
-    p[0] = [p[2], p[3]]
+    p[0] = ElseClause(p[2])
 
 ########################### BLOCO 11 ##################################
 def p_do_action(p):
-  """ do_action : DO control_part SEMI action_statement OD
+  """ do_action : DO control_part SEMI action_statement_list OD
                 | DO control_part SEMI OD
-                | DO action_statement OD
+                | DO action_statement_list OD
   """
   if len(p) == 4:
     p[0] = [p[1], p[2], p[3]]
@@ -468,7 +472,7 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
-  	           | for_control
+  	               | for_control
                    | while_control
   """
   if len(p) == 2:
@@ -552,16 +556,22 @@ def p_procedure_call(p):
   """ procedure_call : identifier LPAREN parameter_list RPAREN
                      | identifier LPAREN RPAREN
   """
-  if len(p) == 4:
-    p[0] = [p[1], p[3]]
+  if len(p) == 5:
+    p[0] = ProcCall(p[1], p[3])
   else:
-    p[0] = p[1]
+    p[0] = ProcCall(p[1])
 
 def p_parameter_list(p):
   """ parameter_list : expression
                      | parameter_list COMMA expression
   """ 
-  p[0] = p[1]
+  if len(p) == 2:
+    p[0] = Param([p[1]])
+  else:
+    p[1].param.append(p[3])
+    p[0] = p[1]
+
+
 
 def p_exit_action(p):
   """ exit_action : EXIT identifier """
@@ -577,17 +587,17 @@ def p_return_action(p):
 	p[0] = p[2]
 
 def p_result_action(p):
-  """ result_action : RESULT expression """
-  p[0] = [p[1], p[2]]
+  """ result_action : RESULT expression"""
+  p[0] = Result(p[2])
 
 def p_builtin_call(p):
   """ builtin_call : builtin_name LPAREN parameter_list RPAREN
                    | builtin_name LPAREN RPAREN
   """
   if len(p) == 4:
-    p[0] = p[1]
+    p[0] = Call(p[1])
   else:
-    p[0] = [p[1], p[3]]
+    p[0] = Call(p[1], p[3])
 
 def p_builtin_name(p):
   """ builtin_name : NUM
@@ -600,7 +610,7 @@ def p_builtin_name(p):
                    | PRINT
   """
 
-  p[0] = p[1]
+  p[0] = Func(p[1])
 
 ########################### BLOCO 13 ##################################
 def p_procedure_statement(p):
@@ -628,7 +638,7 @@ def p_formal_parameter_list(p):
   if len(p) == 2:
     p[0] = [p[1]]
   else:
-    p[0] = p[1] + p[3]
+    p[0] = p[1] + [p[3]]
 
 def p_formal_parameter(p):
   """ formal_parameter : identifier_list parameter_spec """
@@ -643,7 +653,7 @@ def p_parameter_spec(p):
                      | mode
   """
   if len(p)== 3:
-    p[0] = [p[1], p[2]]
+    p[0] = ParamLoc(p[1], p[2])
   else:
     p[0] = p[1]
 
@@ -847,6 +857,33 @@ class Declaration(Node):
       if self.mode is not None: nodelist.append(("mode", self.mode))
       return tuple(nodelist)
 
+class FormalParam(Node):
+    def __init__(self, id_list, param_spec):
+        self.type = "formal_param"
+        self.id_list = id_list
+        self.param_spec = param_spec
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.id_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      if self.param_spec is not None: nodelist.append(("param_spec", self.param_spec))
+      return tuple(nodelist)
+
+class ParamLoc(Node):
+  def __init__(self, mode, attr):
+      self.type = "paramloc"
+      self.mode = mode
+      self.attr = attr
+  attr_names = ("attr",)
+
+  def children(self):
+    nodelist = []
+    if self.mode is not None: nodelist.append(("mode", self.mode))
+    return tuple(nodelist)
+
+
 class ID(Node):
     def __init__(self, char):
         self.type = "ID"
@@ -879,6 +916,17 @@ class DiscreteMode(Node):
         return tuple(nodelist)
 
 class Expr(Node):
+    def __init__(self, exp):
+        self.type = "Expr"
+        self.exp = exp
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.exp is not None: nodelist.append(("exp", self.exp))
+        return tuple(nodelist)
+
+class BoolExpr(Node):
     def __init__(self, exp):
         self.type = "Expr"
         self.exp = exp
@@ -928,20 +976,6 @@ class ProcDef(Node):
           nodelist.append(("exprs[%d]" % i, child))
         return tuple(nodelist)
 
-class FormalParam(Node):
-    def __init__(self, id_list, param_spec):
-        self.type = "formal_param"
-        self.id_list = id_list
-        self.param_spec = param_spec
-    attr_names = ()
-
-    def children(self):
-      nodelist = []
-      for i, child in enumerate(self.id_list or []):
-          nodelist.append(("exprs[%d]" % i, child))
-      if self.param_spec is not None: nodelist.append(("param_spec", self.param_spec))
-      return tuple(nodelist)
-
 class ActionStmt(Node):
     def __init__(self, identifier, action):
         self.type = "action_statement"
@@ -953,6 +987,20 @@ class ActionStmt(Node):
       nodelist = []
       if self.identifier is not None: nodelist.append(("identifier", self.identifier))
       if self.action is not None: nodelist.append(("action", self.action))
+      return tuple(nodelist)
+
+
+
+class ActionStmt_List(Node):
+    def __init__(self, actions):
+        self.type = "action_statement_list"
+        self.actions = actions
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.action or []):
+        nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
 
 class Assignment(Node):
@@ -971,7 +1019,7 @@ class Assignment(Node):
 
 class Binop(Node):
     def __init__(self, op, left, right):
-        self.type = "assignment"
+        self.type = "binop"
         self.left = left
         self.op = op
         self.right = right
@@ -981,6 +1029,105 @@ class Binop(Node):
       nodelist = []
       if self.left is not None: nodelist.append(("left", self.left))
       if self.right is not None: nodelist.append(("right", self.right))
+      return tuple(nodelist)
+
+class Call(Node):
+    def __init__(self, op, param=None):
+        self.type = "call"
+        self.op = op
+        self.param = param
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.op is not None: nodelist.append(("op", self.op))
+      if self.param is not None: nodelist.append(("param", self.param))
+      return tuple(nodelist)
+
+class Func(Node):
+    def __init__(self, op):
+        self.type = "func"
+        self.op = op
+    attr_names = ("op",)
+
+    def children(self):
+      nodelist = []
+      return tuple(nodelist)
+
+class ProcCall(Node):
+    def __init__(self, op, param):
+        self.type = "proccall"
+        self.op = op
+        self.param = param
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.op is not None: nodelist.append(("op", self.op))
+      if self.param is not None: nodelist.append(("param", self.param))
+      return tuple(nodelist)
+
+class Param(Node):
+    def __init__(self, param):
+        self.type = "param"
+        self.param = param
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.param or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+
+class IfAction(Node):
+    def __init__(self, bool_exp, then_c, else_c=None):
+        self.type = "param"
+        self.bool_exp = bool_exp
+        self.then_c = then_c
+        self.else_c = else_c
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.bool_exp is not None: nodelist.append(("bool_exp", self.bool_exp))
+      if self.then_c is not None: nodelist.append(("then_c", self.then_c))
+      if self.else_c is not None: nodelist.append(("else_c", self.else_c))
+      return tuple(nodelist)
+
+class ThenClause(Node):
+    def __init__(self, action_list):
+        self.type = "param"
+        self.action_list = action_list
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.action_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+class Result(Node):
+    def __init__(self, expr):
+        self.type = "param"
+        self.expr = expr
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.expr is not None: nodelist.append(("expr", self.expr))
+      return tuple(nodelist)
+
+class ElseClause(Node):
+    def __init__(self, action_list):
+        self.type = "param"
+        self.action_list = action_list
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.action_list or []):
+          nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
 
 # Build the parser
