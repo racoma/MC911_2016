@@ -8,4 +8,4 @@ Running:
 
 python lyaparser.py exemple.lya
 
-The project was later tested and fixed for Python3
+**The project was later tested and fixed for Python3**
