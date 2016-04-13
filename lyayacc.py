@@ -35,7 +35,7 @@ def p_statement_list(p):
                      | statement_list statement
   """
   if len(p) == 2:
-    p[0] = Statement_list([p[1]])
+    p[0] = StmtList([p[1]])
   else:
     p[1].statements.append(p[2])
     p[0] = p[1]
@@ -55,9 +55,9 @@ def p_declaration_statement(p):
   """ declaration_statement : DCL declaration_list SEMI
   """
   if len(p) == 4:
-    p[0] = DCL_statement(p[2])
+    p[0] = DclStmt(p[2])
   else:
-    p[0] = DCL_statement(p[2])
+    p[0] = DclStmt(p[2])
 
 def p_declaration_list(p):
   """ declaration_list : declaration
@@ -69,7 +69,7 @@ def p_declaration(p):
   """ declaration : identifier_list mode initialization
                   | identifier_list mode
   """
-  p[0] = Declaration(p[1], p[2]) if len(p) == 3 else Declaration(p[1], p[2], p[3])
+  p[0] = Decl(p[1], p[2]) if len(p) == 3 else Decl(p[1], p[2], p[3])
 
 def p_initialization(p):
   ' initialization : ASSIGN expression'
@@ -83,7 +83,7 @@ def p_identifier_list(p):
 
 def p_identifier(p):
   ' identifier : ID '
-  p[0] = ID(p[1])
+  p[0] = ID(p[1], lineno=p.lineno(1))
 
 
 ########################  BLOCO 3  #############################
@@ -96,23 +96,29 @@ def p_synonym_list(p):
   """ synonym_list : synonym_definition
                    | synonym_list COMMA synonym_definition
   """
-  p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
+  if len(p) == 2:
+    p[0] = p[1]
+  else:
+    p[0] = p[1] + [p[3]]
 
 def p_synonym_definition(p):
   """ synonym_definition : identifier_list mode ASSIGN constant_expression
                          | identifier_list ASSIGN constant_expression
   """
-  p[0] = [p[1], p[2], p[4]] if len(p) == 5 else [p[1], p[3]]
+  if len(p) == 5:
+    p[0] = Syn(p[1], p[4], p[2])
+  else:
+    p[0] = Syn(p[1], p[3])
 
 def p_constant_expression(p):
   ' constant_expression : expression'
-  p[0] = Constant(p[1])
+  p[0] = p[1]
 
 ########################  BLOCO 4  #############################
 
 def p_newmode_statement(p):
   ' newmode_statement : TYPE newmode_list SEMI'
-  p[0] = [p[1], p[2]]
+  p[0] = Type(p[2])
 
 def p_newmode_list(p):
   """ newmode_list : mode_definition
@@ -125,7 +131,7 @@ def p_newmode_list(p):
 
 def p_mode_definition(p):
   ' mode_definition : identifier_list ASSIGN mode '
-  p[0] = [p[1], p[2], p[3]]
+  p[0] = ModeDef(p[1], p[2], p[3])
 
 def p_mode(p):
   """ mode : mode_name
@@ -141,7 +147,7 @@ def p_discrete_mode(p):
                     | character_mode
                     | discrete_range_mode
   """
-  p[0] = DiscreteMode(p[1])
+  p[0] = DiscreteMode(p[1], lineno=p.lineno(1))
 
 def p_integer_mode(p):
   ' integer_mode : INT '
@@ -197,7 +203,7 @@ def p_array_mode(p):
   """
   if len(p) == 6:
     p[0] = ArrayMode(p[3], p[5])
-  else: 
+  else:
     p[0] =  + ArrayMode(p[3]+[p[5]], p[7])
 
 def p_index_mode_list(p):
@@ -226,7 +232,10 @@ def p_location(p):
                | location LBRACKET expression_list RBRACKET
                | call_action
   """
-  p[0] = p[1]
+  if len(p) == 5:
+    p[0] = Array(p[1], p[3])
+  else:
+    p[0] = p[1]
 
 def p_lower_bound(p):
   """ lower_bound : expression """
@@ -261,7 +270,7 @@ def p_literal(p):
                | NULL
                | SCONST
   """
-  p[0] = Constant(p[1])
+  p[0] = Constant(p[1], lineno=p.lineno(1))
 
 ########################  BLOCO 7  #############################
 
@@ -348,7 +357,7 @@ def p_binop(p):
 
 def p_operand(p):
   """ operand : MINUS operand1
-  	      | NOT operand1
+  	          | NOT operand1
               | operand1
   """
   if len(p) == 2:
@@ -566,7 +575,7 @@ def p_parameter_list(p):
 
 def p_exit_action(p):
   """ exit_action : EXIT identifier """
-  p[0] = p[2]
+  p[0] = Exit(p[2])
 
 def p_return_action(p):
   """ return_action : RETURN expression 
@@ -606,7 +615,7 @@ def p_builtin_name(p):
 ########################### BLOCO 13 ##################################
 def p_procedure_statement(p):
   """ procedure_statement : label_id COLON procedure_definition SEMI """
-  p[0] = Procedure(p[1], p[3])
+  p[0] = ProcStmt(p[1], p[3])
 
 def p_procedure_definition(p):
   """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
@@ -614,11 +623,11 @@ def p_procedure_definition(p):
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
-    p[0] = ProcDef(p[3], p[5], p[7])
+    p[0] = ProcDef(p[3], p[5], p[7], lineno=p.lineno(1))
   elif len(p) == 8:
-    p[0] = ProcDef(p[3], None, p[6])
+    p[0] = ProcDef(p[3], None, p[6], lineno=p.lineno(1))
   else:
-    p[0] = ProcDef(None, p[5], None)
+    p[0] = ProcDef(None, p[5], None, lineno=p.lineno(1))
 
 
 def p_formal_parameter_list(p):
@@ -705,8 +714,8 @@ class Node(object):
                 attrstr = ', '.join('%s' % v for v in vlist)
             buf.write(attrstr)
 
-        if showcoord:
-            buf.write(' (at %s)' % self.coord)
+        if showcoord and hasattr(self, 'lineno'):
+            buf.write(' (at line: %s)' % self.lineno)
         buf.write('\n')
 
         for (child_name, child) in self.children():
@@ -781,9 +790,9 @@ class Program(Node):
       if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
       return tuple(nodelist)
 
-class Statement_list(Node):
+class StmtList(Node):
     def __init__(self, statements):
-        self.type = "statement_list"
+        self.type = "stmtlist"
         self.statements = statements
     attr_names = ()
 
@@ -793,20 +802,9 @@ class Statement_list(Node):
           nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
         
-class Statement(Node):
-    def __init__(self, statement):
-        self.type = "statement"
-        self.statement = statement
-    attr_names = ()
-
-    def children(self):
-      nodelist = []
-      if self.statement is not None: nodelist.append(("statement", self.statement))
-      return tuple(nodelist)
-        
-class DCL_statement(Node):
+class DclStmt(Node):
     def __init__(self, declarations):
-        self.type = "DCL_statement"
+        self.type = "DclStmt"
         self.declarations = declarations
     attr_names = ()
 
@@ -817,9 +815,9 @@ class DCL_statement(Node):
       return tuple(nodelist)
       
 
-class Declaration(Node):
+class Decl(Node):
     def __init__(self, identifier_list, mode, initialization=None):
-        self.type = "Declaration"
+        self.type = "Decl"
         self.identifier_list = identifier_list
         self.mode = mode
         self.initialization = initialization
@@ -829,8 +827,8 @@ class Declaration(Node):
       nodelist = []
       for i, child in enumerate(self.identifier_list or []):
           nodelist.append(("exprs[%d]" % i, child))
+      if self.mode is not None: nodelist.append(("mode", self.mode))      
       if self.initialization is not None: nodelist.append(("initialization", self.initialization))
-      if self.mode is not None: nodelist.append(("mode", self.mode))
       return tuple(nodelist)
 
 class FormalParam(Node):
@@ -861,8 +859,9 @@ class ParamLoc(Node):
 
 
 class ID(Node):
-    def __init__(self, char):
+    def __init__(self, char, lineno):
         self.type = "ID"
+        self.lineno = lineno
         self.char = char
     attr_names = ("char",)
 
@@ -882,9 +881,10 @@ class Mode(Node):
         return tuple(nodelist)
 
 class DiscreteMode(Node):
-    def __init__(self, mode):
+    def __init__(self, mode, lineno):
         self.type = "DiscreteMode"
         self.mode = mode
+        self.lineno = lineno
     attr_names = ("mode",)
 
     def children(self):
@@ -914,18 +914,19 @@ class BoolExpr(Node):
         return tuple(nodelist)
 
 class Constant(Node):
-    def __init__(self, exp):
+    def __init__(self, exp, lineno):
         self.type = "Constant"
         self.exp = exp
+        self.lineno = lineno
     attr_names = ("exp",)
 
     def children(self):
         nodelist = []
         return tuple(nodelist)
 
-class Procedure(Node):
+class ProcStmt(Node):
     def __init__(self, identifier, procedure):
-        self.type = "Procedure"
+        self.type = "ProcStmt"
         self.identifier = identifier
         self.procedure = procedure
     attr_names = ()
@@ -937,20 +938,21 @@ class Procedure(Node):
         return tuple(nodelist)
 
 class ProcDef(Node):
-    def __init__(self, formal_parameter_list, result_spec, statement_list):
+    def __init__(self, formal_parameter_list, result_spec, statement_list, lineno):
         self.type = "Procedure"
         self.formal_parameter_list = formal_parameter_list
         self.result_spec = result_spec
         self.statement_list = statement_list
+        self.lineno = lineno
 
     attr_names = ()
 
     def children(self):
         nodelist = []
-        if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
-        if self.result_spec is not None: nodelist.append(("result_spec", self.result_spec))
         for i, child in enumerate(self.formal_parameter_list or []):
           nodelist.append(("exprs[%d]" % i, child))
+        if self.result_spec is not None: nodelist.append(("result_spec", self.result_spec))
+        if self.statement_list is not None: nodelist.append(("statement_list", self.statement_list))
         return tuple(nodelist)
 
 class ActionStmt(Node):
@@ -1190,15 +1192,33 @@ class ArrayMode(Node):
       if self.element_mode is not None: nodelist.append(("element_mode", self.element_mode))
       return tuple(nodelist)
 
+class Array(Node):
+    def __init__(self, loc, expr):
+        self.type = "array"
+        self.loc = loc
+        self.expr = expr
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.loc is not None: nodelist.append(("loc", self.loc))
+      for i, child in enumerate(self.expr or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
 class Range(Node):
     def __init__(self, i1, i2):
         self.type = "range"
         self.i1 = i1
         self.i2 = i2
-    attr_names = ("i1", "i2")
+    attr_names = ()
 
     def children(self):
       nodelist = []
+      for i, child in enumerate(self.i1 or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      for i, child in enumerate(self.i2 or []):
+          nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
 
 class StepEnum(Node):
@@ -1218,10 +1238,64 @@ class StepEnum(Node):
       if self.end is not None: nodelist.append(("end", self.end))
       if self.step is not None: nodelist.appstep(("step", self.end))
       return tuple(nodelist)
-       
+
+class Exit(Node):
+    def __init__(self, ident):
+        self.type = "exit"
+        self.ident = ident
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.ident is not None: nodelist.append(("ident", self.ident))
+      return tuple(nodelist)
+
+class Syn(Node):
+    def __init__(self, ident, expr, mode=None):
+        self.type = "syn"
+        self.ident = ident
+        self.expr = expr
+        self.mode = mode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.ident or []):
+        nodelist.append(("exprs[%d]" % i, child))
+      if self.mode is not None: nodelist.append(("mode", self.mode))
+      if self.expr is not None: nodelist.append(("expr", self.expr))
+      return tuple(nodelist)
+
+class Type(Node):
+    def __init__(self, newmode):
+        self.type = "type"
+        self.newmode = newmode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.newmode or []):
+        nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+class ModeDef(Node):
+    def __init__(self, idents, assign, mode):
+        self.type = "modedef"
+        self.idents = idents
+        self.mode = mode
+        self.assign = assign
+    attr_names = ("assign",)
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.idents or []):
+        nodelist.append(("exprs[%d]" % i, child))
+      if self.mode is not None: nodelist.append(("mode", self.mode))
+      return tuple(nodelist)
+
 # Build the parser
 parser = yacc.yacc()
 
 p = parser.parse(f.read(),tracking=True)
 
-p.show()
+p.show(showcoord = True)
