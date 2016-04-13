@@ -270,7 +270,14 @@ def p_literal(p):
                | NULL
                | SCONST
   """
-  p[0] = Constant(p[1], lineno=p.lineno(1))
+  if isinstance(p[1], int):
+    p[0] = Constant(p[1], p.lineno(1), "int")
+  elif isinstance(p[1], bool):
+    p[0] = Constant(p[1], p.lineno(1), "bool")
+  elif isinstance(p[1], str):
+    p[0] = Constant(p[1], p.lineno(1), "string")
+  else:
+    p[0] = Constant(p[1], p.lineno(1), "null")
 
 ########################  BLOCO 7  #############################
 
@@ -914,11 +921,12 @@ class BoolExpr(Node):
         return tuple(nodelist)
 
 class Constant(Node):
-    def __init__(self, exp, lineno):
+    def __init__(self, exp, lineno, tipo):
         self.type = "Constant"
         self.exp = exp
+        self.tipo = tipo
         self.lineno = lineno
-    attr_names = ("exp",)
+    attr_names = ("exp", "tipo",)
 
     def children(self):
         nodelist = []
