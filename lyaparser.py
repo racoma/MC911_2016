@@ -13,9 +13,9 @@ import ast
 f = open(sys.argv[-1])
 
 precedence = (
-	('left', 'CONCAT'),
-	('left', 'NOT'),
-	('left', 'IN'),
+  ('left', 'CONCAT'),
+  ('left', 'NOT'),
+  ('left', 'IN'),
         ('left', 'OR'),
         ('left', 'AND'),
         ('left', 'EQ', 'NEQ'),
@@ -358,13 +358,13 @@ def p_binop(p):
               | binop CONCAT binop
   """
   if len(p) == 2:
-	 p[0] = p[1]
+    p[0] = p[1]
   else:
-  	p[0] = Binop(p[2], p[1], p[3])
+    p[0] = Binop(p[2], p[1], p[3])
 
 def p_operand(p):
   """ operand : MINUS operand1
-  	          | NOT operand1
+              | NOT operand1
               | operand1
   """
   if len(p) == 2:
@@ -410,7 +410,7 @@ def p_action_statement_list(p):
 
 def p_action(p):
   """ action : if_action
-  	     | do_action
+         | do_action
              | assignment_action
              | call_action
              | exit_action
@@ -448,7 +448,7 @@ def p_if_action(p):
     
 def p_then_clause(p):
   """ then_clause : THEN action_statement_list
-  		  | THEN
+        | THEN
   """
   if len(p) == 3:
     p[0] = ThenClause(p[2])
@@ -457,7 +457,7 @@ def p_then_clause(p):
   
 def p_else_clause(p):
   """ else_clause : ELSE action_statement_list
-  		  | ELSE
+        | ELSE
   """
   if len(p) == 2:
     p[0] = ElseClause(None)
@@ -479,7 +479,7 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
-  	           | for_control
+               | for_control
                    | while_control
   """
   if len(p) == 2:
@@ -589,9 +589,9 @@ def p_return_action(p):
                     | RETURN
   """
   if len(p) == 2:
-	p[0] = Return(None)
+    p[0] = Return(None)
   else:
-	p[0] = Return(p[2])
+    p[0] = Return(p[2])
 
 def p_result_action(p):
   """ result_action : RESULT expression"""
@@ -626,7 +626,7 @@ def p_procedure_statement(p):
 
 def p_procedure_definition(p):
   """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
-  			   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+           | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
@@ -660,18 +660,18 @@ def p_parameter_spec(p):
                      | mode
   """
   if len(p)== 3:
-    p[0] = ParamLoc(p[1], p[2])
+    p[0] = ParamSpec(p[1], p[2])
   else:
-    p[0] = p[1]
+    p[0] = ParamSpec(p[1], None)
 
 ###########################################################################################
   
 # Error rule for syntax errors
 def p_error(p):
     if p:
-   	print("Syntax error at '%s'" % repr(p))
-    	print "\n"
-    	parser.errok()
+      print("Syntax error at '%s'" % repr(p))
+      print("\n")
+      parser.errok()
    
 ####################################### AST ###############################################
 
@@ -852,9 +852,9 @@ class FormalParam(Node):
       if self.param_spec is not None: nodelist.append(("param_spec", self.param_spec))
       return tuple(nodelist)
 
-class ParamLoc(Node):
+class ParamSpec(Node):
   def __init__(self, mode, attr):
-      self.type = "paramloc"
+      self.type = "paramspec"
       self.mode = mode
       self.attr = attr
   attr_names = ("attr",)
