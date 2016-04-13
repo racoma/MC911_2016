@@ -237,6 +237,10 @@ def p_location(p):
   """
   if len(p) == 5:
     p[0] = Array(p[1], p[3])
+  elif len(p) == 3:
+    p[0] = DerefRef(p[1], p[2])
+  elif len(p) == 7:
+    p[0] = ArraySlice(p[1], p[3], p[5])
   else:
     p[0] = p[1]
 
@@ -327,22 +331,28 @@ def p_boolean_expression(p):
 def p_then_expression(p):
   """ then_expression : THEN expression
   """
-  p[0] = p[2]
+  p[0] = ThenExpr(p[2])
 
 def p_else_expression(p):
   """ else_expression : ELSE expression
   """
-  p[0] = p[2]
+  p[0] = ElseExpr(p[2])
 
 def p_elsif_expression(p):
   """ elsif_expression : ELSIF boolean_expression then_expression
                        | elsif_expression ELSIF boolean_expression then_expression
   """
-  if len(p) == 4: 
-    p[0] = Elsif(p[2], p[3], None)
+  # if len(p) == 4: 
+  #   p[0] = Elsif(p[2], p[3], None)
+  # else:
+  #   p[0] = Elsif(p[3], p[4], p[1])
+  if len(p) == 4: # single initializer
+      expr = Elsif(p[2], p[3])
+      p[0] = ElsifList([expr])
   else:
-    p[0] = Elsif(p[3], p[4], p[1])
-
+      expr = Elsif(p[3], p[4])
+      p[1].exprs.append(expr)
+      p[0] = p[1]
 
 
 ########################  BLOCO 8  #############################
@@ -635,15 +645,18 @@ def p_procedure_statement(p):
 
 def p_procedure_definition(p):
   """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
-           | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+                           | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+                           | PROC LPAREN RPAREN result_spec SEMI statement_list END 
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
     p[0] = ProcDef(p[3], p[5], p[7], lineno=p.lineno(1))
-  elif len(p) == 8:
+  elif len(p) == 8 and p[3] != ")":
     p[0] = ProcDef(p[3], None, p[6], lineno=p.lineno(1))
+  elif len(p) == 8:
+    p[0] = ProcDef(None, p[4], p[6], lineno=p.lineno(1))
   else:
-    p[0] = ProcDef(None, p[5], None, lineno=p.lineno(1))
+    p[0] = ProcDef(None, None, p[5], lineno=p.lineno(1))
 
 
 def p_formal_parameter_list(p):
@@ -964,7 +977,7 @@ class ProcDef(Node):
         self.statement_list = statement_list
         self.lineno = lineno
 
-    attr_names = ()
+    attr_names = ("")
 
     def children(self):
         nodelist = []
@@ -1388,26 +1401,70 @@ class CondExpr(Node):
       nodelist = []
       if self.boolex is not None: nodelist.append(("boolex", self.boolex))
       if self.thenex is not None: nodelist.append(("thenex", self.thenex))
-      if self.elseex is not None: nodelist.append(("elseex", self.elseex))
       if self.elsifex is not None: nodelist.append(("elsifex", self.elsifex))
+      if self.elseex is not None: nodelist.append(("elseex", self.elseex))
 
       return tuple(nodelist)
 
+class ElsifList(Node):
+    def __init__(self, exprs):
+        self.type = "modedef"
+        self.exprs = exprs
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.exprs or []):
+        nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
 class Elsif(Node):
-    def __init__(self, boolex, thenex, elsifex):
+    def __init__(self, boolex, thenex):
         self.type = "modedef"
         self.boolex = boolex
         self.thenex = thenex
-        self.elsifex = elsifex
     attr_names = ()
 
     def children(self):
       nodelist = []
       if self.boolex is not None: nodelist.append(("boolex", self.boolex))
       if self.thenex is not None: nodelist.append(("thenex", self.thenex))
-      if self.elsifex is not None: nodelist.append(("elsifex", self.elsifex))
 
       return tuple(nodelist)
+
+class ThenExpr(Node):
+    def __init__(self, exp):
+        self.type = "Expr"
+        self.exp = exp
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.exp is not None: nodelist.append(("exp", self.exp))
+        return tuple(nodelist)
+
+class ElseExpr(Node):
+    def __init__(self, exp):
+        self.type = "Expr"
+        self.exp = exp
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.exp is not None: nodelist.append(("exp", self.exp))
+        return tuple(nodelist)
+
+class DerefRef(Node):
+    def __init__(self, location, arrow):
+        self.type = "Expr"
+        self.location = location
+        self.arrow = arrow
+    attr_names = ("arrow",)
+
+    def children(self):
+        nodelist = []
+        if self.location is not None: nodelist.append(("location", self.location))
+        return tuple(nodelist)
 
 # Build the parser
 parser = yacc.yacc()
