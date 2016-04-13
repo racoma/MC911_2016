@@ -147,7 +147,10 @@ def p_discrete_mode(p):
                     | character_mode
                     | discrete_range_mode
   """
-  p[0] = DiscreteMode(p[1], lineno=p.lineno(1))
+  if isinstance(p[1], int) or isinstance(p[1], bool) or isinstance(p[1], str):
+    p[0] = DiscreteMode(p[1], None, lineno=p.lineno(1))
+  else:
+    p[0] = DiscreteMode(None, p[1], lineno=p.lineno(1))
 
 def p_integer_mode(p):
   ' integer_mode : INT '
@@ -165,7 +168,7 @@ def p_discrete_range_mode(p):
   """ discrete_range_mode : discrete_mode_name LPAREN literal_range RPAREN
                           | discrete_mode LPAREN literal_range RPAREN
   """
-  p[0] = [p[1], p[3]]
+  p[0] = DiscreteRange(p[1], p[3])
 
 def p_mode_name(p):
   ' mode_name : identifier '
@@ -181,7 +184,7 @@ def p_literal_range(p):
 
 def p_reference_mode(p):
   ' reference_mode : REF mode '
-  p[0] = [p[1], p[2]]
+  p[0] = Ref(p[2])
 
 def p_composite_mode(p):
   """ composite_mode : string_mode
@@ -191,7 +194,7 @@ def p_composite_mode(p):
 
 def p_string_mode(p):
   ' string_mode : CHARS LBRACKET string_length RBRACKET '
-  p[0] = p[3]
+  p[0] = StrLen(p[3])
 
 def p_string_length(p):
   ' string_length : ICONST '
@@ -311,7 +314,10 @@ def p_conditional_expression(p):
   """ conditional_expression : IF boolean_expression then_expression else_expression FI
                              | IF boolean_expression then_expression elsif_expression else_expression FI
   """
-  p[0] = [p[1], p[2], p[3], p[4]] if len(p) == 6 else [p[1], p[2], p[3], p[4], p[5]]
+  if len(p) == 6:
+   p[0] = CondExpr(p[2], p[3], p[4], None)
+  else:
+   p[0] = CondExpr(p[2], p[3], p[5], p[4])
 
 def p_boolean_expression(p):
   """ boolean_expression : expression
@@ -332,7 +338,10 @@ def p_elsif_expression(p):
   """ elsif_expression : ELSIF boolean_expression then_expression
                        | elsif_expression ELSIF boolean_expression then_expression
   """
-  p[0] = [p[2], p[3]] if len(p) == 4 else p[1] + [p[3], p[4]]
+  if len(p) == 4: 
+    p[0] = Elsif(p[2], p[3], None)
+  else:
+    p[0] = Elsif(p[3], p[4], p[1])
 
 
 
@@ -382,7 +391,7 @@ def p_operand1(p):
 def p_referenced_location(p):
   """ referenced_location : ARROW location
   """
-  p[0] = p[2]
+  p[0] = RefLoc(p[1], p[2])
   
 ########################### BLOCO 9 ##################################
 def p_action_statement(p):
@@ -539,13 +548,13 @@ def p_discrete_expression(p):
   p[0] = p[1]
   
 def p_range_enumeration(p):
-  """ range_enumeration : loop_counter DOWN IN discrete_mode_name
-                        | loop_counter IN discrete_mode_name
+  """ range_enumeration : loop_counter DOWN IN discrete_mode
+                        | loop_counter IN discrete_mode
   """  
   if len(p) == 5:
-    p[0] = [p[1], p[4]]
+    p[0] = RangeEnum(p[1], p[4])
   else:
-    p[0] = [p[1], p[3]]
+    p[0] = RangeEnum(p[1], p[3])
     
 def p_while_control(p):
   """ while_control : WHILE boolean_expression
@@ -566,7 +575,7 @@ def p_procedure_call(p):
   if len(p) == 5:
     p[0] = ProcCall(p[1], p[3])
   else:
-    p[0] = ProcCall(p[1])
+    p[0] = ProcCall(p[1], None)
 
 def p_parameter_list(p):
   """ parameter_list : expression
@@ -888,14 +897,16 @@ class Mode(Node):
         return tuple(nodelist)
 
 class DiscreteMode(Node):
-    def __init__(self, mode, lineno):
+    def __init__(self, tipo, mode, lineno):
         self.type = "DiscreteMode"
+        self.tipo = tipo
         self.mode = mode
         self.lineno = lineno
-    attr_names = ("mode",)
+    attr_names = ("tipo",)
 
     def children(self):
         nodelist = []
+        if self.mode is not None: nodelist.append(("mode", self.mode))
         return tuple(nodelist)
 
 class Expr(Node):
@@ -1299,6 +1310,103 @@ class ModeDef(Node):
       for i, child in enumerate(self.idents or []):
         nodelist.append(("exprs[%d]" % i, child))
       if self.mode is not None: nodelist.append(("mode", self.mode))
+      return tuple(nodelist)
+
+class DiscreteRange(Node):
+    def __init__(self, discr, liter):
+        self.type = "discreterange"
+        self.discr = discr
+        self.liter = liter
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.discr is not None: nodelist.append(("discr", self.discr))
+      if self.liter is not None: nodelist.append(("liter", self.liter))
+
+      return tuple(nodelist)
+
+class RangeEnum(Node):
+    def __init__(self, loop, mode):
+        self.type = "rangeenum"
+        self.loop = loop
+        self.mode = mode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.loop is not None: nodelist.append(("loop", self.loop))
+      if self.mode is not None: nodelist.append(("mode", self.mode))
+
+      return tuple(nodelist)
+
+class Ref(Node):
+    def __init__(self, mode):
+        self.type = "rangeenum"
+        self.mode = mode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.mode is not None: nodelist.append(("mode", self.mode))
+
+      return tuple(nodelist)
+
+class RefLoc(Node):
+    def __init__(self, ref, loc):
+        self.type = "rangeenum"
+        self.ref = ref
+        self.loc = loc
+    attr_names = ("ref", )
+
+    def children(self):
+      nodelist = []
+      if self.loc is not None: nodelist.append(("loc", self.loc))
+
+      return tuple(nodelist)
+
+class StrLen(Node):
+    def __init__(self, slen):
+        self.type = "rangeenum"
+        self.slen = slen
+    attr_names = ("slen", )
+
+    def children(self):
+      nodelist = []
+      return tuple(nodelist)
+
+class CondExpr(Node):
+    def __init__(self, boolex, thenex, elseex, elsifex):
+        self.type = "modedef"
+        self.boolex = boolex
+        self.thenex = thenex
+        self.elseex = elseex
+        self.elsifex = elsifex
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.boolex is not None: nodelist.append(("boolex", self.boolex))
+      if self.thenex is not None: nodelist.append(("thenex", self.thenex))
+      if self.elseex is not None: nodelist.append(("elseex", self.elseex))
+      if self.elsifex is not None: nodelist.append(("elsifex", self.elsifex))
+
+      return tuple(nodelist)
+
+class Elsif(Node):
+    def __init__(self, boolex, thenex, elsifex):
+        self.type = "modedef"
+        self.boolex = boolex
+        self.thenex = thenex
+        self.elsifex = elsifex
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.boolex is not None: nodelist.append(("boolex", self.boolex))
+      if self.thenex is not None: nodelist.append(("thenex", self.thenex))
+      if self.elsifex is not None: nodelist.append(("elsifex", self.elsifex))
+
       return tuple(nodelist)
 
 # Build the parser

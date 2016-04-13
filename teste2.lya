@@ -1,0 +1,2 @@
+type ptr = ref int;
+dcl x, y int, p ptr = ->x;
