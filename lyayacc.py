@@ -85,6 +85,7 @@ def p_identifier(p):
   ' identifier : ID '
   p[0] = ID(p[1])
 
+
 ########################  BLOCO 3  #############################
 
 def p_synonym_statement(p):
@@ -111,13 +112,16 @@ def p_constant_expression(p):
 
 def p_newmode_statement(p):
   ' newmode_statement : TYPE newmode_list SEMI'
-  p[0] = p[1]
+  p[0] = [p[1], p[2]]
 
 def p_newmode_list(p):
   """ newmode_list : mode_definition
                    | newmode_list COMMA mode_definition
   """
-  p[0] = [p[1]] if len(p) == 2 else p[1] + [p[3]]
+  if len(p) == 2:
+      p[0] = [p[1]]
+  else:
+      p[0] = p[1] + [p[3]]
 
 def p_mode_definition(p):
   ' mode_definition : identifier_list ASSIGN mode '
@@ -145,7 +149,7 @@ def p_integer_mode(p):
 
 def p_boolean_mode(p):
   ' boolean_mode : BOOL '
-  p[0] = BOOL(None)
+  p[0] = p[1]
 
 def p_character_mode(p):
   ' character_mode : CHAR '
@@ -171,7 +175,7 @@ def p_literal_range(p):
 
 def p_reference_mode(p):
   ' reference_mode : REF mode '
-  p[0] = REF(p[2])
+  p[0] = [p[1], p[2]]
 
 def p_composite_mode(p):
   """ composite_mode : string_mode
@@ -217,7 +221,6 @@ def p_element_mode(p):
 ########################  BLOCO 5  #############################
 def p_location(p):
   """ location : identifier
-               | identifier LBRACKET expression RBRACKET
                | location LBRACKET lower_bound COLON upper_bound RBRACKET
                | location ARROW
                | location LBRACKET expression_list RBRACKET
@@ -260,7 +263,6 @@ def p_literal(p):
   """
   p[0] = Constant(p[1])
 
-
 ########################  BLOCO 7  #############################
 
 def p_value_array_element(p):
@@ -293,7 +295,7 @@ def p_conditional_expression(p):
   """ conditional_expression : IF boolean_expression then_expression else_expression FI
                              | IF boolean_expression then_expression elsif_expression else_expression FI
   """
-  p[0] = [p[2], p[3], p[4]] if len(p) == 6 else [p[2], p[3], p[4], p[5]]
+  p[0] = [p[1], p[2], p[3], p[4]] if len(p) == 6 else [p[1], p[2], p[3], p[4], p[5]]
 
 def p_boolean_expression(p):
   """ boolean_expression : expression
@@ -392,7 +394,7 @@ def p_action_statement_list(p):
 
 def p_action(p):
   """ action : if_action
-  	         | do_action
+  	     | do_action
              | assignment_action
              | call_action
              | exit_action
@@ -564,7 +566,7 @@ def p_parameter_list(p):
 
 def p_exit_action(p):
   """ exit_action : EXIT identifier """
-  p[0] = [p[1], p[2]]
+  p[0] = p[2]
 
 def p_return_action(p):
   """ return_action : RETURN expression 
@@ -608,7 +610,7 @@ def p_procedure_statement(p):
 
 def p_procedure_definition(p):
   """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
-  			                   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
+  			   | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
@@ -1216,7 +1218,7 @@ class StepEnum(Node):
       if self.end is not None: nodelist.append(("end", self.end))
       if self.step is not None: nodelist.appstep(("step", self.end))
       return tuple(nodelist)
-      
+       
 # Build the parser
 parser = yacc.yacc()
 
