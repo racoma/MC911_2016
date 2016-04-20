@@ -246,11 +246,11 @@ def p_location(p):
 
 def p_lower_bound(p):
   """ lower_bound : expression """
-  p[0] = [p[1]]
-  
+  p[0] = p[1]
+
 def p_upper_bound(p):
   """ upper_bound : expression """
-  p[0] = [p[1]]
+  p[0] = p[1]
 
 def p_expression_list(p):
   """ expression_list : expression
@@ -342,7 +342,7 @@ def p_elsif_expression(p):
   """ elsif_expression : ELSIF boolean_expression then_expression
                        | elsif_expression ELSIF boolean_expression then_expression
   """
-  # if len(p) == 4: 
+  # if len(p) == 4:
   #   p[0] = Elsif(p[2], p[3], None)
   # else:
   #   p[0] = Elsif(p[3], p[4], p[1])
@@ -402,7 +402,7 @@ def p_referenced_location(p):
   """ referenced_location : ARROW location
   """
   p[0] = RefLoc(p[1], p[2])
-  
+
 ########################### BLOCO 9 ##################################
 def p_action_statement(p):
   """ action_statement : label_id COLON action SEMI
@@ -412,11 +412,11 @@ def p_action_statement(p):
     p[0] = ActionStmt(None, p[1])
   else:
     p[0] = ActionStmt(p[1], p[3])
-    
+
 def p_label_id(p):
   """ label_id : identifier
   """
-  p[0] = p[1]  
+  p[0] = p[1]
 
 def p_action_statement_list(p):
   """ action_statement_list : action_statement
@@ -464,7 +464,7 @@ def p_if_action(p):
     p[0] = IfAction(p[2], p[3], p[4])
   else:
     p[0] = IfAction(p[2], p[3])
-    
+
 def p_then_clause(p):
   """ then_clause : THEN action_statement_list
         | THEN
@@ -473,7 +473,7 @@ def p_then_clause(p):
     p[0] = ThenClause(p[2])
   else:
     p[0] = ThenClause(None)
-  
+
 def p_else_clause(p):
   """ else_clause : ELSE action_statement_list
         | ELSE
@@ -510,15 +510,15 @@ def p_for_control(p):
   """ for_control : FOR iteration
   """
   p[0] = ForControl(p[2])
-  
+
 def p_iteration(p):
   """ iteration : step_enumeration
                 | range_enumeration
-  """  
+  """
   p[0] = p[1]
 
 def p_step_enumeration(p):
-  """ step_enumeration : loop_counter ASSIGN start_value step_value DOWN end_value 
+  """ step_enumeration : loop_counter ASSIGN start_value step_value DOWN end_value
                        | loop_counter ASSIGN start_value DOWN end_value
                        | loop_counter ASSIGN start_value step_value end_value
                        | loop_counter ASSIGN start_value end_value
@@ -539,38 +539,38 @@ def p_loop_counter(p):
 
 def p_start_value(p):
   """ start_value : discrete_expression
-  """ 
+  """
   p[0] = p[1]
 
 def p_step_value(p):
   """ step_value : BY ICONST
-  """ 
+  """
   p[0] = p[2]
 
 def p_end_value(p):
   """ end_value : TO discrete_expression
   """
   p[0] = p[2]
-  
+
 def p_discrete_expression(p):
   """ discrete_expression : expression
-  """  
+  """
   p[0] = p[1]
-  
+
 def p_range_enumeration(p):
   """ range_enumeration : loop_counter DOWN IN discrete_mode
                         | loop_counter IN discrete_mode
-  """  
+  """
   if len(p) == 5:
     p[0] = RangeEnum(p[1], p[4])
   else:
     p[0] = RangeEnum(p[1], p[3])
-    
+
 def p_while_control(p):
   """ while_control : WHILE boolean_expression
   """
   p[0] = WhileControl(p[2])
-  
+
 ########################### BLOCO 12 ##################################
 def p_call_action(p):
   """ call_action : procedure_call
@@ -590,7 +590,7 @@ def p_procedure_call(p):
 def p_parameter_list(p):
   """ parameter_list : expression
                      | parameter_list COMMA expression
-  """ 
+  """
   if len(p) == 2:
     p[0] = Param([p[1]])
   else:
@@ -604,7 +604,7 @@ def p_exit_action(p):
   p[0] = Exit(p[2])
 
 def p_return_action(p):
-  """ return_action : RETURN expression 
+  """ return_action : RETURN expression
                     | RETURN
   """
   if len(p) == 2:
@@ -644,9 +644,9 @@ def p_procedure_statement(p):
   p[0] = ProcStmt(p[1], p[3])
 
 def p_procedure_definition(p):
-  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END 
-                           | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END 
-                           | PROC LPAREN RPAREN result_spec SEMI statement_list END 
+  """ procedure_definition : PROC LPAREN formal_parameter_list RPAREN result_spec SEMI statement_list END
+                           | PROC LPAREN formal_parameter_list RPAREN SEMI statement_list END
+                           | PROC LPAREN RPAREN result_spec SEMI statement_list END
                            | PROC LPAREN RPAREN SEMI statement_list END
   """
   if len(p) == 9:
@@ -676,7 +676,7 @@ def p_formal_parameter(p):
 def p_result_spec(p):
   """ result_spec : RETURNS LPAREN parameter_spec RPAREN """
   p[0] = Returns(p[3])
-    
+
 def p_parameter_spec(p):
   """ parameter_spec : mode LOC
                      | mode
@@ -687,14 +687,14 @@ def p_parameter_spec(p):
     p[0] = ParamSpec(p[1], None)
 
 ###########################################################################################
-  
+
 # Error rule for syntax errors
 def p_error(p):
     if p:
       print("Syntax error at '%s'" % repr(p))
       print("\n")
       parser.errok()
-   
+
 ####################################### AST ###############################################
 
 class Node(object):
@@ -830,7 +830,7 @@ class StmtList(Node):
       for i, child in enumerate(self.statements or []):
           nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
-        
+
 class DclStmt(Node):
     def __init__(self, declarations):
         self.type = "DclStmt"
@@ -842,7 +842,7 @@ class DclStmt(Node):
       for i, child in enumerate(self.declarations or []):
           nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)
-      
+
 
 class Decl(Node):
     def __init__(self, identifier_list, mode, initialization=None):
@@ -856,7 +856,7 @@ class Decl(Node):
       nodelist = []
       for i, child in enumerate(self.identifier_list or []):
           nodelist.append(("exprs[%d]" % i, child))
-      if self.mode is not None: nodelist.append(("mode", self.mode))      
+      if self.mode is not None: nodelist.append(("mode", self.mode))
       if self.initialization is not None: nodelist.append(("initialization", self.initialization))
       return tuple(nodelist)
 
@@ -1247,10 +1247,8 @@ class Range(Node):
 
     def children(self):
       nodelist = []
-      for i, child in enumerate(self.i1 or []):
-          nodelist.append(("exprs[%d]" % i, child))
-      for i, child in enumerate(self.i2 or []):
-          nodelist.append(("exprs[%d]" % i, child))
+      if self.i1 is not None: nodelist.append(("i1", self.i1))
+      if self.i2 is not None: nodelist.append(("i2", self.i2))
       return tuple(nodelist)
 
 class StepEnum(Node):
@@ -1355,7 +1353,7 @@ class RangeEnum(Node):
 
 class Ref(Node):
     def __init__(self, mode):
-        self.type = "rangeenum"
+        self.type = "ref"
         self.mode = mode
     attr_names = ()
 
@@ -1367,7 +1365,7 @@ class Ref(Node):
 
 class RefLoc(Node):
     def __init__(self, ref, loc):
-        self.type = "rangeenum"
+        self.type = "refloc"
         self.ref = ref
         self.loc = loc
     attr_names = ("ref", )
@@ -1380,7 +1378,7 @@ class RefLoc(Node):
 
 class StrLen(Node):
     def __init__(self, slen):
-        self.type = "rangeenum"
+        self.type = "strlen"
         self.slen = slen
     attr_names = ("slen", )
 
@@ -1390,7 +1388,7 @@ class StrLen(Node):
 
 class CondExpr(Node):
     def __init__(self, boolex, thenex, elseex, elsifex):
-        self.type = "modedef"
+        self.type = "condexpr"
         self.boolex = boolex
         self.thenex = thenex
         self.elseex = elseex
@@ -1408,7 +1406,7 @@ class CondExpr(Node):
 
 class ElsifList(Node):
     def __init__(self, exprs):
-        self.type = "modedef"
+        self.type = "elsiflist"
         self.exprs = exprs
     attr_names = ()
 
@@ -1420,7 +1418,7 @@ class ElsifList(Node):
 
 class Elsif(Node):
     def __init__(self, boolex, thenex):
-        self.type = "modedef"
+        self.type = "elsif"
         self.boolex = boolex
         self.thenex = thenex
     attr_names = ()
@@ -1434,7 +1432,7 @@ class Elsif(Node):
 
 class ThenExpr(Node):
     def __init__(self, exp):
-        self.type = "Expr"
+        self.type = "thenexpr"
         self.exp = exp
     attr_names = ()
 
@@ -1445,7 +1443,7 @@ class ThenExpr(Node):
 
 class ElseExpr(Node):
     def __init__(self, exp):
-        self.type = "Expr"
+        self.type = "elseexpr"
         self.exp = exp
     attr_names = ()
 
@@ -1456,7 +1454,7 @@ class ElseExpr(Node):
 
 class DerefRef(Node):
     def __init__(self, location, arrow):
-        self.type = "Expr"
+        self.type = "DerefRef"
         self.location = location
         self.arrow = arrow
     attr_names = ("arrow",)
@@ -1464,6 +1462,21 @@ class DerefRef(Node):
     def children(self):
         nodelist = []
         if self.location is not None: nodelist.append(("location", self.location))
+        return tuple(nodelist)
+
+class ArraySlice(Node):
+    def __init__(self, location, lower, upper):
+        self.type = "arrayslice"
+        self.location = location
+        self.lower = lower
+        self.upper = upper
+    attr_names = ()
+
+    def children(self):
+        nodelist = []
+        if self.location is not None: nodelist.append(("location", self.location))
+        if self.lower is not None: nodelist.append(("lower", self.lower))
+        if self.upper is not None: nodelist.append(("upper", self.upper))
         return tuple(nodelist)
 
 # Build the parser
