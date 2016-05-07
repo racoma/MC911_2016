@@ -724,7 +724,7 @@ IntType = ExprType("int",
          'LE', 'LT', 'EQ', 'NE', 'GT', 'GE', 'MOD')),
     set(('PLUS', 'MINUS', 'NOT', 'IN')),
     )
-CharType = ExprType("char",
+BoolType = ExprType("bool",
     set(('AND', 'OR', 'EQ', 'NE')),
     set(('NOT',))
     )    
