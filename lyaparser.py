@@ -13,9 +13,9 @@ import ast
 f = open(sys.argv[-1])
 
 precedence = (
-  ('left', 'CONCAT'),
-  ('left', 'NOT'),
-  ('left', 'IN'),
+        ('left', 'CONCAT'),
+        ('left', 'NOT'),
+        ('left', 'IN'),
         ('left', 'OR'),
         ('left', 'AND'),
         ('left', 'EQ', 'NEQ'),
@@ -686,7 +686,7 @@ def p_parameter_spec(p):
   else:
     p[0] = ParamSpec(p[1], None)
 
-###########################################################################################
+###################################### Error ##############################################
 
 # Error rule for syntax errors
 def p_error(p):
@@ -694,7 +694,85 @@ def p_error(p):
       print("Syntax error at '%s'" % repr(p))
       print("\n")
       parser.errok()
+      
+#################################### Symbol Table ########################################      
+      
+      
+class SymbolTable(dict):
+    def __init__(self, decl=None):
+        super().__init__()
+        self.decl = decl
+    def insert(self, name, value):
+        self[name] = value
+    def lookup(self, name):
+        return self.get(name, None)
+    def return_type(self):
+        if self.decl:
+            return self.decl.mode
+        return None
+        
+#################################### Types ##################################################
 
+class ExprType(object):
+    def __init__(self, name, bin_ops=set(), un_ops=set()):
+        self.name = name
+        self.bin_ops = bin_ops
+        self.un_ops = un_ops
+
+IntType = ExprType("int",
+    set(('PLUS', 'MINUS', 'TIMES', 'DIVIDE',
+         'LE', 'LT', 'EQ', 'NE', 'GT', 'GE', 'MOD')),
+    set(('PLUS', 'MINUS', 'NOT', 'IN')),
+    )
+CharType = ExprType("char",
+    set(('AND', 'OR', 'EQ', 'NE')),
+    set(('NOT',))
+    )    
+CharType = ExprType("char",
+    set(('PLUS', 'MINUS')),
+    set(('PLUS', 'MINUS', 'IN', 'CONCAT')),
+    )
+StringType = ExprType("string",
+    set(('PLUS',)),
+    set(('CONCAT')),
+    )
+
+######################################### Scopes ###############################################
+
+class Environment(object):
+    def __init__(self):
+        self.stack = []
+        self.root = SymbolTable()
+        self.stack.append(self.root)
+        self.root.update({
+            "int": IntType,
+            "bool": BoolType,
+            "char": CharType,
+            "string": StringType
+        })
+    def push(self, enclosure):
+        self.stack.append(SymbolTable(decl=enclosure))
+    def pop(self):
+        self.stack.pop()
+    def peek(self):
+        return self.stack[-1]
+    def scope_level(self):
+        return len(self.stack)
+    def insert_local(self, name, value):
+        self.peek().insert(name, value)
+    def insert_root(self, name, value):
+        self.root.insert(name, value)
+    def lookup(self, name):
+        for scope in reversed(self.stack):
+            hit = scope.lookup(name)
+            if hit is not None:
+                return hit
+        return None
+    def find(self, name):
+        if name in self.stack[-1]:
+            return True
+        else:
+            return False
 ####################################### AST ###############################################
 
 class Node(object):
