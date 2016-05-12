@@ -379,7 +379,7 @@ def p_binop(p):
   if len(p) == 2:
     p[0] = p[1]
   else:
-    p[0] = Binop(p[2], p[1], p[3])
+    p[0] = Binop(p[2], p[1], p[3], p.lineno(1))
 
 def p_operand(p):
   """ operand : MINUS operand1
@@ -695,84 +695,7 @@ def p_error(p):
       print("\n")
       parser.errok()
       
-#################################### Symbol Table ########################################      
-      
-      
-class SymbolTable(dict):
-    def __init__(self, decl=None):
-        super().__init__()
-        self.decl = decl
-    def insert(self, name, value):
-        self[name] = value
-    def lookup(self, name):
-        return self.get(name, None)
-    def return_type(self):
-        if self.decl:
-            return self.decl.mode
-        return None
-        
-#################################### Types ##################################################
 
-class ExprType(object):
-    def __init__(self, name, bin_ops=set(), un_ops=set()):
-        self.name = name
-        self.bin_ops = bin_ops
-        self.un_ops = un_ops
-
-IntType = ExprType("int",
-    set(('PLUS', 'MINUS', 'TIMES', 'DIVIDE',
-         'LE', 'LT', 'EQ', 'NE', 'GT', 'GE', 'MOD')),
-    set(('PLUS', 'MINUS', 'NOT', 'IN')),
-    )
-BoolType = ExprType("bool",
-    set(('AND', 'OR', 'EQ', 'NE')),
-    set(('NOT',))
-    )    
-CharType = ExprType("char",
-    set(('PLUS', 'MINUS')),
-    set(('PLUS', 'MINUS', 'IN', 'CONCAT')),
-    )
-StringType = ExprType("string",
-    set(('PLUS',)),
-    set(('CONCAT')),
-    )
-
-######################################### Scopes ###############################################
-
-class Environment(object):
-    def __init__(self):
-        self.stack = []
-        self.root = SymbolTable()
-        self.stack.append(self.root)
-        self.root.update({
-            "int": IntType,
-            "bool": BoolType,
-            "char": CharType,
-            "string": StringType
-        })
-    def push(self, enclosure):
-        self.stack.append(SymbolTable(decl=enclosure))
-    def pop(self):
-        self.stack.pop()
-    def peek(self):
-        return self.stack[-1]
-    def scope_level(self):
-        return len(self.stack)
-    def insert_local(self, name, value):
-        self.peek().insert(name, value)
-    def insert_root(self, name, value):
-        self.root.insert(name, value)
-    def lookup(self, name):
-        for scope in reversed(self.stack):
-            hit = scope.lookup(name)
-            if hit is not None:
-                return hit
-        return None
-    def find(self, name):
-        if name in self.stack[-1]:
-            return True
-        else:
-            return False
 ####################################### AST ###############################################
 
 class Node(object):
@@ -988,12 +911,12 @@ class Mode(Node):
         return tuple(nodelist)
 
 class DiscreteMode(Node):
-    def __init__(self, tipo, mode, lineno):
+    def __init__(self, type, mode, lineno):
         self.type = "DiscreteMode"
-        self.tipo = tipo
+        self.type = type
         self.mode = mode
         self.lineno = lineno
-    attr_names = ("tipo",)
+    attr_names = ("type",)
 
     def children(self):
         nodelist = []
@@ -1023,12 +946,12 @@ class BoolExpr(Node):
         return tuple(nodelist)
 
 class Constant(Node):
-    def __init__(self, exp, lineno, tipo):
+    def __init__(self, exp, lineno, type):
         self.type = "Constant"
         self.exp = exp
-        self.tipo = tipo
+        self.type = type
         self.lineno = lineno
-    attr_names = ("exp", "tipo",)
+    attr_names = ("exp", "type",)
 
     def children(self):
         nodelist = []
@@ -1107,11 +1030,12 @@ class Assignment(Node):
       return tuple(nodelist)
 
 class Binop(Node):
-    def __init__(self, op, left, right):
+    def __init__(self, op, left, right, lineno):
         self.type = "binop"
         self.left = left
         self.op = op
         self.right = right
+        self.lineno = lineno
     attr_names = ("op",)
 
     def children(self):
