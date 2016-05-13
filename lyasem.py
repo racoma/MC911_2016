@@ -1,5 +1,6 @@
 import sys
 from lyaparser import *
+from lyalex import tokens
 
 #################################### Symbol Table ########################################      
 
@@ -25,21 +26,20 @@ class ExprType(object):
         self.un_ops = un_ops
 
 IntType = ExprType("int",
-    set(('PLUS', 'MINUS', 'TIMES', 'DIVIDE',
-         'LE', 'LT', 'EQ', 'NE', 'GT', 'GE', 'MOD')),
-    set(('PLUS', 'MINUS', 'NOT', 'IN')),
+    set(('+', '-', '*', '/',
+         '<=', '<', '==', '!=', '>', '>=', '%')),
+    set(('+', '-', '!', 'IN')),
     )
 BoolType = ExprType("bool",
-    set(('AND', 'OR', 'EQ', 'NE')),
-    set(('NOT',))
+    set(('&&', '||', '==', '!=')),
+    set(('!',))
     )
 CharType = ExprType("char",
-    set(('PLUS', 'MINUS')),
-    set(('PLUS', 'MINUS', 'IN', 'CONCAT')),
+    set(('+', '-')),
+    set(('+', '-', 'IN', '&')),
     )
 StringType = ExprType("string",
-    set(('PLUS',)),
-    set(('CONCAT')),
+    set(('&', '==', '!=')),
     )
 
 ######################################### Scopes ###############################################
@@ -105,10 +105,11 @@ class Visitor(NodeVisitor):
         }
     def raw_type_unary(self, node, op, val):
         if hasattr(val, "type"):
-            if op not in val.type.unary_ops:
+            if op not in val.type.un_ops:
                 error(node.lineno,
                       "Unary operator {} not supported".format(op))
             return val.type
+
     def raw_type_binary(self, node, op, left, right):
         if hasattr(left, "type") and hasattr(right, "type"):
             if left.type != right.type:
@@ -116,7 +117,7 @@ class Visitor(NodeVisitor):
                 "Binary operator {} does not have matching types".format(op))
                 return left.type
             errside = None
-            print (op)
+            print(right.type.bin_ops)
             if op not in left.type.bin_ops:
                 errside = "LHS"
             if op not in right.type.bin_ops:
@@ -132,16 +133,19 @@ class Visitor(NodeVisitor):
         node.symtab = self.environment.peek()
         # Visit all of the statements
         for stmts in node.statement_list.statements: self.visit(stmts)
+
     def visit_Syn(self, node):
         # Visit all of the synonyms
         for syn in node.syns:
             self.visit(syn)
-    def visit_UnaryExpr(self,node):
+
+    def visit_Operand(self,node):
         self.visit(node.expr)
         # Make sure that the operation is supported by the type
         raw_type = self.raw_type_unary(node, node.op, node.expr)
         # Set the result type to the same as the operand
         node.raw_type = raw_type
+
     def visit_Binop(self,node):
         # Make sure left and right operands have the same type
         # Make sure the operation is supported
@@ -150,6 +154,12 @@ class Visitor(NodeVisitor):
         raw_type = self.raw_type_binary(node, node.op, node.left, node.right)
         # Assign the result type
         node.raw_type = raw_type
+
+    def visit_Constant(self,node):
+        nodetype = self.typemap.get(node.type, None)
+        if nodetype is None:
+            error(node.lineno, "Type {} is not supported".format(valtype))
+        node.type = nodetype
 
 
 def check_errors(node):
