@@ -26,18 +26,16 @@ class ExprType(object):
         self.un_ops = un_ops
 
 IntType = ExprType("int",
-    set(('+', '-', '*', '/',
-         '<=', '<', '==', '!=', '>', '>=', '%')),
+    set(('+', '-', '*', '/', '<=', '<', '==', '!=', '>', '>=', '%')),
     set(('+', '-')),
     )
 
 CharType = ExprType("char",
-    set(('+', '-')),
-    set(('+', '-', 'IN', '&')),
+    set(('==', '!=', '>', '>=', '<', '<=')),
     )
 
 StringType = ExprType("string",
-    set(('&', '==', '!=')),
+    set(('&', '==', '!=', '+')),
     )
 
 BoolType = ExprType("bool",
@@ -82,7 +80,7 @@ class Environment(object):
         else:
             return False
 
-######### ERROR #######
+########################################### ERROR ###############################################
 
 def error(lineno, message, filename=None):
     print("{}: {}".format(lineno, message))
