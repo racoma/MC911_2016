@@ -279,8 +279,10 @@ def p_literal(p):
   """
   if isinstance(p[1], int):
     p[0] = Constant(p[1], p.lineno(1), "int")
-  elif isinstance(p[1], bool):
+  elif p[1] == 'true' or p[1] == 'false':
     p[0] = Constant(p[1], p.lineno(1), "bool")
+  elif p[1][0] == "\'":
+    p[0] = Constant(p[1], p.lineno(1), "char")
   elif isinstance(p[1], str):
     p[0] = Constant(p[1], p.lineno(1), "string")
   else:

@@ -142,7 +142,7 @@ def t_ICONST(t):
 
 #Constants rule
 def t_CCONST(t):
-    r"\'([^\\\n]|(\\.))*?\'"   
+    r"\'([^\\\n]|(\\.))*?\'"
     return t
 
 #Strings rule

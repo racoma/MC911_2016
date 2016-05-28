@@ -28,18 +28,21 @@ class ExprType(object):
 IntType = ExprType("int",
     set(('+', '-', '*', '/',
          '<=', '<', '==', '!=', '>', '>=', '%')),
-    set(('+', '-', '!', 'IN')),
+    set(('+', '-')),
     )
-BoolType = ExprType("bool",
-    set(('&&', '||', '==', '!=')),
-    set(('!',))
-    )
+
 CharType = ExprType("char",
     set(('+', '-')),
     set(('+', '-', 'IN', '&')),
     )
+
 StringType = ExprType("string",
     set(('&', '==', '!=')),
+    )
+
+BoolType = ExprType("bool",
+    set(('&&', '||', '==', '!=')),
+    set(('!',))
     )
 
 ######################################### Scopes ###############################################
@@ -117,7 +120,6 @@ class Visitor(NodeVisitor):
                 "Binary operator {} does not have matching types".format(op))
                 return left.type
             errside = None
-            print(right.type.bin_ops)
             if op not in left.type.bin_ops:
                 errside = "LHS"
             if op not in right.type.bin_ops:
@@ -132,19 +134,22 @@ class Visitor(NodeVisitor):
         node.environment = self.environment
         node.symtab = self.environment.peek()
         # Visit all of the statements
-        for stmts in node.statement_list.statements: self.visit(stmts)
+        for stmts in node.statement_list.statements:
+            self.visit(stmts)
+            if isinstance(stmts, Assignment):
+                self.environment.insert_local(stmts.location.char, stmts.expr)
+
 
     def visit_Syn(self, node):
         # Visit all of the synonyms
-        for syn in node.syns:
-            self.visit(syn)
+        self.visit(node.expr)
 
     def visit_Operand(self,node):
         self.visit(node.expr)
         # Make sure that the operation is supported by the type
         raw_type = self.raw_type_unary(node, node.op, node.expr)
         # Set the result type to the same as the operand
-        node.raw_type = raw_type
+        node.type = raw_type
 
     def visit_Binop(self,node):
         # Make sure left and right operands have the same type
@@ -153,12 +158,42 @@ class Visitor(NodeVisitor):
         self.visit(node.right)
         raw_type = self.raw_type_binary(node, node.op, node.left, node.right)
         # Assign the result type
-        node.raw_type = raw_type
+        node.type = raw_type
 
     def visit_Constant(self,node):
         nodetype = self.typemap.get(node.type, None)
         if nodetype is None:
-            error(node.lineno, "Type {} is not supported".format(valtype))
+            error(node.lineno, "Type {} is not supported".format(node.type))
+        node.type = nodetype
+
+    def visit_Assignment(self,node):
+        var = self.environment.lookup(node.location.char)
+        if var is None:
+            error(node.location.lineno, "Error. '{}' is not defined".format(node.location.char))
+        self.visit(node.expr)
+
+    def visit_Decl(self,node):
+        for i, child in enumerate(node.identifier_list or []):
+            # Adiciona a tabela
+            self.environment.insert_local(child.char, node)
+        # Verifica se tem o mesmo tipo
+        self.visit(node.mode.mode)
+        if hasattr(node.mode.mode, "type"):
+            node.type = node.mode.mode.type
+
+        self.visit(node.initialization.exp)
+        if hasattr(node.initialization.exp, "type"):
+            declared_type = node.type.name
+            value_type = node.initialization.exp.type
+            if declared_type != value_type:
+                error(node.identifier_list[0].lineno, "Cannot assign {} to {}".format(value_type, declared_type))
+        node.scope_level = self.environment.scope_level()
+
+    def visit_DiscreteMode(self,node):
+        nodetype = self.environment.lookup(node.type)
+        if not isinstance(nodetype, ExprType):
+            error(node.lineno, "{} is not a valid type".format(node.type))
+            return
         node.type = nodetype
 
 

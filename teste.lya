@@ -1,1 +1,5 @@
-a = "hello" & "ha";
+dcl a int = 2; // Ok
+dcl b char = 3; // Error. 3 is not char
+dcl c int = a+3; // Ok
+dcl d int = a+b; // Error. int + char
+dcl e bool = true; // Ok
