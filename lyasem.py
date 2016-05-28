@@ -186,7 +186,10 @@ class Visitor(NodeVisitor):
         node.type = node.exp.type
 
     def visit_Assignment(self,node):
-        var = self.environment.lookup(node.location.char)
+        if not isinstance(node.location, ProcCall):
+            var = self.environment.lookup(node.location.char)
+        else:
+            return
         if var is None:
             error(node.location.lineno, "Error. '{}' is not defined".format(node.location.char))
         self.visit(node.expr)

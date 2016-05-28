@@ -1,2 +1,14 @@
-       dcl a chars[10] = "Hello" & "World"; // Ok
-       dcl b chars[10] = "Hello" * "World"; // Error (unsupported op *)
+dcl x, y int;
+
+p: proc (b bool) returns (int loc);
+  if b then
+    result x;
+  else
+    result y;
+  fi;
+end;
+
+dcl b bool = false;
+p(b)    = 20;
+p(true) = 10;
+print(x,y);   // display 10, 20
