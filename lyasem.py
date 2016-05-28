@@ -20,28 +20,37 @@ class SymbolTable(dict):
 #################################### Types ##################################################
 
 class ExprType(object):
-    def __init__(self, name, bin_ops=set(), un_ops=set()):
+    def __init__(self, name, bin_ops=set(), un_ops=set(), bin_opc=set(), un_opc=set()):
         self.name = name
         self.bin_ops = bin_ops
-        self.un_ops = un_ops
+        self.un_ops = un_ops or set()
+        self.bin_opc = bin_opc or set()
+        self.un_opc = un_opc or set()
 
 IntType = ExprType("int",
     set(('+', '-', '*', '/', '<=', '<', '==', '!=', '>', '>=', '%')),
-    set(('+', '-')),
+    set(('+', '-')),	
+    bin_opc={'+' : 'add', '-' : 'sub', '*' : 'mul', '/' : 'div', '<=' : 'leq', '<' : 'lt', '==' : 'eq', '!=' : 'neq', '>' : 'gt', '>=': 'geq', '%' : 'mod'},
+    un_opc={'+' : 'add', '-' : 'sub'},
     )
 
 CharType = ExprType("char",
     set(('==', '!=', '>', '>=', '<', '<=')),
+    bin_opc={'==' : 'eq', '!=' : 'neq', '>' : 'gt', '>=' : 'geq', '<' : 'lt', '<=' : 'leq'},
     )
 
 StringType = ExprType("string",
     set(('&', '==', '!=', '+')),
+    bin_opc={'&' : 'cct', '==' : 'eq', '!=' : 'neq', '+' : 'add'},
     )
 
 BoolType = ExprType("bool",
     set(('&&', '||', '==', '!=')),
-    set(('!',))
+    set(('!')),
+    bin_opc={'&&' : 'and', '||' : 'or', '==' : 'eq', '!=' : 'neq'},
+    un_opc={'!' : 'dif'}
     )
+
 
 ######################################### Scopes ###############################################
 
