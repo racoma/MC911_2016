@@ -1384,7 +1384,8 @@ class StrLen(Node):
     def __init__(self, slen):
         self.type = "strlen"
         self.slen = slen
-    attr_names = ("slen", )
+        self.type = "string"
+    attr_names = ("slen", "type")
 
     def children(self):
       nodelist = []

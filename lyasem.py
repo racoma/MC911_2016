@@ -141,8 +141,15 @@ class Visitor(NodeVisitor):
 
 
     def visit_Syn(self, node):
-        # Visit all of the synonyms
+        node.scope_level = self.environment.scope_level()
+        # 2. Add an entry to the symbol table
+        for i, child in enumerate(node.ident or []):
+            self.environment.insert_local(child.char, node)
         self.visit(node.expr)
+        node.type = node.expr.exp.type
+        # for i, child in enumerate(node.ident or []):
+        #     e = self.environment.lookup(child.char)
+        #     print(e.type.name)
 
     def visit_Operand(self,node):
         self.visit(node.expr)
@@ -166,11 +173,30 @@ class Visitor(NodeVisitor):
             error(node.lineno, "Type {} is not supported".format(node.type))
         node.type = nodetype
 
+    def visit_ID(self, node):
+        e = self.environment.lookup(node.char)
+
+        if e is not None:
+            node.type = e.type
+        else:
+            node.type = None
+
+    def visit_Expr(self, node):
+        self.visit(node.exp)
+        node.type = node.exp.type
+
     def visit_Assignment(self,node):
         var = self.environment.lookup(node.location.char)
         if var is None:
             error(node.location.lineno, "Error. '{}' is not defined".format(node.location.char))
         self.visit(node.expr)
+
+        self.visit(node.location)
+        if hasattr(node.location, "type") and node.location.type != None and hasattr(node.expr, "type"):
+            declared_type = node.location.type.name
+            value_type = node.expr.type.name
+            if declared_type != value_type:
+                error(node.location.lineno, "Cannot assign {} to {}".format(value_type, declared_type))
 
     def visit_Decl(self,node):
         for i, child in enumerate(node.identifier_list or []):
@@ -181,15 +207,24 @@ class Visitor(NodeVisitor):
         if hasattr(node.mode.mode, "type"):
             node.type = node.mode.mode.type
 
-        self.visit(node.initialization.exp)
-        if hasattr(node.initialization.exp, "type"):
-            declared_type = node.type.name
-            value_type = node.initialization.exp.type
-            if declared_type != value_type:
-                error(node.identifier_list[0].lineno, "Cannot assign {} to {}".format(value_type, declared_type))
+        # Testa se a declaration tem um assignment
+        if node.initialization:
+            self.visit(node.initialization.exp)
+            if hasattr(node.initialization.exp, "type"):
+                declared_type = node.type.name
+                value_type = node.initialization.exp.type.name
+                if declared_type != value_type:
+                    error(node.identifier_list[0].lineno, "Cannot assign {} to {}".format(value_type, declared_type))
         node.scope_level = self.environment.scope_level()
 
     def visit_DiscreteMode(self,node):
+        nodetype = self.environment.lookup(node.type)
+        if not isinstance(nodetype, ExprType):
+            error(node.lineno, "{} is not a valid type".format(node.type))
+            return
+        node.type = nodetype
+
+    def visit_StrLen(self,node):
         nodetype = self.environment.lookup(node.type)
         if not isinstance(nodetype, ExprType):
             error(node.lineno, "{} is not a valid type".format(node.type))
