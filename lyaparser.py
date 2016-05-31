@@ -1229,15 +1229,15 @@ class ArrayMode(Node):
       return tuple(nodelist)
 
 class Array(Node):
-    def __init__(self, loc, expr):
+    def __init__(self, location, expr):
         self.type = "array"
-        self.loc = loc
+        self.location = location
         self.expr = expr
     attr_names = ()
 
     def children(self):
       nodelist = []
-      if self.loc is not None: nodelist.append(("loc", self.loc))
+      if self.location is not None: nodelist.append(("location", self.location))
       for i, child in enumerate(self.expr or []):
           nodelist.append(("exprs[%d]" % i, child))
       return tuple(nodelist)

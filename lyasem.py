@@ -188,21 +188,74 @@ class Visitor(NodeVisitor):
         else:
             node.type = None
 
+    def visit_Array(self, node):
+        self.visit(node.location)
+        e = self.environment.lookup(node.location.char)
+
+        if e is not None:
+            node.type = e.type
+        else:
+            node.type = None
+
+    def visit_ArrayMode(self, node):
+        nodetype = self.typemap.get(node.element_mode.mode.type, None)
+        node.type = nodetype
+
+    def visit_Mode(self, node):
+        self.visit(node.mode)
+        node.type = node.mode.type
+
+    def visit_Ref(self, node):
+        self.visit(node.mode)
+        node.type = node.mode.type
+
+    def visit_RefLoc(self, node):
+        self.visit(node.loc)
+        node.type = node.loc.type
+
     def visit_Expr(self, node):
         self.visit(node.exp)
         node.type = node.exp.type
 
-    def visit_Assignment(self,node):
-        if not isinstance(node.location, ProcCall):
-            var = self.environment.lookup(node.location.char)
+    def visit_ProcStmt(self, node):
+        self.environment.insert_local(node.identifier.char, node)
+        self.visit(node.procedure)
+
+        if(node.procedure.type != None):
+            node.type = node.procedure.type
         else:
-            return
+            node.type = None
+
+    def visit_ProcCall(self, node):
+        self.visit(node.op)
+        node.type = node.op.type
+
+    def visit_CondExpr(self, node):
+        self.visit(node.thenex.exp)
+        node.type = node.thenex.exp.type
+
+    def visit_ProcDef(self, node):
+        if node.result_spec != None:
+            self.visit(node.result_spec.param.mode)
+            node.type = node.result_spec.param.mode.type
+        else:
+            node.type = None
+
+    def visit_Assignment(self,node):
+        if isinstance(node.location, DerefRef) or isinstance(node.location, ArraySlice) or isinstance(node.location, Array):
+            var = self.environment.lookup(node.location.location.char)
+        elif isinstance(node.location, ProcCall):
+            var = self.environment.lookup(node.location.op.char)
+        else:
+            var = self.environment.lookup(node.location.char)
+        # # else:
+        #     return
         if var is None:
             error(node.location.lineno, "Error. '{}' is not defined".format(node.location.char))
         self.visit(node.expr)
 
         self.visit(node.location)
-        if hasattr(node.location, "type") and node.location.type != None and hasattr(node.expr, "type"):
+        if hasattr(node.location, "type") and node.location.type != None and hasattr(node.expr, "type") and node.expr.type != None:
             declared_type = node.location.type.name
             value_type = node.expr.type.name
             if declared_type != value_type:
@@ -213,9 +266,9 @@ class Visitor(NodeVisitor):
             # Adiciona a tabela
             self.environment.insert_local(child.char, node)
         # Verifica se tem o mesmo tipo
-        self.visit(node.mode.mode)
-        if hasattr(node.mode.mode, "type"):
-            node.type = node.mode.mode.type
+        self.visit(node.mode)
+        if hasattr(node.mode, "type"):
+            node.type = node.mode.type
 
         # Testa se a declaration tem um assignment
         if node.initialization:
@@ -229,9 +282,9 @@ class Visitor(NodeVisitor):
 
     def visit_DiscreteMode(self,node):
         nodetype = self.environment.lookup(node.type)
-        if not isinstance(nodetype, ExprType):
-            error(node.lineno, "{} is not a valid type".format(node.type))
-            return
+        # if not isinstance(nodetype, ExprType):
+        #     error(node.lineno, "{} is not a valid type".format(node.type))
+        #     return
         node.type = nodetype
 
     def visit_StrLen(self,node):
@@ -241,6 +294,16 @@ class Visitor(NodeVisitor):
             return
         node.type = nodetype
 
+    def visit_Type(self, node):
+        for i, child in enumerate(node.newmode or []):
+            self.visit(child)
+
+    def visit_ModeDef(self, node):
+        for i, child in enumerate(node.idents or []):
+            # Adiciona a tabela
+            self.environment.insert_local(child.char, node)
+        self.visit(node.mode)
+        node.type = node.mode.type
 
 def check_errors(node):
     visitor = Visitor()
