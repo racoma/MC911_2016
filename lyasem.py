@@ -145,7 +145,9 @@ class Visitor(NodeVisitor):
             self.visit(stmts)
             if isinstance(stmts, Assignment):
                 self.environment.insert_local(stmts.location.char, stmts.expr)
-
+            # print(node.symtab)
+        node.symtab = self.environment.peek()
+        # print(len(self.environment.peek())
 
     def visit_Syn(self, node):
         node.scope_level = self.environment.scope_level()
@@ -173,6 +175,7 @@ class Visitor(NodeVisitor):
         raw_type = self.raw_type_binary(node, node.op, node.left, node.right)
         # Assign the result type
         node.type = raw_type
+        # print(node.type.name)
 
     def visit_Constant(self,node):
         nodetype = self.typemap.get(node.type, None)
@@ -218,6 +221,8 @@ class Visitor(NodeVisitor):
         node.type = node.exp.type
 
     def visit_ProcStmt(self, node):
+        node.scope_level = self.environment.scope_level()
+        self.environment.push(node)
         self.environment.insert_local(node.identifier.char, node)
         self.visit(node.procedure)
 
@@ -225,6 +230,12 @@ class Visitor(NodeVisitor):
             node.type = node.procedure.type
         else:
             node.type = None
+
+        node.symtab = self.environment.peek()
+        # print(node.symtab)
+        self.environment.insert_root(node.identifier.char, node)
+        self.environment.pop()
+
 
     def visit_ProcCall(self, node):
         self.visit(node.op)
@@ -240,6 +251,24 @@ class Visitor(NodeVisitor):
             node.type = node.result_spec.param.mode.type
         else:
             node.type = None
+
+        if node.formal_parameter_list != None:
+            for i, child in enumerate(node.formal_parameter_list or []):
+                self.visit(child)
+
+        for stmts in node.statement_list.statements:
+            self.visit(stmts)
+
+
+    def visit_FormalParam(self, node):
+        for i, child in enumerate(node.id_list or []):
+            self.environment.insert_local(child.char, node)
+        self.visit(node.param_spec)
+        node.type = node.param_spec.type
+
+    def visit_ParamSpec(self, node):
+        self.visit(node.mode)
+        node.type = node.mode.type
 
     def visit_Assignment(self,node):
         if isinstance(node.location, DerefRef) or isinstance(node.location, ArraySlice) or isinstance(node.location, Array):

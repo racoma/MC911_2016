@@ -46,9 +46,10 @@ LVM code is only allowed to use the following operators:
 '''
 
 import sys
+from lyasem import *
 import lyasem
-import lyaparser
 import lyablock
+import lyaparser
 from collections import defaultdict
 
 
@@ -72,25 +73,35 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.temp_count += 1
         return name
 
+    def numVariables(self, node):
+        count = 0
+        for value, obj in node.symtab.items():
+            if isinstance(obj, lyaparser.Decl):
+                count += 1
+        return count
+
     def visit_Program(self,node):
         # Reset the sequence of instructions and temporary count
         self.code = lyablock.BasicBlock()
         self.program = self.code
         self.temp_count = 0
-        inst = ('stp')
+        inst = "('stp')"
+        self.code.append(inst)
+        # Allocate variables
+        inst = ('alc', self.numVariables(node))
         self.code.append(inst)
         # Visit all of the statements in the program
         self.visit(node.statement_list)
-        inst2 = ('end')
+        inst2 = "('end')"
         self.code.append(inst2)
 
     def visit_Constant(self,node):
-        inst = ('ldc', node.exp)
+        inst = "('ldc', node.exp)"
         self.code.append(inst)
 
     def visit_ID(self, node):
         target = self.new_temp(node.type)
-        inst = ('ldv', node.char, target)
+        inst = "('ldv', {}, target)".format(node.char)
         self.code.append(inst)
         node.gen_location = target
 
@@ -102,19 +113,51 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.visit(node.right)
 
         # Create the opcode and append to list
+        # print(node.type)
         opcode = node.type.bin_opc[node.op]
-        inst = (opcode)
+        inst = "('" + opcode + "')"
         self.code.append(inst)
 
     def visit_Operand(self,node):
         self.visit(node.expr)
         target = self.new_temp(node.type)
         opcode = node.type.un_opc[node.op]
-        inst = (opcode)
-        inst2 = ('ldv', node.ident, target)
+        inst = "('" + opcode + "')"
+        inst2 = "('ldv', node.ident, target)"
         self.code.append(inst2)
         self.code.append(inst)
         node.gen_location = target
+
+    def visit_Decl(self, node):
+        pass
+
+class JumpGenerator(lyablock.BlockVisitor):
+    def visit_BasicBlock(self,block):
+        print("Block:[%s]" % block)
+        for inst in block.instructions:
+            print("    %s" % (inst,))
+        print("")
+
+    def visit_IfBlock(self,block):
+        # Emit a conditional jump around the if-branch
+        #inst = ('if', block.condvar)
+        #block.append(inst)
+        self.visit_BasicBlock(block)
+        if block.falsebranch:
+            pass
+            # Emit a jump around the else-branch (if there is one)
+            #inst = ('else',)
+            #block.truebranch.append(inst)
+        self.visit(block.truebranch)
+        if block.falsebranch:
+            self.visit(block.falsebranch)
+
+    def visit_WhileBlock(self,block):
+        # Emit a conditional jump around the if-branch
+        #inst = ('while', block.condvar)
+        #block.append(inst)
+        self.visit_BasicBlock(block)
+        self.visit(block.truebranch)
 
 def gen_code(node):
     #adicionar teste sem erros lyasem
@@ -122,5 +165,7 @@ def gen_code(node):
     gen.visit(node)
     return gen.code
 
-code = gen_code(lyaparser.p)
+# lyasem.check_errors(lyaparser.p)
+code = gen_code(p)
+JumpGenerator().visit(code)
 

@@ -1,14 +1,6 @@
-dcl x, y int;
-
-p: proc (b bool) returns (int loc);
-  if b then
-    result x;
-  else
-    result y;
-  fi;
+dcl m int = 2, n int = 3;
+p: proc (x int);
+  dcl s int;
+  s = m * x;
 end;
-
-dcl b bool = false;
-p(b)    = 20;
-p(true) = 10;
-print(x,y);   // display 10, 20
+p(n);
