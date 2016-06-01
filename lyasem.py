@@ -137,7 +137,7 @@ class Visitor(NodeVisitor):
         return left.type
 
     def visit_Program(self,node):
-        self.environment.push(node)
+        # self.environment.push(node)
         node.environment = self.environment
         node.symtab = self.environment.peek()
         # Visit all of the statements

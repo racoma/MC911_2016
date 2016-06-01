@@ -67,9 +67,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         ''' A list of external declarations (and types)'''
         self.externs = []
         
-    def new_temp(self,tipo):
+    def new_temp(self):
         #Creates new temporary variable of a given type
-        name = "__%s_%d" % (tipo,self.temp_count)
+        name = "%d" % (self.temp_count)
         self.temp_count += 1
         return name
 
@@ -82,8 +82,9 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Program(self,node):
         # Reset the sequence of instructions and temporary count
-        self.code = lyablock.BasicBlock()
+        # self.code = lyablock.BasicBlock()
         self.program = self.code
+        self.environment = node.environment
         self.temp_count = 0
         inst = "('stp')"
         self.code.append(inst)
@@ -91,18 +92,30 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst = ('alc', self.numVariables(node))
         self.code.append(inst)
         # Visit all of the statements in the program
-        self.visit(node.statement_list)
+        for stmts in node.statement_list.statements:
+            self.visit(stmts)
         inst2 = "('end')"
         self.code.append(inst2)
 
+
+    def visit_Decl(self,node):
+        node.scope_level = self.environment.scope_level()
+        if node.initialization:
+            self.visit(node.initialization.exp)
+        for i, child in enumerate(node.identifier_list or []):
+            self.visit(child)
+            inst = "('stv', {}, {})".format(node.scope_level-1, child.gen_location)
+            self.code.append(inst)
+
+
     def visit_Constant(self,node):
-        inst = "('ldc', node.exp)"
+        inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
 
     def visit_ID(self, node):
-        target = self.new_temp(node.type)
-        inst = "('ldv', {}, target)".format(node.char)
-        self.code.append(inst)
+        target = self.new_temp()
+        # inst = "('ldv', {}, {})".format(node.char, target)
+        # self.code.append(inst)
         node.gen_location = target
 
     def visit_Syn(self, node):   
@@ -120,20 +133,25 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Operand(self,node):
         self.visit(node.expr)
-        target = self.new_temp(node.type)
+        target = self.new_temp()
         opcode = node.type.un_opc[node.op]
         inst = "('" + opcode + "')"
-        inst2 = "('ldv', node.ident, target)"
+        inst2 = "('ldv', {}, {})".format(node.ident, target)
         self.code.append(inst2)
         self.code.append(inst)
         node.gen_location = target
 
-    def visit_Decl(self, node):
-        pass
+
+    ##### PROC #####
+
+    def visit_ProcStmt(self, node):
+        self.visit(node.identifier)
+        inst = "('jmp', {})".format(node.identifier.gen_location)
+        self.code.append(inst)
 
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
-        print("Block:[%s]" % block)
+        # print("Block:[%s]" % block)
         for inst in block.instructions:
             print("    %s" % (inst,))
         print("")
