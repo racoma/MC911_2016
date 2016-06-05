@@ -50,7 +50,6 @@ from lyasem import *
 import lyasem
 import lyablock
 import lyaparser
-from collections import defaultdict
 
 
 class GenerateCode(lyaparser.NodeVisitor):
@@ -66,6 +65,8 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         ''' A list of external declarations (and types)'''
         self.externs = []
+
+        self.countLabels = 0
         
     def new_temp(self):
         #Creates new temporary variable of a given type
@@ -85,15 +86,16 @@ class GenerateCode(lyaparser.NodeVisitor):
         # self.code = lyablock.BasicBlock()
         self.program = self.code
         self.environment = node.environment
-        self.temp_count = 0
         inst = "('stp')"
         self.code.append(inst)
         # Allocate variables
         inst = ('alc', self.numVariables(node))
         self.code.append(inst)
-        # Visit all of the statements in the program
+        # Visit all statements in the program
         for stmts in node.statement_list.statements:
             self.visit(stmts)
+        inst = ('dlc', self.numVariables(node))
+        self.code.append(inst)
         inst2 = "('end')"
         self.code.append(inst2)
 
@@ -124,8 +126,6 @@ class GenerateCode(lyaparser.NodeVisitor):
     def visit_Binop(self,node):
         self.visit(node.left)
         self.visit(node.right)
-
-        # Create the opcode and append to list
         # print(node.type)
         opcode = node.type.bin_opc[node.op]
         inst = "('" + opcode + "')"
@@ -141,13 +141,39 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst)
         node.gen_location = target
 
-
     ##### PROC #####
 
     def visit_ProcStmt(self, node):
-        self.visit(node.identifier)
+        self.visit(node.identifier)       
         inst = "('jmp', {})".format(node.identifier.gen_location)
         self.code.append(inst)
+
+        self.visit(node.procedure)
+
+    def visit_ProcDef(self, node):
+        self.countLabels += 1
+        inst = "('lbl', %d)" % self.countLabels
+        self.code.append(inst) 
+        inst = "('enf', %d)" % self.countLabels
+        self.code.append(inst)
+        inst = ('alc', self.numVariables(node))
+        self.code.append(inst)
+        
+        for stmts in node.statement_list.statements:
+            self.visit(stmts)
+            
+        inst = "('ret', %d, %d)" % (self.countLabels,self.numVariables(node))
+        self.code.append(inst)
+        self.countLabels += 1
+        inst = "('lbl', %d)" % self.countLabels
+        self.code.append(inst)
+        
+    def visit_ProcCall(self, node):
+        self.visit(node.op)
+        inst = "('cfu', %d)" % self.countLabels
+        self.code.append(inst)
+       
+
 
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
@@ -186,4 +212,3 @@ def gen_code(node):
 # lyasem.check_errors(lyaparser.p)
 code = gen_code(p)
 JumpGenerator().visit(code)
-
