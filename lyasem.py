@@ -246,6 +246,7 @@ class Visitor(NodeVisitor):
         node.type = node.thenex.exp.type
 
     def visit_ProcDef(self, node):
+        node.symtab = self.environment.peek()
         if node.result_spec != None:
             self.visit(node.result_spec.param.mode)
             node.type = node.result_spec.param.mode.type
