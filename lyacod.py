@@ -140,6 +140,14 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst2)
         self.code.append(inst)
         node.gen_location = target
+        
+    def visit_Func(self,node):
+        if (node.op == 'read'):
+            inst = "('rdv')"
+            self.code.append(inst)
+        if (node.op == 'print'):
+            inst = "('prv')"
+            self.code.append(inst)        
 
     ##### PROC #####
 
