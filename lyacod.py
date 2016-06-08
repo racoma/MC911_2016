@@ -180,7 +180,20 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.visit(node.op)
         inst = "('cfu', %d)" % self.countLabels
         self.code.append(inst)
-       
+      
+    def visit_DoAction(self, node):
+        self.countLabels += 1
+        inst = "('lbl', %d)" % self.countLabels
+        self.code.append(inst)
+        self.visit(node.control)
+	    #inserir visita ao action_list
+        inst2 = "('jmp', %d)" % self.countLabels
+        self.countLabels += 1
+        inst = "('jof', %d)" % self.countLabels
+        self.code.append(inst)
+        self.code.append(inst2)
+        inst = "('lbl', %d)" % self.countLabels
+        self.code.append(inst)	       
 
 
 class JumpGenerator(lyablock.BlockVisitor):
