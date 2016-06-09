@@ -83,7 +83,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Program(self,node):
         # Reset the sequence of instructions and temporary count
-        # self.code = lyablock.BasicBlock()
+        #self.code = lyablock.BasicBlock()
         self.program = self.code
         self.environment = node.environment
         inst = "('stp')"
@@ -109,19 +109,42 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('stv', {}, {})".format(node.scope_level-1, child.gen_location)
             self.code.append(inst)
 
-
     def visit_Constant(self,node):
+        #target = self.new_temp()        
+        #node.gen_location = target
         inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
-
+   
+    '''
+    def visit_Assignment(self,node):
+        self.visit(node.expr)
+        inst = "('stv', {}, {})".format(node.scope_level-1, node.expr.exp.gen_location)
+        self.code.append(inst)
+    '''
+        
+    '''              
+    def visit_Expr(self, node):
+        target = self.new_temp()   
+        self.visit(node.exp)
+        inst2 = "('ldv', {}, {})".format(target, node.exp)
+        self.code.append(inst2)
+        node.gen_location = target        
+    '''
+        
     def visit_ID(self, node):
         target = self.new_temp()
-        # inst = "('ldv', {}, {})".format(node.char, target)
-        # self.code.append(inst)
+        #inst = "('ldv', {}, {})".format(target,node.char)
+        #self.code.append(inst)
         node.gen_location = target
 
     def visit_Syn(self, node):   
         self.visit(node.expr)
+        
+    def visit_BoolExpr(self, node):
+        target = self.new_temp()
+        node.gen_location = target
+    
+
 
     def visit_Binop(self,node):
         self.visit(node.left)
@@ -136,8 +159,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         target = self.new_temp()
         opcode = node.type.un_opc[node.op]
         inst = "('" + opcode + "')"
-        inst2 = "('ldv', {}, {})".format(node.ident, target)
-        self.code.append(inst2)
+        #inst2 = "('ldv', {}, {})".format(target, node.ident)
+        #self.code.append(inst2)
         self.code.append(inst)
         node.gen_location = target
         
@@ -180,20 +203,43 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.visit(node.op)
         inst = "('cfu', %d)" % self.countLabels
         self.code.append(inst)
-      
+
     def visit_DoAction(self, node):
         self.countLabels += 1
         inst = "('lbl', %d)" % self.countLabels
         self.code.append(inst)
-        self.visit(node.control)
-	    #inserir visita ao action_list
         inst2 = "('jmp', %d)" % self.countLabels
         self.countLabels += 1
+
+        self.visit(node.control)
+	#inserir visita ao action_list
+
         inst = "('jof', %d)" % self.countLabels
         self.code.append(inst)
         self.code.append(inst2)
-        inst = "('lbl', %d)" % self.countLabels
-        self.code.append(inst)	       
+        instf = "('lbl', %d)" % self.countLabels
+        self.code.append(inst)	
+
+    def visit_IfAction(self, node):
+     
+        self.countLabels += 1
+        inst2 = "('lbl', %d)" % self.countLabels
+
+        self.visit(node.then_c)
+        self.visit(node.else_c)
+
+        inst = "('jof', %d)" % self.countLabels
+        self.code.append(inst)
+        self.code.append(inst2)
+    
+
+    def visit_WhileControl(self, node):
+        inst = "('ldv', {}, {})".format(node.ident, target)
+        self.code.append(inst)
+        #self.visit(node.BoolExpr)
+
+        inst = "('jof', %d)" % self.countLabels
+        self.code.append(inst)
 
 
 class JumpGenerator(lyablock.BlockVisitor):
