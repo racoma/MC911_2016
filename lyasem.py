@@ -290,6 +290,7 @@ class Visitor(NodeVisitor):
             value_type = node.expr.type.name
             if declared_type != value_type:
                 error(node.location.lineno, "Cannot assign {} to {}".format(value_type, declared_type))
+        node.scope_level = self.environment.scope_level()
 
     def visit_Decl(self,node):
         for i, child in enumerate(node.identifier_list or []):
