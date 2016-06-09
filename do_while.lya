@@ -1,0 +1,66 @@
+/*
+i - 0
+b - 1
+x - 2
+*/
+
+
+dcl i int, b bool = true;
+x: 
+  do while b;//label 2
+        read (i);
+        if i <= 0 then
+            exit x;
+        fi;//label 4
+        print (i*i);
+  od; //label 3
+//label 1  
+print (0);
+
+/*
+[
+  ('stp'),
+  ('alc', 2),
+  
+  ('ldc', true),
+  ('stv', 0, 1),
+  
+  do while
+  ('lbl', 2),
+  ('ldv', 0, 1),
+  ('jof', 3),
+  
+  read
+  ('rdv'),
+  
+  if
+  ('stv', 0, 0),
+  ('ldv', 0, 0),
+  ('ldc', 0),
+  ('leq'),
+  ('jof', 4),
+  exit
+  ('jmp', 1),
+  
+  fi
+  ('lbl', 4),
+  
+  print
+  ('ldv', 0, 0),
+  ('ldv', 0, 0),
+  ('mul'),
+  ('prv'),
+  
+  ('jmp', 2),
+  
+  od
+  ('lbl', 3),
+  ('lbl', 1),
+  
+  print
+  ('ldc', 0),
+  ('prv'),
+  ('dlc', 2),
+  ('end'),
+]
+*/

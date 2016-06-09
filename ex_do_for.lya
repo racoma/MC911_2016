@@ -1,0 +1,55 @@
+/*
+i - 0
+soma - 1
+*/
+
+dcl i, soma int;
+soma = 0;
+do for i=1 to 10; //--label 1
+    soma = soma + i;
+od; //--label 2
+print (soma); 
+
+/*
+[
+  ('stp'),
+  ('alc', 2),
+
+soma
+  ('ldc', 0),
+  ('stv', 0, 1),
+
+do for
+  ('ldc', 1),
+  ('stv', 0, 0),
+
+  ('lbl', 1),
+
+soma +=
+  ('ldv', 0, 1),
+  ('ldv', 0, 0),
+  ('add'),
+  ('stv', 0, 1),
+
+atualiza i
+  ('ldv', 0, 0),
+  ('ldc', 1),
+  ('add'),
+  ('stv', 0, 0),
+
+compara
+  ('ldv', 0, 0),
+  ('ldc', 10),
+  ('leq'),
+  ('jof', 2),
+  ('jmp', 1),
+
+od
+  ('lbl', 2),
+
+  ('ldv', 0, 1),
+  ('prv'),
+  ('dlc', 2),
+  ('end'),
+]
+*/
