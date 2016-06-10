@@ -50,6 +50,7 @@ from lyasem import *
 import lyasem
 import lyablock
 import lyaparser
+from collections import defaultdict
 
 
 class GenerateCode(lyaparser.NodeVisitor):
@@ -59,6 +60,13 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         self.temp_count = 0
         
+        # dictionary for counting var numbers per scope
+        self.number = defaultdict(int)
+        # dictionary for storing global var number 
+        self.vardict = defaultdict(int)
+        # dictionary for storing funciton number
+        self.func = defaultdict(int)
+        
         ''' The generated code (list of tuples)'''
         self.code = lyablock.BasicBlock()
         self.start_block = self.code
@@ -67,6 +75,20 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.externs = []
 
         self.countLabels = 0
+        
+    #Funcao para contar variaveis por escopo
+    def var_scope(self,scope):
+        '''
+        Increments count per scope
+        '''
+        count = "%d" % (self.number[scope])
+        self.number[scope] += 1
+        return count
+        
+    def param_number(self,varnumber):
+        paramnumber = - varnumber
+        count = "%d" % (paramnumber)
+        return count                 
         
     def new_temp(self):
         #Creates new temporary variable of a given type
@@ -102,34 +124,52 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Decl(self,node):
         node.scope_level = self.environment.scope_level()
-        if node.initialization:
-            self.visit(node.initialization.exp)
         for i, child in enumerate(node.identifier_list or []):
+            #count var number
+            nvar = self.var_scope(node.scope_level)
+            #stores var number
+            self.vardict[child.char] = nvar
             self.visit(child)
-            inst = "('stv', {}, {})".format(node.scope_level-1, child.gen_location)
-            self.code.append(inst)
+            #inst = "('stv', {}, {})".format(node.scope_level-1, child.gen_location)
+            #self.code.append(inst)
+            if node.initialization:
+                 self.visit(node.initialization.exp)
+                 inst = "('stv', {}, {})".format(node.scope_level-1, nvar)
+                 self.code.append(inst)            
+    
+    def visit_FormalParam(self,node):
+        node.scope_level = self.environment.scope_level()
+        for i, child in enumerate(node.id_list or []):
+            #count param number
+            nparam = self.param_number(self.number[node.scope_level])
+            #stores param number
+            self.vardict[child.char] = nparam
+            self.visit(child)
+                   
 
     def visit_Constant(self,node):
-        #target = self.new_temp()        
-        #node.gen_location = target
+        target = self.new_temp()        
+        node.gen_location = target
         inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
    
-    '''
+    
     def visit_Assignment(self,node):
         self.visit(node.expr)
-        inst = "('stv', {}, {})".format(node.scope_level-1, node.expr.exp.gen_location)
+        self.visit(node.location)
+        #get var number
+        nvar = self.vardict[node.location.char]
+        inst = "('stv', {}, {})".format(node.scope_level-1,nvar)
         self.code.append(inst)
-    '''
-        
-    '''              
+     
+    '''             
     def visit_Expr(self, node):
         target = self.new_temp()   
         self.visit(node.exp)
         inst2 = "('ldv', {}, {})".format(target, node.exp)
         self.code.append(inst2)
-        node.gen_location = target        
-    '''
+        node.gen_location = target
+    '''        
         
     def visit_ID(self, node):
         target = self.new_temp()
@@ -145,8 +185,15 @@ class GenerateCode(lyaparser.NodeVisitor):
         node.gen_location = target
     
 
-
     def visit_Binop(self,node):
+        print(self.vardict)
+        
+        nvar = self.vardict[node.left.char]
+        inst = "('ldv', {}, {})".format(node.scope_level-2,nvar)
+        self.code.append(inst)
+        nvar = self.vardict[node.right.char]
+        inst = "('ldv', {}, {})".format(node.scope_level-1,nvar)
+        self.code.append(inst)
         self.visit(node.left)
         self.visit(node.right)
         # print(node.type)
@@ -181,6 +228,8 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         self.visit(node.procedure)
 
+    #ideia: criar dict para labels
+    #precisa subir o enf para o procstmt e consequentemente o lbl e alc 
     def visit_ProcDef(self, node):
         self.countLabels += 1
         inst = "('lbl', %d)" % self.countLabels
@@ -190,6 +239,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst = ('alc', self.numVariables(node))
         self.code.append(inst)
         
+        for i, child in enumerate(node.formal_parameter_list or []):
+            self.visit(child)
+            
         for stmts in node.statement_list.statements:
             self.visit(stmts)
             
@@ -232,15 +284,16 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst)
         self.code.append(inst2)
     
-
+    
     def visit_WhileControl(self, node):
-        inst = "('ldv', {}, {})".format(node.ident, target)
+        var = self.var_scope(node.scope_level)
+        inst = "('ldv', {}, {})".format(var,var)
         self.code.append(inst)
         #self.visit(node.BoolExpr)
 
         inst = "('jof', %d)" % self.countLabels
         self.code.append(inst)
-
+    
 
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
