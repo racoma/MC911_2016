@@ -66,6 +66,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.vardict = defaultdict(int)
         # dictionary for storing funciton number
         self.func = defaultdict(int)
+        # dictionary for storing label numbers
+        self.labeldict = defaultdict(int)
         
         ''' The generated code (list of tuples)'''
         self.code = lyablock.BasicBlock()
@@ -222,16 +224,19 @@ class GenerateCode(lyaparser.NodeVisitor):
     ##### PROC #####
 
     def visit_ProcStmt(self, node):
-        self.visit(node.identifier)       
-        inst = "('jmp', {})".format(node.identifier.gen_location)
+        self.visit(node.identifier)   
+        self.countLabels += 1
+        self.labeldict[node.identifier.char] = self.countLabels
+        aux = self.countLabels + 1    
+        inst = "('jmp', {})".format(aux)
         self.code.append(inst)
 
         self.visit(node.procedure)
 
-    #ideia: criar dict para labels
+    #ideia: talvez criar outro dict para labels
     #precisa subir o enf para o procstmt e consequentemente o lbl e alc 
     def visit_ProcDef(self, node):
-        self.countLabels += 1
+        print (self.labeldict)
         inst = "('lbl', %d)" % self.countLabels
         self.code.append(inst) 
         inst = "('enf', %d)" % self.countLabels
@@ -253,8 +258,14 @@ class GenerateCode(lyaparser.NodeVisitor):
         
     def visit_ProcCall(self, node):
         self.visit(node.op)
-        inst = "('cfu', %d)" % self.countLabels
+        self.visit(node.param)
+        inst = "('cfu', %d)" % self.labeldict[node.op.char]
         self.code.append(inst)
+        
+    def visit_Param(self, node):
+        for i, child in enumerate(node.param or []):
+             inst = "('ldv', 0, {})".format(self.vardict[child.exp.char])
+             self.code.append(inst)                
 
     def visit_DoAction(self, node):
         self.countLabels += 1
