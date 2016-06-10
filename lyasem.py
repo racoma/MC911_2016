@@ -176,6 +176,7 @@ class Visitor(NodeVisitor):
         # Assign the result type
         node.type = raw_type
         # print(node.type.name)
+        node.scope_level = self.environment.scope_level()
 
     def visit_Constant(self,node):
         nodetype = self.typemap.get(node.type, None)
@@ -335,6 +336,14 @@ class Visitor(NodeVisitor):
             self.environment.insert_local(child.char, node)
         self.visit(node.mode)
         node.type = node.mode.type
+        
+    def visit_WhileControl(self,node):
+        node.scope_level = self.environment.scope_level()
+    
+    '''    
+    def visit_FormalParam(self,node):
+        node.scope_level = self.environment.scope_level()
+    '''            
 
 def check_errors(node):
     visitor = Visitor()
