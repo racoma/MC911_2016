@@ -892,7 +892,7 @@ class ParamSpec(Node):
 
 class ID(Node):
     def __init__(self, char, lineno):
-        self.type = "ID"
+        self.ttype = "ID"
         self.lineno = lineno
         self.char = char
     attr_names = ("char",)
@@ -949,7 +949,7 @@ class BoolExpr(Node):
 
 class Constant(Node):
     def __init__(self, exp, lineno, type):
-        self.type = "Constant"
+        self.ttype = "Constant"
         self.exp = exp
         self.type = type
         self.lineno = lineno
@@ -1033,7 +1033,7 @@ class Assignment(Node):
 
 class Binop(Node):
     def __init__(self, op, left, right, lineno):
-        self.type = "binop"
+        self.ttype = "binop"
         self.left = left
         self.op = op
         self.right = right
