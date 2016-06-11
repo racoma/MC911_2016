@@ -306,9 +306,6 @@ class GenerateCode(lyaparser.NodeVisitor):
         for i, child in enumerate(node.action_list or []):
             self.visit(child)
                            
-
-        inst = "('jof', %d)" % self.countLabels
-        self.code.append(inst)
         self.code.append(inst2)
         inst = "('lbl', %d)" % self.countLabels
         self.code.append(inst)	
@@ -319,13 +316,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst2 = "('lbl', %d)" % self.countLabels
 
         self.visit(node.bool_exp)
+        inst = "('jof', %d)" % self.countLabels
+        self.code.append(inst)
         if node.then_c is not None:
             self.visit(node.then_c)
         if node.else_c is not None:    
             self.visit(node.else_c)
-
-        inst = "('jof', %d)" % self.countLabels
-        self.code.append(inst)
         self.code.append(inst2)
     
     
@@ -342,14 +338,18 @@ class GenerateCode(lyaparser.NodeVisitor):
         
         if node.identifier is not None:
             self.countLabels += 1
+            self.labeldict[node.identifier.char] = self.countLabels
             flabel = "('lbl', %d)" % self.countLabels	  
         
         if node.action is not None:
             self.visit(node.action)
         
         if node.identifier is not None:    
-            self.code.append(flabel)    
-        
+            self.code.append(flabel)
+            
+    def visit_Exit(self, node):           
+        inst = "('jmp', {})".format(self.labeldict[node.ident.char])
+        self.code.append(inst)
         
         
         
