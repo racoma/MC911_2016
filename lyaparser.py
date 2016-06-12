@@ -1161,7 +1161,7 @@ class DoAction(Node):
 
 class ForControl(Node):
     def __init__(self, iteration):
-        self.type = "forcontrol"
+        self.ttype = "forcontrol"
         self.iteration = iteration
     attr_names = ()
 
@@ -1172,7 +1172,7 @@ class ForControl(Node):
 
 class WhileControl(Node):
     def __init__(self, bool_exp):
-        self.type = "whilecontrol"
+        self.ttype = "whilecontrol"
         self.bool_exp = bool_exp
     attr_names = ()
 
