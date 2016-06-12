@@ -500,13 +500,15 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
-                    | for_control
+                   | for_control
                    | while_control
   """
-  if len(p) == 2:
-    p[0] = Control(p[1], None)
-  else:
+  if len(p) == 3:
     p[0] = Control(p[1], p[2])
+  elif (p[1] == 'for_control'):
+    p[0] = Control(p[1], None)
+  else: 
+    p[0] = Control(None, p[1])
 
 def p_for_control(p):
   """ for_control : FOR iteration
