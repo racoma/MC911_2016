@@ -345,7 +345,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         for i, child in enumerate(node.formal_parameter_list or []):
             self.visit(child)
 
-        self.visit(node.result_spec)
+        if node.result_spec is not None:
+            self.visit(node.result_spec)
             
         for stmts in node.statement_list.statements:
             self.visit(stmts)      
