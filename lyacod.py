@@ -171,7 +171,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             #count param number
             # nparam = self.param_number(self.number[node.scope_level-1]-1)
             nparam = self.param_number(self.param_init)
-            self.param_init += 1;
+            self.param_init += 1
             #stores param number
             self.vardict[child.char] = nparam
             self.scopedict[child.char] = node.scope_level
@@ -401,7 +401,9 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(inst)
 
     def visit_DoAction(self, node):
-        if (node.control.ttype is 'whilecontrol'):
+
+        if ((node.control.whilecontrol is not None) and (node.control.forcontrol is None)):
+                print ("while")
                 self.countLabels += 1
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
@@ -416,11 +418,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst2)
                 inst = "('lbl', %d)" % dlabel
                 self.code.append(inst)
-
-        elif (node.control.ttype is 'forcontrol'):
-                inst = "('ldc', {})".format (node.control.iteration.start.exp.exp)
+        
+        elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
+                inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)	
-                inst = "('stv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 self.countLabels += 1
                 self.labeldict[node.control.ttype] = self.countLabels
@@ -430,17 +432,17 @@ class GenerateCode(lyaparser.NodeVisitor):
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
 
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 inst = "('ldc', 1)"
                 self.code.append(inst)
                 inst = "('add')"
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
-                inst = "('ldc', {})".format (node.control.iteration.end.exp.exp)
+                inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
                 self.code.append(inst)                        
                 inst = "('leq')"
                 self.code.append(inst)
@@ -451,7 +453,52 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
-
+                
+        else:
+                inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
+                self.code.append(inst)	
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                self.code.append(inst)
+                self.countLabels += 1
+                self.labeldict[node.control.ttype] = self.countLabels
+                inst = "('lbl', %d)" % self.countLabels
+                self.code.append(inst)
+                self.countLabels += 1
+                self.labeldict['od'] = self.countLabels
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.whilecontrol.bool_exp.exp.exp.char])
+                self.code.append(inst)
+                inst = "('jof', %d)"% self.labeldict['od']
+                self.code.append(inst)
+                
+                for i, child in enumerate(node.action_list or []):
+                    self.visit(child)                
+                
+                #update for
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                self.code.append(inst)
+                inst = "('ldc', 1)"
+                self.code.append(inst)
+                inst = "('add')"
+                self.code.append(inst)
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                self.code.append(inst)
+                #test for
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                self.code.append(inst)
+                inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
+                self.code.append(inst)                        
+                inst = "('leq')"
+                self.code.append(inst)
+                self.countLabels += 1
+                inst = "('jof', %d)"% self.labeldict['od']
+                self.code.append(inst)
+                inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
+                self.code.append(inst)
+                
+                inst = "('lbl', %d)" % self.labeldict['od']
+                self.code.append(inst)
+                
+                
     def visit_IfAction(self, node):
         self.visit(node.bool_exp)
         inst = "('jof', %d)" % (self.countLabels+1)
@@ -516,7 +563,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Returns(self, node):
         nparam = self.param_number(self.param_init)
-        self.param_init += 1;
+        self.param_init += 1
         #stores param number
         self.vardict["_ret"] = nparam
         self.scopedict["_ret"] = node.scope_level
