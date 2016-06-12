@@ -1,11 +1,26 @@
 # MC911_2016
 
-The project currently consists of 2 files: lyalex.py and lyaparser.py
-The construction/print of the AST is also coded in the lyaparser.py file.
-We used Python 2.7.10.
+Second fase: semantic processing and code generation for LVM, the Lya Virtual Machine.
+Main files: lyalex.py lyaparser.py lyasem.py lyacod.py
 
 Running:
 
-python lyaparser.py exemple.lya
+python3 lyacod.py exemple.lya
 
-**The project was later tested and fixed for Python3**
+Tests OK:
+
+ex_proc.lya
+ex_do_for.lya
+do_while.lya
+for_while.lya
+ex_results.lya
+
+Tests NO:
+
+locs.lya
+slices_n_builtins.lya
+returning_location.lya
+references.lya
+arrays.lya
+arrays_02.lya
+2dim_arrays.lya
