@@ -505,9 +505,11 @@ def p_control_part(p):
   """
   if len(p) == 3:
     p[0] = Control(p[1], p[2])
-  elif (p[1] == 'for_control'):
+  elif isinstance(p[1], ForControl):
+    print ("passou no for_control")
     p[0] = Control(p[1], None)
   else: 
+    print ("passou no while_control")  
     p[0] = Control(None, p[1])
 
 def p_for_control(p):
