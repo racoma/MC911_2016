@@ -138,10 +138,10 @@ class GenerateCode(lyaparser.NodeVisitor):
 
 
     def visit_Decl(self,node):
-        print(self.vardict)
-        print(self.scopedict)
+        #print(self.vardict)
+        #print(self.scopedict)
         # node.scope_level = self.environment.scope_level()
-        print(node.scope_level)
+        #print(node.scope_level)
         for i, child in enumerate(node.identifier_list or []):
             #count var number
             nvar = self.var_scope(node.scope_level)
@@ -235,8 +235,8 @@ class GenerateCode(lyaparser.NodeVisitor):
     def visit_BoolExpr(self, node):
         # target = self.new_temp()
         # node.gen_location = target
-        print(self.vardict)
-        print(self.scopedict)
+        #print(self.vardict)
+        #print(self.scopedict)
         if node.exp is not None:
             self.visit(node.exp)
             if(hasattr(node.exp.exp, "ttype") and node.exp.exp.ttype == "ID"):
@@ -246,8 +246,8 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
 
     def visit_Binop(self,node):
-        print(self.vardict)
-        print(self.scopedict)
+        #print(self.vardict)
+        #print(self.scopedict)
         #ver melhor a questao do escopo como target aqui, talvez salvar no dict o escopo da var?
         
         if (node.left.ttype == 'ID'):
@@ -262,7 +262,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         if (node.right.ttype == 'ID'):
             nvar = self.vardict[node.right.char]
             varscop = self.scopedict[node.right.char]
-            print("Varscope", varscop, node.right.char)
+            #print("Varscope", varscop, node.right.char)
             inst = "('ldv', {}, {})".format(varscop-1,nvar)
             self.code.append(inst)
         elif (node.right.ttype == 'Constant'):
@@ -312,7 +312,7 @@ class GenerateCode(lyaparser.NodeVisitor):
     #ideia: talvez criar outro dict para labels
     #precisa subir o enf para o procstmt e consequentemente o lbl e alc 
     def visit_ProcDef(self, node):
-        print (self.labeldict)
+        #print (self.labeldict)
         inst = "('lbl', %d)" % self.countLabels
         self.code.append(inst) 
         inst = "('enf', %d)" % self.countLabels
@@ -359,20 +359,56 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.visit(child)   
 
     def visit_DoAction(self, node):
-        self.countLabels += 1
-        inst = "('lbl', %d)" % self.countLabels
-        self.code.append(inst)
-        inst2 = "('jmp', %d)" % self.countLabels
-        self.countLabels += 1
+        if (node.control.ttype is 'whilecontrol'):
+                self.countLabels += 1
+                inst = "('lbl', %d)" % self.countLabels
+                self.code.append(inst)
+                inst2 = "('jmp', %d)" % self.countLabels
+                self.countLabels += 1
+                dlabel = self.countLabels
+                self.visit(node.control) 
 
-        self.visit(node.control) 
+                for i, child in enumerate(node.action_list or []):
+                    self.visit(child)
+                                   
+                self.code.append(inst2)
+                inst = "('lbl', %d)" % dlabel
+                self.code.append(inst)
 
-        for i, child in enumerate(node.action_list or []):
-            self.visit(child)
-                           
-        self.code.append(inst2)
-        inst = "('lbl', %d)" % self.countLabels
-        self.code.append(inst)	
+        elif (node.control.ttype is 'forcontrol'):
+                inst = "('ldc', {})".format (node.control.iteration.start.exp.exp)
+                self.code.append(inst)	
+                inst = "('stv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                self.code.append(inst)
+                self.countLabels += 1
+                self.labeldict[node.control.ttype] = self.countLabels
+                inst = "('lbl', %d)" % self.countLabels
+                self.code.append(inst)
+
+                for i, child in enumerate(node.action_list or []):
+                    self.visit(child)
+
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                self.code.append(inst)
+                inst = "('ldc', 1)"
+                self.code.append(inst)
+                inst = "('add')"
+                self.code.append(inst)
+                inst = "('stv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                self.code.append(inst)
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.iteration.start.exp])
+                self.code.append(inst)
+                inst = "('ldc', {})".format (node.control.iteration.end.exp.exp)
+                self.code.append(inst)                        
+                inst = "('leq')"
+                self.code.append(inst)
+                self.countLabels += 1
+                inst = "('jof', %d)"% self.countLabels
+                self.code.append(inst)
+                inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
+                self.code.append(inst)
+                inst = "('lbl', %d)" % self.countLabels
+                self.code.append(inst)
 
     def visit_IfAction(self, node):
      
