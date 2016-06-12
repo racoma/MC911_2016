@@ -30,13 +30,13 @@ class ExprType(object):
 IntType = ExprType("int",
     set(('+', '-', '*', '/', '<=', '<', '==', '!=', '>', '>=', '%')),
     set(('+', '-')),	
-    bin_opc={'+' : 'add', '-' : 'sub', '*' : 'mul', '/' : 'div', '<=' : 'leq', '<' : 'lt', '==' : 'eq', '!=' : 'neq', '>' : 'gt', '>=': 'geq', '%' : 'mod'},
+    bin_opc={'+' : 'add', '-' : 'sub', '*' : 'mul', '/' : 'div', '<=' : 'leq', '<' : 'lt', '==' : 'eq', '!=' : 'neq', '>' : 'grt', '>=': 'geq', '%' : 'mod'},
     un_opc={'+' : 'add', '-' : 'sub'},
     )
 
 CharType = ExprType("char",
     set(('==', '!=', '>', '>=', '<', '<=')),
-    bin_opc={'==' : 'eq', '!=' : 'neq', '>' : 'gt', '>=' : 'geq', '<' : 'lt', '<=' : 'leq'},
+    bin_opc={'==' : 'eq', '!=' : 'neq', '>' : 'grt', '>=' : 'geq', '<' : 'lt', '<=' : 'leq'},
     )
 
 StringType = ExprType("string",
