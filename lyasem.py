@@ -213,6 +213,10 @@ class Visitor(NodeVisitor):
         self.visit(node.mode)
         node.type = node.mode.type
 
+    def visit_Result(self, node):
+        self.visit(node.expr)
+        node.scope_level = self.environment.scope_level()
+
     def visit_RefLoc(self, node):
         self.visit(node.loc)
         node.type = node.loc.type
@@ -267,6 +271,7 @@ class Visitor(NodeVisitor):
             self.environment.insert_local(child.char, node)
         self.visit(node.param_spec)
         node.type = node.param_spec.type
+        node.scope_level = self.environment.scope_level()
 
     def visit_ParamSpec(self, node):
         self.visit(node.mode)
