@@ -368,13 +368,19 @@ class GenerateCode(lyaparser.NodeVisitor):
              self.code.append(inst)
         
     def visit_Param(self, node):
+        lista = []
         for i, child in enumerate(node.param or []):
 
             if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):	
-                 inst = "('ldv', 0, {})".format(self.vardict[child.exp.char])
-                 self.code.append(inst)
-             
-            self.visit(child)   
+                 varscop = self.scopedict[child.exp.char]
+                 lista.append( ["('ldv', {}, {})".format(varscop-1,self.vardict[child.exp.char]), self.vardict[child.exp.char] ] )
+
+            self.visit(child)  
+
+        lista = sorted(lista, key=lambda ins: ins[1], reverse=True) 
+        for inst, i in lista:
+            print(lista)
+            self.code.append(inst)
 
     def visit_DoAction(self, node):
         if (node.control.ttype is 'whilecontrol'):
@@ -429,18 +435,31 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
 
     def visit_IfAction(self, node):
-     
-        self.countLabels += 1
-        inst2 = "('lbl', %d)" % self.countLabels
-
         self.visit(node.bool_exp)
-        inst = "('jof', %d)" % self.countLabels
+        inst = "('jof', %d)" % (self.countLabels+1)
         self.code.append(inst)
         if node.then_c is not None:
             self.visit(node.then_c)
+            if node.else_c is not None:
+                label = self.countLabels+2
+                inst = "('jmp', {})".format(label)
+                self.code.append(inst)
         if node.else_c is not None:    
             self.visit(node.else_c)
+        self.countLabels += 1
+        inst2 = "('lbl', %d)" % self.countLabels
         self.code.append(inst2)
+
+    def visit_ThenClause(self, node):
+        for i, child in enumerate(node.action_list or []):
+            self.visit(child)
+
+    def visit_ElseClause(self, node):
+        self.countLabels += 1
+        inst2 = "('lbl', %d)" % self.countLabels
+        self.code.append(inst2)
+        for i, child in enumerate(node.action_list or []):
+            self.visit(child)
     
     
     def visit_WhileControl(self, node):
