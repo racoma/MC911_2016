@@ -300,9 +300,6 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.visit(node.identifier)   
         self.countLabels += 1
         self.labeldict[node.identifier.char] = self.countLabels
-        aux = self.countLabels + 1    
-        inst = "('jmp', {})".format(aux)
-        self.code.append(inst)
 
         # Pega qual o valor da proxima variavel para parametros
         self.param_init = self.number[node.scope_level]
@@ -312,10 +309,21 @@ class GenerateCode(lyaparser.NodeVisitor):
     #ideia: talvez criar outro dict para labels
     #precisa subir o enf para o procstmt e consequentemente o lbl e alc 
     def visit_ProcDef(self, node):
-        #print (self.labeldict)
-        inst = "('lbl', %d)" % self.countLabels
+        li = self.countLabels
+        if node.result_spec is not None:
+                self.countLabels += 1
+                lp = "('lbl', %d)" % self.countLabels
+        
+        ret = "('ret', %d, %d)" % (li,self.numVariables(node))
+        self.countLabels += 1
+        nlf = self.countLabels
+   
+        inst = "('jmp', %d)"% nlf
+        self.code.append(inst)
+
+        inst = "('lbl', %d)" % li
         self.code.append(inst) 
-        inst = "('enf', %d)" % self.countLabels
+        inst = "('enf', %d)" % li
         self.code.append(inst)
         inst = ('alc', self.numVariables(node))
         self.code.append(inst)
@@ -324,13 +332,13 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.visit(child)
             
         for stmts in node.statement_list.statements:
-            self.visit(stmts)
-            
-        inst = "('ret', %d, %d)" % (self.countLabels,self.numVariables(node))
-        self.code.append(inst)
-        self.countLabels += 1
-        inst = "('lbl', %d)" % self.countLabels
-        self.code.append(inst)
+            self.visit(stmts)      
+
+        if node.result_spec is not None:
+                self.code.append(lp)
+        self.code.append(ret)
+        lf = "('lbl', %d)" % nlf
+        self.code.append(lf)
         
     def visit_ProcCall(self, node):
         self.visit(node.op)
