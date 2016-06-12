@@ -215,7 +215,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 varscop = self.scopedict[var.char]
                 inst = "('ldr', {}, {})".format(varscop-1,nvar)
                 self.code.append(inst)
-            else:
+            elif isinstance(node.expr.exp, ID):
                 nvar2 = self.vardict[node.expr.exp.char]
                 varscop = self.scopedict[node.expr.exp.char]
                 inst = "('ldv', {}, {})".format(varscop-1,nvar2)
