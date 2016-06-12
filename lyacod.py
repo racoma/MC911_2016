@@ -209,6 +209,13 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('" + opcode + "')"
             self.code.append(inst)
 
+        if isinstance(node.expr.exp, RefLoc):
+            var = node.expr.exp.loc
+            nvar = self.vardict[var.char]
+            varscop = self.scopedict[var.char]
+            inst = "('ldr', {}, {})".format(varscop-1,nvar)
+            self.code.append(inst)
+
         #get var number
         nvar = self.vardict[node.location.char]
         inst = "('stv', {}, {})".format(node.scope_level-1,nvar)
@@ -330,6 +337,8 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         for i, child in enumerate(node.formal_parameter_list or []):
             self.visit(child)
+
+        self.visit(node.result_spec)
             
         for stmts in node.statement_list.statements:
             self.visit(stmts)      
@@ -354,7 +363,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.visit(node.op)
         if(node.op.op == 'read'):
              child = node.param.param[0]
-             inst = "('stv', 0, {})".format(self.vardict[child.exp.char])
+             varscop = self.scopedict[child.exp.char]
+             inst = "('stv', {}, {})".format(varscop-1,self.vardict[child.exp.char])
              self.code.append(inst)
         
     def visit_Param(self, node):
@@ -456,8 +466,24 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(flabel)
 
     def visit_Result(self, node):
-        inst = "('ldv', {}, {})".format(node.scope_level-1,self.vardict[node.expr.exp.char])
+        if isinstance(node.expr.exp, DerefRef):
+            varscop = self.scopedict[node.expr.exp.location.char]
+            inst = "('lrv', {}, {})".format(varscop-1,self.vardict[node.expr.exp.location.char])
+        elif isinstance(node.expr.exp, ID):
+            varscop = self.scopedict[node.expr.exp.char]
+            inst = "('ldv', {}, {})".format(varscop-1,self.vardict[node.expr.exp.char])
         self.code.append(inst)
+
+        inst = "('stv', {}, {})".format(node.scope_level-1,self.vardict["_ret"])
+        self.code.append(inst)
+
+    def visit_Returns(self, node):
+        nparam = self.param_number(self.param_init)
+        self.param_init += 1;
+        #stores param number
+        self.vardict["_ret"] = nparam
+        self.scopedict["_ret"] = node.scope_level
+        print(self.vardict)
             
     def visit_Exit(self, node):           
         inst = "('jmp', {})".format(self.labeldict[node.ident.char])

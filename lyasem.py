@@ -262,9 +262,14 @@ class Visitor(NodeVisitor):
             for i, child in enumerate(node.formal_parameter_list or []):
                 self.visit(child)
 
+        if node.result_spec != None:
+            self.visit(node.result_spec)
+
         for stmts in node.statement_list.statements:
             self.visit(stmts)
 
+    def visit_Returns(self, node):
+        node.scope_level = self.environment.scope_level()
 
     def visit_FormalParam(self, node):
         for i, child in enumerate(node.id_list or []):
