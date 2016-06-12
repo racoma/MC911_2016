@@ -208,13 +208,20 @@ class GenerateCode(lyaparser.NodeVisitor):
             opcode = self.which_code(node.op)
             inst = "('" + opcode + "')"
             self.code.append(inst)
+        else:
+            if isinstance(node.expr.exp, RefLoc):
+                var = node.expr.exp.loc
+                nvar = self.vardict[var.char]
+                varscop = self.scopedict[var.char]
+                inst = "('ldr', {}, {})".format(varscop-1,nvar)
+                self.code.append(inst)
+            else:
+                nvar2 = self.vardict[node.expr.exp.char]
+                varscop = self.scopedict[node.expr.exp.char]
+                inst = "('ldv', {}, {})".format(varscop-1,nvar2)
+                self.code.append(inst)
 
-        if isinstance(node.expr.exp, RefLoc):
-            var = node.expr.exp.loc
-            nvar = self.vardict[var.char]
-            varscop = self.scopedict[var.char]
-            inst = "('ldr', {}, {})".format(varscop-1,nvar)
-            self.code.append(inst)
+        
 
         #get var number
         nvar = self.vardict[node.location.char]
@@ -345,6 +352,9 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         if node.result_spec is not None:
                 self.code.append(lp)
+        if(self.numVariables(node) > 0):
+            dlc = "('dlc', %d)" % (self.numVariables(node))
+            self.code.append(dlc)
         self.code.append(ret)
         lf = "('lbl', %d)" % nlf
         self.code.append(lf)
@@ -374,6 +384,13 @@ class GenerateCode(lyaparser.NodeVisitor):
             if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):	
                  varscop = self.scopedict[child.exp.char]
                  lista.append( ["('ldv', {}, {})".format(varscop-1,self.vardict[child.exp.char]), self.vardict[child.exp.char] ] )
+
+            elif isinstance(child.exp, RefLoc): 
+                var = child.exp.loc
+                nvar = self.vardict[var.char]
+                varscop = self.scopedict[var.char]
+                inst = "('ldr', {}, {})".format(varscop-1,nvar)
+                lista.append([inst, self.vardict[var.char]])
 
             self.visit(child)  
 
