@@ -12,7 +12,7 @@ do for i=1 to 10 while b; //--label 1 --jof 2
     if soma > 100 then // --jof 3
         b = false;
     fi; //--label 3
-    -- jmp 1
+    //-- jmp 1
 od; //-- label 2
 print (soma);
 

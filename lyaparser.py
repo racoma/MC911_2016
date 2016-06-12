@@ -500,13 +500,13 @@ def p_do_action(p):
 
 def p_control_part(p):
   """ control_part : for_control while_control
-               | for_control
+                    | for_control
                    | while_control
   """
   if len(p) == 2:
-    p[0] = p[1]
+    p[0] = Control(p[1], None)
   else:
-    p[0] = [p[1], p[2]]
+    p[0] = Control(p[1], p[2])
 
 def p_for_control(p):
   """ for_control : FOR iteration
@@ -1157,6 +1157,19 @@ class DoAction(Node):
       if self.control is not None: nodelist.append(("control", self.control))
       for i, child in enumerate(self.action_list or []):
           nodelist.append(("exprs[%d]" % i, child))
+      return tuple(nodelist)
+
+class Control(Node):
+    def __init__(self, forcontrol, whilecontrol):
+        self.ttype = "control"
+        self.forcontrol = forcontrol 
+        self.whilecontrol = whilecontrol
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      if self.forcontrol is not None: nodelist.append(("forcontrol", self.forcontrol))
+      if self.whilecontrol is not None: nodelist.append(("whilecontrol", self.whilecontrol))
       return tuple(nodelist)
 
 class ForControl(Node):
