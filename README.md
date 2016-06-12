@@ -7,20 +7,20 @@ Running:
 
 python3 lyacod.py exemple.lya
 
-Tests OK:
+*Tests OK:*
 
-ex_proc.lya
-ex_do_for.lya
-do_while.lya
-for_while.lya
-ex_results.lya
+- ex_proc.lya
+- ex_do_for.lya
+- do_while.lya
+- for_while.lya
+- ex_results.lya
 
-Tests NO:
+*Tests NOK:*
 
-locs.lya
-slices_n_builtins.lya
-returning_location.lya
-references.lya
-arrays.lya
-arrays_02.lya
-2dim_arrays.lya
+- locs.lya
+- slices_n_builtins.lya
+- returning_location.lya
+- references.lya
+- arrays.lya
+- arrays_02.lya
+- 2dim_arrays.lya
