@@ -30,15 +30,15 @@ LVM code is only allowed to use the following operators:
     (’ret’, k, n)  # Return from Function D[k]=M[sp]; pc=M[sp-1]; sp=sp-(n+2)
     (’idx’, k)     # Index M[sp-1]=M[sp-1] + M[sp] * k sp=sp-1
     (’grc’)        # Get(Load) Reference Contents M[sp]=M[M[sp]]
-    (’lmv’, k)     # Load multiple values 
-    (’smv’, k)     # Store multiple Values 
-    (’sts’, k)     # Store string constant on reference 
+    (’lmv’, k)     # Load multiple values
+    (’smv’, k)     # Store multiple Values
+    (’sts’, k)     # Store string constant on reference
     (’rdv’)        # Read single Value sp=sp+1;  M[sp]=input()
-    (’rds’)        # Read String and store it on stack reference 
+    (’rds’)        # Read String and store it on stack reference
     (’prv’)        # Print Value print(M[sp]); sp=sp-1
     ('prt', k)     # Print Multiple Values print(M[sp-k+1:sp+1]); sp-=(k-1)
     (’prc’, i)     # Print String constant print(H(i),end="")
-    (’prs’)        # Print contents of a string location 
+    (’prs’)        # Print contents of a string location
     (’stp’)        # Start Program sp=-1; D[0]=0
     (’lbl’, i)     # No operation (define the label index i)
     (’end’)        # Stop execution
@@ -59,12 +59,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         super(GenerateCode, self).__init__()
 
         self.temp_count = 0
-        
+
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
-        # dictionary for storing global var number 
+        # dictionary for storing global var number
         self.vardict = defaultdict(int)
-        # dictionary for storing global var number 
+        # dictionary for storing global var number
         self.varloc = defaultdict(str)
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
@@ -74,7 +74,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.func = defaultdict(int)
         # dictionary for storing label numbers
         self.labeldict = defaultdict(int)
-        
+
         ''' The generated code (list of tuples)'''
         self.code = lyablock.BasicBlock()
         self.start_block = self.code
@@ -82,9 +82,25 @@ class GenerateCode(lyaparser.NodeVisitor):
         ''' A list of external declarations (and types)'''
         self.externs = []
 
+        # Dictionary to save Procs and params
+        self.procs = {}
+
         self.countLabels = 0
         self.param_init = 0
-        
+
+    def insert_param(self, proc, loc):
+        if proc in self.procs:
+            count = len(self.procs[proc])
+            self.procs[proc].update({count: loc})
+        else:
+            count = 0
+            self.procs[proc] = {count: loc}
+
+    def insert_ret(self, proc, loc):
+        if proc in self.procs:
+            self.procs[proc].update({"_ret": loc})
+        else:
+            self.procs[proc] = {"_ret": loc}
     #Funcao para contar variaveis por escopo
     def var_scope(self,scope):
         '''
@@ -93,13 +109,13 @@ class GenerateCode(lyaparser.NodeVisitor):
         count = "%d" % (self.number[scope])
         self.number[scope] += 1
         return count
-        
+
     def param_number(self,varnumber):
         paramnumber = - varnumber
         count = "%d" % (paramnumber)
 
-        return count                 
-        
+        return count
+
     def new_temp(self):
         #Creates new temporary variable of a given type
         name = "%d" % (self.temp_count)
@@ -164,12 +180,12 @@ class GenerateCode(lyaparser.NodeVisitor):
                     self.code.append(inst)
                  self.visit(node.initialization.exp)
                  inst = "('stv', {}, {})".format(node.scope_level-1, nvar)
-                 self.code.append(inst)            
-    
+                 self.code.append(inst)
+
     def visit_FormalParam(self,node):
         # node.scope_level = node.scope_level-1
-        print("FormalParam", node.scope_level)
-        print("Param_init", self.param_init)
+        # print("FormalParam", node.scope_level)
+        # print("Param_init", self.param_init)
         for i, child in enumerate(node.id_list or []):
             self.varloc[child.char] = node.param_spec.attr
             #count var number
@@ -182,20 +198,21 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.vardict[child.char] = nparam
             self.scopedict[child.char] = node.scope_level
             self.visit(child)
-                   
+
 
     def visit_Constant(self,node):
-        target = self.new_temp()        
+        target = self.new_temp()
         node.gen_location = target
         inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
-   
-    
+
+
     def visit_Assignment(self,node):
         self.visit(node.expr)
         self.visit(node.location)
 
         if(len(node.op) == 2):
+
             var = node.expr.exp
             if (var.ttype == 'ID'):
                 if self.varloc[var.char] == "loc":
@@ -208,7 +225,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
             elif (var.ttype == 'Constant'):
                 inst = "('ldc', {})".format(var.exp)
-                self.code.append(inst)        
+                self.code.append(inst)
 
             if self.varloc[node.location.char] == "loc":
                 code = 'lrv'
@@ -235,8 +252,13 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = "('ldv', {}, {})".format(varscop-1,nvar2)
                 self.code.append(inst)
 
-        
-        if self.varloc[node.location.char] == "loc":
+        ret = None
+        if isinstance(node.expr.exp, ProcCall):
+            params = self.procs[node.expr.exp.op.char]
+            ret = params["_ret"]
+            print(ret)
+
+        if self.varloc[node.location.char] == "loc" or ret == "loc":
             code = 'srv'
         else:
             code = 'stv'
@@ -244,25 +266,25 @@ class GenerateCode(lyaparser.NodeVisitor):
         nvar = self.vardict[node.location.char]
         inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
         self.code.append(inst)
-     
-    '''             
+
+    '''
     def visit_Expr(self, node):
-        target = self.new_temp()   
+        target = self.new_temp()
         self.visit(node.exp)
         inst2 = "('ldv', {}, {})".format(target, node.exp)
         self.code.append(inst2)
         node.gen_location = target
-    '''        
-        
+    '''
+
     def visit_ID(self, node):
         target = self.new_temp()
         #inst = "('ldv', {}, {})".format(target,node.char)
         #self.code.append(inst)
         node.gen_location = target
 
-    def visit_Syn(self, node):   
+    def visit_Syn(self, node):
         self.visit(node.expr)
-        
+
     def visit_BoolExpr(self, node):
         # target = self.new_temp()
         # node.gen_location = target
@@ -280,7 +302,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         #print(self.vardict)
         #print(self.scopedict)
         #ver melhor a questao do escopo como target aqui, talvez salvar no dict o escopo da var?
-        
+
         if (node.left.ttype == 'ID'):
             nvar = self.vardict[node.left.char]
             varscop = self.scopedict[node.left.char]
@@ -288,8 +310,8 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(inst)
         elif (node.left.ttype == 'Constant'):
             inst = "('ldc', {})".format(node.left.exp)
-            self.code.append(inst)        
-        
+            self.code.append(inst)
+
         if (node.right.ttype == 'ID'):
             nvar = self.vardict[node.right.char]
             varscop = self.scopedict[node.right.char]
@@ -298,8 +320,8 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(inst)
         elif (node.right.ttype == 'Constant'):
             inst = "('ldc', {})".format(node.right.exp)
-            self.code.append(inst) 
-        
+            self.code.append(inst)
+
         # self.visit(node.left)
         # self.visit(node.right)
         # print(node.type)
@@ -316,19 +338,19 @@ class GenerateCode(lyaparser.NodeVisitor):
         #self.code.append(inst2)
         self.code.append(inst)
         node.gen_location = target
-        
+
     def visit_Func(self,node):
         if (node.op == 'read'):
             inst = "('rdv')"
             self.code.append(inst)
         if (node.op == 'print'):
             inst = "('prv')"
-            self.code.append(inst)        
+            self.code.append(inst)
 
     ##### PROC #####
 
     def visit_ProcStmt(self, node):
-        self.visit(node.identifier)   
+        self.visit(node.identifier)
         self.countLabels += 1
         self.labeldict[node.identifier.char] = self.countLabels
 
@@ -337,23 +359,34 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         self.visit(node.procedure)
 
+        # Salva parametros no dictionary para checar na ProcCall
+        if node.procedure.formal_parameter_list != None:
+            formalparams = node.procedure.formal_parameter_list
+            for i, fp in enumerate(formalparams or []):
+                for i, child in enumerate(fp.id_list or []):
+                    self.insert_param(node.identifier.char, fp.param_spec.attr)
+
+
+        if node.procedure.result_spec is not None and node.procedure.result_spec.param is not None:
+            self.insert_ret(node.identifier.char, node.procedure.result_spec.param.attr)
+        print("ProcStmt",self.procs)
     #ideia: talvez criar outro dict para labels
-    #precisa subir o enf para o procstmt e consequentemente o lbl e alc 
+    #precisa subir o enf para o procstmt e consequentemente o lbl e alc
     def visit_ProcDef(self, node):
         li = self.countLabels
         if node.result_spec is not None:
                 self.countLabels += 1
                 lp = "('lbl', %d)" % self.countLabels
-        
+
         ret = "('ret', %d, %d)" % (li,self.numVariables(node))
         self.countLabels += 1
         nlf = self.countLabels
-   
+
         inst = "('jmp', %d)"% nlf
         self.code.append(inst)
 
         inst = "('lbl', %d)" % li
-        self.code.append(inst) 
+        self.code.append(inst)
         inst = "('enf', %d)" % li
         self.code.append(inst)
         inst = ('alc', self.numVariables(node))
@@ -364,9 +397,9 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         if node.result_spec is not None:
             self.visit(node.result_spec)
-            
+
         for stmts in node.statement_list.statements:
-            self.visit(stmts)      
+            self.visit(stmts)
 
         if node.result_spec is not None:
                 self.code.append(lp)
@@ -376,43 +409,84 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(ret)
         lf = "('lbl', %d)" % nlf
         self.code.append(lf)
-        
+
     def visit_ProcCall(self, node):
         self.visit(node.op)
-        self.visit(node.param)
+        # self.visit(node.param)
+
+        params = self.procs[node.op.char]
+        print(params)
+
+        # Visita todas as Expr dos Params
+        for i, expr in reversed(list(enumerate(node.param.param or []))):
+            self.visit(expr.exp)
+            if (isinstance(expr.exp, ID)):
+                if params[i] == "loc":
+                    code = 'ldr'
+                else:
+                    code = 'ldv'
+                varscop = self.scopedict[expr.exp.char]
+                self.code.append("('{}', {}, {})".format(code,varscop-1,self.vardict[expr.exp.char]) )
+
+            elif isinstance(expr.exp, RefLoc):
+                var = expr.exp.loc
+                nvar = self.vardict[var.char]
+                varscop = self.scopedict[var.char]
+                inst = "('ldr', {}, {})".format(varscop-1,nvar)
+                lista.append([inst, self.vardict[var.char]])
+
         inst = "('cfu', %d)" % self.labeldict[node.op.char]
         self.code.append(inst)
-        
+
     def visit_Call(self, node):
-        
-        if(node.op.op != 'read'):
-             self.visit(node.param)       
-        
-        self.visit(node.op)
+
+        if(node.op.op == 'print'):
+            for i, expr in enumerate(node.param.param or []):
+                if (isinstance(expr.exp, ID)):
+                    varscop = self.scopedict[expr.exp.char]
+                    self.code.append("('ldv', {}, {})".format(varscop-1,self.vardict[expr.exp.char]) )
+
+                elif isinstance(expr.exp, RefLoc):
+                    var = expr.exp.loc
+                    nvar = self.vardict[var.char]
+                    varscop = self.scopedict[var.char]
+                    inst = "('ldr', {}, {})".format(varscop-1,nvar)
+                    lista.append([inst, self.vardict[var.char]])
+
+                    self.visit(node.op)
+                else:
+                    self.visit(expr.exp)
+
+                self.visit(node.op)
+
+        elif(node.op.op != 'read'):
+             self.visit(node.param)
+
         if(node.op.op == 'read'):
+             self.visit(node.op)
              child = node.param.param[0]
              varscop = self.scopedict[child.exp.char]
              inst = "('stv', {}, {})".format(varscop-1,self.vardict[child.exp.char])
              self.code.append(inst)
-        
+
     def visit_Param(self, node):
         lista = []
         for i, child in enumerate(node.param or []):
 
-            if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):	
+            if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):
                  varscop = self.scopedict[child.exp.char]
                  lista.append( ["('ldv', {}, {})".format(varscop-1,self.vardict[child.exp.char]), self.vardict[child.exp.char] ] )
 
-            elif isinstance(child.exp, RefLoc): 
+            elif isinstance(child.exp, RefLoc):
                 var = child.exp.loc
                 nvar = self.vardict[var.char]
                 varscop = self.scopedict[var.char]
                 inst = "('ldr', {}, {})".format(varscop-1,nvar)
                 lista.append([inst, self.vardict[var.char]])
 
-            self.visit(child)  
+            self.visit(child)
 
-        lista = sorted(lista, key=lambda ins: ins[1], reverse=True) 
+        lista = sorted(lista, key=lambda ins: ins[1], reverse=True)
         for inst, i in lista:
             print(lista)
             self.code.append(inst)
@@ -427,18 +501,18 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst2 = "('jmp', %d)" % self.countLabels
                 self.countLabels += 1
                 dlabel = self.countLabels
-                self.visit(node.control) 
+                self.visit(node.control)
 
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
-                                   
+
                 self.code.append(inst2)
                 inst = "('lbl', %d)" % dlabel
                 self.code.append(inst)
-        
+
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
-                self.code.append(inst)	
+                self.code.append(inst)
                 inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 self.countLabels += 1
@@ -460,7 +534,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
-                self.code.append(inst)                        
+                self.code.append(inst)
                 inst = "('leq')"
                 self.code.append(inst)
                 self.countLabels += 1
@@ -470,10 +544,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
-                
+
         else:
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
-                self.code.append(inst)	
+                self.code.append(inst)
                 inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 self.countLabels += 1
@@ -486,10 +560,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('jof', %d)"% self.labeldict['od']
                 self.code.append(inst)
-                
+
                 for i, child in enumerate(node.action_list or []):
-                    self.visit(child)                
-                
+                    self.visit(child)
+
                 #update for
                 inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
@@ -503,7 +577,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
                 self.code.append(inst)
                 inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
-                self.code.append(inst)                        
+                self.code.append(inst)
                 inst = "('leq')"
                 self.code.append(inst)
                 self.countLabels += 1
@@ -511,11 +585,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
                 self.code.append(inst)
-                
+
                 inst = "('lbl', %d)" % self.labeldict['od']
                 self.code.append(inst)
-                
-                
+
+
     def visit_IfAction(self, node):
         self.visit(node.bool_exp)
         inst = "('jof', %d)" % (self.countLabels+1)
@@ -526,7 +600,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 label = self.countLabels+2
                 inst = "('jmp', {})".format(label)
                 self.code.append(inst)
-        if node.else_c is not None:    
+        if node.else_c is not None:
             self.visit(node.else_c)
         self.countLabels += 1
         inst2 = "('lbl', %d)" % self.countLabels
@@ -542,8 +616,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst2)
         for i, child in enumerate(node.action_list or []):
             self.visit(child)
-    
-    
+
+
     def visit_WhileControl(self, node):
 
         # inst = "('ldv', {}, {})".format(node.scope_level-1,self.vardict[node.bool_exp.exp.exp.char])
@@ -552,18 +626,18 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         inst = "('jof', %d)" % self.countLabels
         self.code.append(inst)
-        
+
     def visit_ActionStmt(self, node):
-        
+
         if node.identifier is not None:
             self.countLabels += 1
             self.labeldict[node.identifier.char] = self.countLabels
-            flabel = "('lbl', %d)" % self.countLabels	  
-        
+            flabel = "('lbl', %d)" % self.countLabels
+
         if node.action is not None:
             self.visit(node.action)
-        
-        if node.identifier is not None:    
+
+        if node.identifier is not None:
             self.code.append(flabel)
 
     def visit_Result(self, node):
@@ -576,7 +650,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 code = 'ldr'
             else:
                 code = 'ldv'
-            print(node.expr.exp.char)
+            # print(node.expr.exp.char)
             inst = "('{}', {}, {})".format(code, varscop-1,self.vardict[node.expr.exp.char])
         self.code.append(inst)
 
@@ -594,19 +668,19 @@ class GenerateCode(lyaparser.NodeVisitor):
         if node.param is not None:
             self.varloc["_ret"] = node.param.attr
         print(self.vardict)
-            
-    def visit_Exit(self, node):           
+
+    def visit_Exit(self, node):
         inst = "('jmp', {})".format(self.labeldict[node.ident.char])
         self.code.append(inst)
-        
-        
-        
+
+
+
 
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
         # print("Block:[%s]" % block)
         for inst in block.instructions:
-            print("    %s" % (inst,))
+            print("    %s," % (inst,))
         print("")
 
     def visit_IfBlock(self,block):

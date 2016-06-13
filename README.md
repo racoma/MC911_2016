@@ -9,15 +9,16 @@ python3 lyacod.py exemple.lya
 
 *Tests OK:*
 
-- ex_proc.lya
+- ex_proc.lya (existe um dlc que não está na resolução do professor, mas acredito que está certo)
 - ex_do_for.lya
 - do_while.lya
 - for_while.lya
 - ex_results.lya
+- locs.lya - (duvida com um 'ret' e um 'alc')
+
 
 *Tests NOK:*
 
-- locs.lya
 - slices_n_builtins.lya
 - returning_location.lya
 - references.lya

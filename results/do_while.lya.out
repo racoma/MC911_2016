@@ -1,0 +1,83 @@
+passou no while_control
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: i (at line: 4)
+        Mode: 
+          DiscreteMode: int (at line: 4)
+      Decl: 
+        ID: b (at line: 4)
+        Mode: 
+          DiscreteMode: bool (at line: 4)
+        Expr: 
+          Constant: true, bool (at line: 4)
+    ActionStmt: 
+      ID: x (at line: 5)
+      DoAction: 
+        Control: 
+          WhileControl: 
+            BoolExpr: 
+              Expr: 
+                ID: b (at line: 6)
+        ActionStmt: 
+          Call: 
+            Func: read
+            Param: 
+              Expr: 
+                ID: i (at line: 7)
+        ActionStmt: 
+          IfAction: 
+            BoolExpr: 
+              Expr: 
+                Binop: <= (at line: 8)
+                  ID: i (at line: 8)
+                  Constant: 0, int (at line: 8)
+            ThenClause: 
+              ActionStmt: 
+                Exit: 
+                  ID: x (at line: 9)
+        ActionStmt: 
+          Call: 
+            Func: print
+            Param: 
+              Expr: 
+                Binop: * (at line: 11)
+                  ID: i (at line: 11)
+                  ID: i (at line: 11)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            Constant: 0, int (at line: 14)
+while
+    [,
+    ('stp'),
+    ('alc', 2),
+    ('ldc', true),
+    ('stv', 0, 1),
+    ('lbl', 2),
+    ('ldv', 0, 1),
+    ('jof', 3),
+    ('rdv'),
+    ('stv', 0, 0),
+    ('ldv', 0, 0),
+    ('ldc', 0),
+    ('leq'),
+    ('jof', 4),
+    ('jmp', 1),
+    ('lbl', 4),
+    ('ldv', 0, 0),
+    ('ldv', 0, 0),
+    ('mul'),
+    ('prv'),
+    ('jmp', 2),
+    ('lbl', 3),
+    ('lbl', 1),
+    ('ldc', 0),
+    ('prv'),
+    ('dlc', 2),
+    ('end'),
+    ],
+

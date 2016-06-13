@@ -1,0 +1,65 @@
+passou no for_control
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: i (at line: 3)
+        ID: soma (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+    ActionStmt: 
+      Assignment: =
+        ID: soma (at line: 4)
+        Expr: 
+          Constant: 0, int (at line: 4)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: i (at line: 5)
+              Expr: 
+                Constant: 1, int (at line: 5)
+              Expr: 
+                Constant: 10, int (at line: 5)
+        ActionStmt: 
+          Assignment: =
+            ID: soma (at line: 6)
+            Expr: 
+              Binop: + (at line: 6)
+                ID: soma (at line: 6)
+                ID: i (at line: 6)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            ID: soma (at line: 8)
+    [,
+    ('stp'),
+    ('alc', 2),
+    ('ldc', 0),
+    ('stv', 0, 1),
+    ('ldc', 1),
+    ('stv', 0, 0),
+    ('lbl', 1),
+    ('ldv', 0, 1),
+    ('ldv', 0, 0),
+    ('add'),
+    ('stv', 0, 1),
+    ('ldv', 0, 0),
+    ('ldc', 1),
+    ('add'),
+    ('stv', 0, 0),
+    ('ldv', 0, 0),
+    ('ldc', 10),
+    ('leq'),
+    ('jof', 2),
+    ('jmp', 1),
+    ('lbl', 2),
+    ('ldv', 0, 1),
+    ('prv'),
+    ('dlc', 2),
+    ('end'),
+    ],
+

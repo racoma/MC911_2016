@@ -1,0 +1,68 @@
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: m (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+        Expr: 
+          Constant: 2, int (at line: 3)
+      Decl: 
+        ID: n (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+        Expr: 
+          Constant: 3, int (at line: 3)
+    ProcStmt: 
+      ID: p (at line: 4)
+      ProcDef:  (at line: 4)
+        FormalParam: 
+          ID: x (at line: 4)
+          ParamSpec: None
+            Mode: 
+              DiscreteMode: int (at line: 4)
+        StmtList: 
+          DclStmt: 
+            Decl: 
+              ID: s (at line: 5)
+              Mode: 
+                DiscreteMode: int (at line: 5)
+          ActionStmt: 
+            Assignment: =
+              ID: s (at line: 6)
+              Expr: 
+                Binop: * (at line: 6)
+                  ID: m (at line: 6)
+                  ID: x (at line: 6)
+    ActionStmt: 
+      ProcCall: 
+        ID: p (at line: 8)
+        Param: 
+          Expr: 
+            ID: n (at line: 8)
+ProcStmt {'p': {0: None}}
+{0: None}
+    [,
+    ('stp'),
+    ('alc', 2),
+    ('ldc', 2),
+    ('stv', 0, 0),
+    ('ldc', 3),
+    ('stv', 0, 1),
+    ('jmp', 2),
+    ('lbl', 1),
+    ('enf', 1),
+    ('alc', 1),
+    ('ldv', 0, 0),
+    ('ldv', 1, -2),
+    ('mul'),
+    ('stv', 1, 0),
+    ('dlc', 1),
+    ('ret', 1, 1),
+    ('lbl', 2),
+    ('ldv', 0, 1),
+    ('cfu', 1),
+    ('dlc', 2),
+    ('end'),
+    ],
+
