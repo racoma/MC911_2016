@@ -433,7 +433,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 nvar = self.vardict[var.char]
                 varscop = self.scopedict[var.char]
                 inst = "('ldr', {}, {})".format(varscop-1,nvar)
-                lista.append([inst, self.vardict[var.char]])
+                self.code.append(inst)
 
         inst = "('cfu', %d)" % self.labeldict[node.op.char]
         self.code.append(inst)

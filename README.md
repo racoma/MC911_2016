@@ -15,13 +15,13 @@ python3 lyacod.py exemple.lya
 - for_while.lya
 - ex_results.lya
 - locs.lya - (duvida com um 'ret' e um 'alc')
+- references.lya - (duvida com um 'ret' e um 'alc')
 
 
 *Tests NOK:*
 
 - slices_n_builtins.lya
 - returning_location.lya
-- references.lya
 - arrays.lya
 - arrays_02.lya
 - 2dim_arrays.lya
