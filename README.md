@@ -20,8 +20,10 @@ python3 lyacod.py exemple.lya
 
 *Tests NOK:*
 
-- slices_n_builtins.lya
-- returning_location.lya
+- returning_location.lya 
+	- problema com numeracao de variaveis (acho que a variavel b de 'dcl b bool = false;' deve valer 2, e a de 'b bool' deve valer 3)
+	- problemas com 'ret' e 'alc'
 - arrays.lya
 - arrays_02.lya
 - 2dim_arrays.lya
+- slices_n_builtins.lya

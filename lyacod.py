@@ -203,13 +203,21 @@ class GenerateCode(lyaparser.NodeVisitor):
     def visit_Constant(self,node):
         target = self.new_temp()
         node.gen_location = target
+        if node.exp == 'false':
+            node.exp = 0
+        elif node.exp == 'true':
+            node.exp = 1
         inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
 
 
     def visit_Assignment(self,node):
-        self.visit(node.expr)
-        self.visit(node.location)
+        if isinstance(node.location, ProcCall):
+            self.visit(node.location)
+            self.visit(node.expr)
+        else:
+            self.visit(node.expr)
+            self.visit(node.location)
 
         if(len(node.op) == 2):
 
@@ -258,14 +266,21 @@ class GenerateCode(lyaparser.NodeVisitor):
             ret = params["_ret"]
             print(ret)
 
-        if self.varloc[node.location.char] == "loc" or ret == "loc":
-            code = 'srv'
+        if isinstance(node.location, ProcCall):
+            #get function number
+            nvar = self.labeldict[node.location.op.char]
+            inst = "('smv', {})".format(nvar)
+            self.code.append(inst)
+
         else:
-            code = 'stv'
-        #get var number
-        nvar = self.vardict[node.location.char]
-        inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
-        self.code.append(inst)
+            if self.varloc[node.location.char] == "loc" or ret == "loc":
+                code = 'srv'
+            else:
+                code = 'stv'
+            #get var number
+            nvar = self.vardict[node.location.char]
+            inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
+            self.code.append(inst)
 
     '''
     def visit_Expr(self, node):
@@ -390,7 +405,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst = "('enf', %d)" % li
         self.code.append(inst)
         inst = ('alc', self.numVariables(node))
-        self.code.append(inst)
+        if self.numVariables(node) >0:
+            self.code.append(inst)
 
         for i, child in enumerate(node.formal_parameter_list or []):
             self.visit(child)
