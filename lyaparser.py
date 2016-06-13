@@ -899,6 +899,7 @@ class ID(Node):
         self.ttype = "ID"
         self.lineno = lineno
         self.char = char
+        self.loc = None
     attr_names = ("char",)
 
     def children(self):

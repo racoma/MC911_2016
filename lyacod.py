@@ -64,6 +64,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.number = defaultdict(int)
         # dictionary for storing global var number 
         self.vardict = defaultdict(int)
+        # dictionary for storing global var number 
+        self.varloc = defaultdict(str)
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
         # dictionary to store variables scope
@@ -155,7 +157,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                  if(node.initialization.exp.ttype == "ID"):
                     nvar2 = self.vardict[node.initialization.exp.char]
                     varscop = self.scopedict[node.initialization.exp.char]
-                    inst = "('ldv', {}, {})".format(varscop-1,nvar2)
+                    if self.varloc[node.initialization.exp.char] == "loc":
+                        inst = "('lrv', {}, {})".format(varscop-1,nvar2)
+                    else:
+                        inst = "('ldv', {}, {})".format(varscop-1,nvar2)
                     self.code.append(inst)
                  self.visit(node.initialization.exp)
                  inst = "('stv', {}, {})".format(node.scope_level-1, nvar)
@@ -166,6 +171,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         print("FormalParam", node.scope_level)
         print("Param_init", self.param_init)
         for i, child in enumerate(node.id_list or []):
+            self.varloc[child.char] = node.param_spec.attr
             #count var number
             # nvar = self.var_scope(node.scope_level-1, param=1)
             #count param number
@@ -192,17 +198,25 @@ class GenerateCode(lyaparser.NodeVisitor):
         if(len(node.op) == 2):
             var = node.expr.exp
             if (var.ttype == 'ID'):
+                if self.varloc[var.char] == "loc":
+                    code = 'lrv'
+                else:
+                    code = 'ldv'
                 nvar = self.vardict[var.char]
                 varscop = self.scopedict[var.char]
-                inst = "('ldv', {}, {})".format(varscop-1,nvar)
+                inst = "('{}', {}, {})".format(code, varscop-1,nvar)
                 self.code.append(inst)
             elif (var.ttype == 'Constant'):
                 inst = "('ldc', {})".format(var.exp)
                 self.code.append(inst)        
 
+            if self.varloc[node.location.char] == "loc":
+                code = 'lrv'
+            else:
+                code = 'ldv'
             nvar2 = self.vardict[node.location.char]
             varscop = self.scopedict[node.location.char]
-            inst = "('ldv', {}, {})".format(varscop-1,nvar2)
+            inst = "('{}', {}, {})".format(code, varscop-1,nvar2)
             self.code.append(inst)
 
             opcode = self.which_code(node.op)
@@ -222,10 +236,13 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
 
         
-
+        if self.varloc[node.location.char] == "loc":
+            code = 'srv'
+        else:
+            code = 'stv'
         #get var number
         nvar = self.vardict[node.location.char]
-        inst = "('stv', {}, {})".format(node.scope_level-1,nvar)
+        inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
         self.code.append(inst)
      
     '''             
@@ -555,7 +572,12 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('lrv', {}, {})".format(varscop-1,self.vardict[node.expr.exp.location.char])
         elif isinstance(node.expr.exp, ID):
             varscop = self.scopedict[node.expr.exp.char]
-            inst = "('ldv', {}, {})".format(varscop-1,self.vardict[node.expr.exp.char])
+            if self.varloc["_ret"] == "loc":
+                code = 'ldr'
+            else:
+                code = 'ldv'
+            print(node.expr.exp.char)
+            inst = "('{}', {}, {})".format(code, varscop-1,self.vardict[node.expr.exp.char])
         self.code.append(inst)
 
         inst = "('stv', {}, {})".format(node.scope_level-1,self.vardict["_ret"])
@@ -567,6 +589,10 @@ class GenerateCode(lyaparser.NodeVisitor):
         #stores param number
         self.vardict["_ret"] = nparam
         self.scopedict["_ret"] = node.scope_level
+
+        # save return loc if location
+        if node.param is not None:
+            self.varloc["_ret"] = node.param.attr
         print(self.vardict)
             
     def visit_Exit(self, node):           
