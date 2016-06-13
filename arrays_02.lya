@@ -9,7 +9,7 @@ sum: proc (v vector) returns (int);
     i = 1;
     s = 0;
     do
-      while i<10;
+      while i < 10;
           s = s + v[i];
           i += 1;
     od;
