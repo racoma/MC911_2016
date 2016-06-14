@@ -210,9 +210,20 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst = "('ldc', {})".format(node.exp)
         self.code.append(inst)
 
+    def visit_Array(self,node):
+        inst = "('ldr', 0, 0)" #array first index
+        self.code.append(inst)       
+        for i, child in enumerate(node.expr or []):
+            self.visit(child)
+            if (child.exp.ttype == 'ID'):
+                inst = "('ldv', 0, {})".format(self.vardict[child.exp.char])
+                self.code.append(inst)            
+        inst = "('idx', 1)"
+        self.code.append(inst)            
+                    
 
     def visit_Assignment(self,node):
-        if isinstance(node.location, ProcCall):
+        if (isinstance(node.location, ProcCall) or node.location.ttype == 'array'):
             self.visit(node.location)
             self.visit(node.expr)
         else:
@@ -272,7 +283,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('smv', {})".format(nvar)
             self.code.append(inst)
 
-        else:
+        elif (node.location.ttype != 'array'):
             if self.varloc[node.location.char] == "loc" or ret == "loc":
                 code = 'srv'
             else:
@@ -281,15 +292,10 @@ class GenerateCode(lyaparser.NodeVisitor):
             nvar = self.vardict[node.location.char]
             inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
             self.code.append(inst)
-
-    '''
-    def visit_Expr(self, node):
-        target = self.new_temp()
-        self.visit(node.exp)
-        inst2 = "('ldv', {}, {})".format(target, node.exp)
-        self.code.append(inst2)
-        node.gen_location = target
-    '''
+        
+        elif (node.location.ttype == 'array'):          
+            inst = "('smv', 1)"
+            self.code.append(inst)                
 
     def visit_ID(self, node):
         target = self.new_temp()
@@ -481,8 +487,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         if(node.op.op == 'read'):
              self.visit(node.op)
              child = node.param.param[0]
-             varscop = self.scopedict[child.exp.char]
-             inst = "('stv', {}, {})".format(varscop-1,self.vardict[child.exp.char])
+             if (child.exp.ttype != 'array'):
+                 varscop = self.scopedict[child.exp.char]
+                 inst = "('stv', {}, {})".format(varscop-1,self.vardict[child.exp.char])
+             else:
+                 varscop = self.scopedict[child.exp.location.char]
+                 inst = "('stv', {}, {})".format(varscop-1,self.vardict[child.exp.location.char])
              self.code.append(inst)
 
     def visit_Param(self, node):
@@ -638,7 +648,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         # inst = "('ldv', {}, {})".format(node.scope_level-1,self.vardict[node.bool_exp.exp.exp.char])
         # self.code.append(inst)
-        self.visit(node.bool_exp)
+        # self.visit(node.bool_exp)
 
         inst = "('jof', %d)" % self.countLabels
         self.code.append(inst)
