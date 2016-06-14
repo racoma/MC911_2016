@@ -812,9 +812,6 @@ class NodeVisitor(object):
         for c_name, c in node.children():
             self.visit(c)
 
-
-# class Expr: pass
-
 class Program(Node):
     def __init__(self, statement_list):
         self.type = "program"
@@ -1235,7 +1232,7 @@ class Operand(Node):
 
 class ArrayMode(Node):
     def __init__(self, index_mode, element_mode):
-        self.type = "arraymode"
+        self.ttype = "arraymode"
         self.index_mode = index_mode
         self.element_mode = element_mode
     attr_names = ()
@@ -1248,7 +1245,7 @@ class ArrayMode(Node):
 
 class Array(Node):
     def __init__(self, location, expr):
-        self.type = "array"
+        self.ttype = "array"
         self.location = location
         self.expr = expr
     attr_names = ()
