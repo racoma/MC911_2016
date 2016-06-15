@@ -130,7 +130,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 crange = self.bounddict['upper'] - self.bounddict['lower']             
                 count = count + crange
                 count += 1
-
+            elif isinstance(obj, lyaparser.ModeDef):
+                self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
+                self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
+                crange = self.bounddict['upper'] - self.bounddict['lower']             
+                count = count + crange   
         return count
 
     def which_code(self, op):
