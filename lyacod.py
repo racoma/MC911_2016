@@ -604,6 +604,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
 
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
+                print("aquiii")
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
                 inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
@@ -612,6 +613,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.labeldict[node.control.ttype] = self.countLabels
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
+                instjmp = "('jmp', %d)" % self.countLabels 
+                self.countLabels += 1
+                instlabel = "('lbl', %d)" % self.countLabels                
+                instjof = "('jof', %d)"% self.countLabels
 
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
@@ -630,13 +635,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('leq')"
                 self.code.append(inst)
-                self.countLabels += 1
-                inst = "('jof', %d)"% self.countLabels
-                self.code.append(inst)
-                inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
-                self.code.append(inst)
-                inst = "('lbl', %d)" % self.countLabels
-                self.code.append(inst)
+
+                self.code.append(instjof)
+
+                self.code.append(instjmp)
+                self.code.append(instlabel)
 
         else:
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
