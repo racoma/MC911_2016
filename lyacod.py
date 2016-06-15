@@ -506,6 +506,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         params = self.procs[node.op.char]
         print(params)
 
+        if (params['_ret']):
+                inst = ('alc', 1)
+                self.code.append(inst)            
         # Visita todas as Expr dos Params
         for i, expr in reversed(list(enumerate(node.param.param or []))):
             self.visit(expr.exp)
