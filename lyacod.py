@@ -125,7 +125,6 @@ class GenerateCode(lyaparser.NodeVisitor):
             if isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype != 'arraymode' :
                 count += 1
             elif isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype == 'arraymode' :
-                print ("achou array")
                 self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
                 self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
                 crange = self.bounddict['upper'] - self.bounddict['lower']             
@@ -223,7 +222,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst)
 
     def visit_Array(self,node):
-        inst = "('ldr', 0, 0)" #array first index
+        inst = "('ldr', 0, {})".format(self.vardict[node.location.char])
         self.code.append(inst)       
         for i, child in enumerate(node.expr or []):
             self.visit(child)
@@ -449,6 +448,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         lf = "('lbl', %d)" % nlf
         self.code.append(lf)
 
+
     def visit_ProcCall(self, node):
         self.visit(node.op)
         # self.visit(node.param)
@@ -541,9 +541,8 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(inst)
 
     def visit_DoAction(self, node):
-
+      
         if ((node.control.whilecontrol is not None) and (node.control.forcontrol is None)):
-                print ("while")
                 self.countLabels += 1
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
@@ -562,7 +561,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 self.countLabels += 1
                 self.labeldict[node.control.ttype] = self.countLabels
@@ -572,15 +571,15 @@ class GenerateCode(lyaparser.NodeVisitor):
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
 
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 inst = "('ldc', 1)"
                 self.code.append(inst)
                 inst = "('add')"
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
                 self.code.append(inst)
@@ -614,16 +613,16 @@ class GenerateCode(lyaparser.NodeVisitor):
                     self.visit(child)
 
                 #update for
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 inst = "('ldc', 1)"
                 self.code.append(inst)
                 inst = "('add')"
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 #test for
-                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.start.exp])
+                inst = "('ldv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
                 self.code.append(inst)
                 inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
                 self.code.append(inst)
@@ -637,7 +636,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
                 inst = "('lbl', %d)" % self.labeldict['od']
                 self.code.append(inst)
-
+        print (self.vardict)
 
     def visit_IfAction(self, node):
         self.visit(node.bool_exp)
