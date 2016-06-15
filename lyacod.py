@@ -149,7 +149,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
                 count += count2
             elif isinstance(obj, lyaparser.ModeDef):
-                self.insert_bounds(obj.identifier_list[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
+                self.insert_bounds(obj.idents[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
                 crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
                 count = count + crange   
         return count
@@ -239,8 +239,8 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.scopedict[child.char] = node.scope_level
             self.visit(child)
 
-    def visit_ModeDef(self,node):
-        print ("modedef")    
+    def visit_Range(self,node):
+        pass
 
     def visit_Constant(self,node):
         target = self.new_temp()
@@ -406,7 +406,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         # self.visit(node.left)
         # self.visit(node.right)
-        # print(node.type)
+        print(node.type)
         opcode = node.type.bin_opc[node.op]
         inst = "('" + opcode + "')"
         self.code.append(inst)
