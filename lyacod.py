@@ -459,8 +459,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         if node.result_spec is not None:
                 self.countLabels += 1
                 lp = "('lbl', %d)" % self.countLabels
-
-        ret = "('ret', %d, %d)" % (li,self.numVariables(node))
+       
         self.countLabels += 1
         nlf = self.countLabels
 
@@ -474,9 +473,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         inst = ('alc', self.numVariables(node))
         if self.numVariables(node) >0:
             self.code.append(inst)
-
+        
+        nparam = 0
         for i, child in enumerate(node.formal_parameter_list or []):
             self.visit(child)
+            for i, child2 in enumerate(child.id_list or []):
+                nparam += 1
 
         if node.result_spec is not None:
             self.visit(node.result_spec)
@@ -489,6 +491,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         if(self.numVariables(node) > 0):
             dlc = "('dlc', %d)" % (self.numVariables(node))
             self.code.append(dlc)
+        
+
+        ret = "('ret', %d, %d)" % (li,nparam)
         self.code.append(ret)
         lf = "('lbl', %d)" % nlf
         self.code.append(lf)
