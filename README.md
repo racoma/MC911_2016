@@ -14,16 +14,15 @@ python3 lyacod.py exemple.lya
 - do_while.lya (duvida com um 'ldc', true)
 - for_while.lya
 - ex_results.lya
-- locs.lya - (duvida com um 'ret' e um 'alc')
-- references.lya - (duvida com um 'ret' e um 'alc')
+- locs.lya 
+- references.lya
 - arrays.lya
+- 2dim_arrays.lya
 
 
 *Tests NOK:*
-
 - returning_location.lya 
 	- problema com numeracao de variaveis (acho que a variavel b de 'dcl b bool = false;' deve valer 2, e a de 'b bool' deve valer 3)
 	- problemas com 'ret' e 'alc'
 - arrays_02.lya
-- 2dim_arrays.lya
 - slices_n_builtins.lya
