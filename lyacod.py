@@ -142,12 +142,13 @@ class GenerateCode(lyaparser.NodeVisitor):
                 count += 1
                 print(obj.mode.mode)
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, Array2Mode) :
-                count = 1
+                count2 = 1
                 for i, child in enumerate(obj.mode.mode.index_mode or []):
                     self.insert_bounds(obj.identifier_list[0], child.i1.exp.exp, child.i2.exp.exp)
                     crange = child.i2.exp.exp - child.i1.exp.exp + 1
-                    count *= crange
+                    count2 *= crange
 
+                count += count2
             elif isinstance(obj, lyaparser.ModeDef):
                 self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
                 self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
