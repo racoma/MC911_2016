@@ -135,24 +135,22 @@ class GenerateCode(lyaparser.NodeVisitor):
             if isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype != 'arraymode' :
                 count += 1
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, ArrayMode) :
-                self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
-                self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
-                crange = self.bounddict['upper'] - self.bounddict['lower']             
+                self.insert_bounds(obj.identifier_list[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
+                crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
                 count = count + crange
                 count += 1
                 print(obj.mode.mode)
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, Array2Mode) :
                 count2 = 1
                 for i, child in enumerate(obj.mode.mode.index_mode or []):
-                    self.insert_bounds(obj.identifier_list[0], child.i1.exp.exp, child.i2.exp.exp)
+                    self.insert_bounds(obj.identifier_list[0].char, child.i1.exp.exp, child.i2.exp.exp)
                     crange = child.i2.exp.exp - child.i1.exp.exp + 1
                     count2 *= crange
 
                 count += count2
             elif isinstance(obj, lyaparser.ModeDef):
-                self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
-                self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
-                crange = self.bounddict['upper'] - self.bounddict['lower']             
+                self.insert_bounds(obj.identifier_list[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
+                crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
                 count = count + crange   
         return count
 
@@ -191,11 +189,12 @@ class GenerateCode(lyaparser.NodeVisitor):
             #count var number
             if node.mode is not None:
                  if isinstance(node.mode.mode, ArrayMode):
-                    crange = self.bounddict['upper'] - self.bounddict['lower']                    
-                    print (self.bounddict)
+                    bounds = self.bounds[node.identifier_list[0].char]
+                    crange = bounds['u1'] - bounds['l1']                    
+                    print (bounds)
                     nvar = self.var_scope(node.scope_level, crange)
                  elif isinstance(node.mode.mode, Array2Mode):
-                    bounds = self.bounds[node.identifier_list[0]]
+                    bounds = self.bounds[node.identifier_list[0].char]
                     print(bounds)
                     crange1 = bounds["u1"] - bounds["l1"] + 1
                     crange2 = bounds["u2"] - bounds["l2"] + 1
@@ -254,20 +253,32 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst)
 
     def visit_Array(self,node):
-        inst = "('ldr', 0, {})".format(self.vardict[node.location.char])
+        varscop = self.scopedict[node.location.char]
+        inst = "('ldr', {}, {})".format(varscop-1, self.vardict[node.location.char])
         self.code.append(inst)       
         for i, child in enumerate(node.expr or []):
             self.visit(child)
+            varscop = self.scopedict[child.exp.char]
             if (child.exp.ttype == 'ID'):
-                inst = "('ldv', 0, {})".format(self.vardict[child.exp.char])
-                self.code.append(inst)            
+                inst = "('ldv', {}, {})".format(varscop-1, self.vardict[child.exp.char])
+                self.code.append(inst)        
+
+        print(self.bounds)
+        bounds = self.bounds[node.location.char]   
         
-        inst = "('ldc', {})".format(self.bounddict['lower'])
+        inst = "('ldc', {})".format(bounds['l1'])
         self.code.append(inst)      
         inst = "('sub')"
         self.code.append(inst)              
-        inst = "('idx', 1)"
-        self.code.append(inst)            
+
+        if(len(bounds) >= 2):
+            a = int(self.vardict[node.location.char]) + int(bounds['u2'])
+            inst = "('idx', {})".format(a)
+            self.code.append(inst)  
+        else:    
+            a = int(self.vardict[node.location.char]) + int(bounds['l1'])
+            inst = "('idx', {})".format(a)
+            self.code.append(inst)            
                     
 
     def visit_Assignment(self,node):
