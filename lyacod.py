@@ -256,6 +256,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         varscop = self.scopedict[node.location.char]
         inst = "('ldr', {}, {})".format(varscop-1, self.vardict[node.location.char])
         self.code.append(inst)       
+        count = 0
         for i, child in enumerate(node.expr or []):
             self.visit(child)
             varscop = self.scopedict[child.exp.char]
@@ -263,23 +264,24 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = "('ldv', {}, {})".format(varscop-1, self.vardict[child.exp.char])
                 self.code.append(inst)        
 
-        print(self.bounds)
-        bounds = self.bounds[node.location.char]   
-        
-        inst = "('ldc', {})".format(bounds['l1'])
-        self.code.append(inst)      
-        inst = "('sub')"
-        self.code.append(inst)              
+            print(self.bounds)
+            bounds = self.bounds[node.location.char]   
 
-        if(len(bounds) >= 2):
-            a = int(self.vardict[node.location.char]) + int(bounds['u2'])
-            inst = "('idx', {})".format(a)
-            self.code.append(inst)  
-        else:    
-            a = int(self.vardict[node.location.char]) + int(bounds['l1'])
-            inst = "('idx', {})".format(a)
-            self.code.append(inst)            
-                    
+            inst = "('ldc', {})".format(bounds['l1'])
+            self.code.append(inst)      
+            inst = "('sub')"
+            self.code.append(inst)              
+
+            if(len(bounds) >= 2 and count == 0):
+                a = int(self.vardict[node.location.char]) + int(bounds['u2'])
+                inst = "('idx', {})".format(a)
+                self.code.append(inst)  
+            else:    
+                a = int(self.vardict[node.location.char]) + int(bounds['l1'])
+                inst = "('idx', {})".format(a)
+                self.code.append(inst)            
+
+            count += 1
 
     def visit_Assignment(self,node):
         if (isinstance(node.location, ProcCall) or node.location.ttype == 'array'):
