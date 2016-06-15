@@ -132,7 +132,7 @@ class GenerateCode(lyaparser.NodeVisitor):
     def numVariables(self, node):
         count = 0
         for value, obj in node.symtab.items():
-            if isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype != 'arraymode' :
+            if isinstance(obj, lyaparser.Decl) and not isinstance(obj.mode.mode, ArrayMode) and not isinstance(obj.mode.mode, Array2Mode) :
                 count += 1
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, ArrayMode) :
                 self.insert_bounds(obj.identifier_list[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
