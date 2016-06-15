@@ -259,7 +259,6 @@ class GenerateCode(lyaparser.NodeVisitor):
         count = 0
         for i, child in enumerate(node.expr or []):
             self.visit(child)
-            
             if (child.exp.ttype == 'ID'):
                 varscop = self.scopedict[child.exp.char]
                 inst = "('ldv', {}, {})".format(varscop-1, self.vardict[child.exp.char])
@@ -273,12 +272,12 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('sub')"
             self.code.append(inst)              
 
-            if(len(bounds) >= 3 and count == 0):
-                a = int(self.vardict[node.location.char]) + int(bounds['u2'])
+            if(len(bounds) > 2 and count == 0):
+                a = int(bounds['u2'])
                 inst = "('idx', {})".format(a)
                 self.code.append(inst)  
             else:    
-                a = int(self.vardict[node.location.char]) + int(bounds['l1'])
+                a = 1
                 inst = "('idx', {})".format(a)
                 self.code.append(inst)            
 
@@ -605,7 +604,6 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
 
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
-                print("aquiii")
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
                 inst = "('stv', 0, {})".format(self.vardict[node.control.forcontrol.iteration.loop.char])
@@ -614,10 +612,6 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.labeldict[node.control.ttype] = self.countLabels
                 inst = "('lbl', %d)" % self.countLabels
                 self.code.append(inst)
-                instjmp = "('jmp', %d)" % self.countLabels 
-                self.countLabels += 1
-                instlabel = "('lbl', %d)" % self.countLabels                
-                instjof = "('jof', %d)"% self.countLabels
 
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
@@ -636,11 +630,13 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
                 inst = "('leq')"
                 self.code.append(inst)
-
-                self.code.append(instjof)
-
-                self.code.append(instjmp)
-                self.code.append(instlabel)
+                self.countLabels += 1
+                inst = "('jof', %d)"% self.countLabels
+                self.code.append(inst)
+                inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
+                self.code.append(inst)
+                inst = "('lbl', %d)" % self.countLabels
+                self.code.append(inst)
 
         else:
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
