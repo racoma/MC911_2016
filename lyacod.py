@@ -74,13 +74,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.func = defaultdict(int)
         # dictionary for storing label numbers
         self.labeldict = defaultdict(int)
+        # dictionary for storing array bounds
+        self.bounddict = defaultdict(int)
 
         ''' The generated code (list of tuples)'''
         self.code = lyablock.BasicBlock()
         self.start_block = self.code
-
-        ''' A list of external declarations (and types)'''
-        self.externs = []
 
         # Dictionary to save Procs and params
         self.procs = {}
@@ -101,13 +100,11 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.procs[proc].update({"_ret": loc})
         else:
             self.procs[proc] = {"_ret": loc}
+            
     #Funcao para contar variaveis por escopo
-    def var_scope(self,scope):
-        '''
-        Increments count per scope
-        '''
+    def var_scope(self,scope, crange):
         count = "%d" % (self.number[scope])
-        self.number[scope] += 1
+        self.number[scope] = self.number[scope] + crange + 1
         return count
 
     def param_number(self,varnumber):
@@ -125,8 +122,16 @@ class GenerateCode(lyaparser.NodeVisitor):
     def numVariables(self, node):
         count = 0
         for value, obj in node.symtab.items():
-            if isinstance(obj, lyaparser.Decl):
+            if isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype != 'arraymode' :
                 count += 1
+            elif isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype == 'arraymode' :
+                print ("achou array")
+                self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
+                self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
+                crange = self.bounddict['upper'] - self.bounddict['lower']             
+                count = count + crange
+                count += 1
+
         return count
 
     def which_code(self, op):
@@ -162,7 +167,13 @@ class GenerateCode(lyaparser.NodeVisitor):
         #print(node.scope_level)
         for i, child in enumerate(node.identifier_list or []):
             #count var number
-            nvar = self.var_scope(node.scope_level)
+            if node.mode is not None:
+                 if node.mode.mode.ttype == 'arraymode':
+                    crange = self.bounddict['upper'] - self.bounddict['lower']                    
+                    print (self.bounddict)
+                    nvar = self.var_scope(node.scope_level, crange)
+                 else:
+                    nvar = self.var_scope(node.scope_level, 0)
             #stores var number
             self.vardict[child.char] = nvar
             self.scopedict[child.char] = node.scope_level
@@ -181,6 +192,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                  self.visit(node.initialization.exp)
                  inst = "('stv', {}, {})".format(node.scope_level-1, nvar)
                  self.code.append(inst)
+    
 
     def visit_FormalParam(self,node):
         # node.scope_level = node.scope_level-1
@@ -218,6 +230,11 @@ class GenerateCode(lyaparser.NodeVisitor):
             if (child.exp.ttype == 'ID'):
                 inst = "('ldv', 0, {})".format(self.vardict[child.exp.char])
                 self.code.append(inst)            
+        
+        inst = "('ldc', {})".format(self.bounddict['lower'])
+        self.code.append(inst)      
+        inst = "('sub')"
+        self.code.append(inst)              
         inst = "('idx', 1)"
         self.code.append(inst)            
                     
@@ -476,6 +493,12 @@ class GenerateCode(lyaparser.NodeVisitor):
                     lista.append([inst, self.vardict[var.char]])
 
                     self.visit(node.op)
+                    
+                elif isinstance(expr.exp, Array):
+                    self.visit(expr.exp)
+                    inst = "('grc')"
+                    self.code.append(inst)
+                                
                 else:
                     self.visit(expr.exp)
 
@@ -700,8 +723,6 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.code.append(inst)
 
 
-
-
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
         # print("Block:[%s]" % block)
@@ -709,26 +730,7 @@ class JumpGenerator(lyablock.BlockVisitor):
             print("    %s," % (inst,))
         print("")
 
-    def visit_IfBlock(self,block):
-        # Emit a conditional jump around the if-branch
-        #inst = ('if', block.condvar)
-        #block.append(inst)
-        self.visit_BasicBlock(block)
-        if block.falsebranch:
-            pass
-            # Emit a jump around the else-branch (if there is one)
-            #inst = ('else',)
-            #block.truebranch.append(inst)
-        self.visit(block.truebranch)
-        if block.falsebranch:
-            self.visit(block.falsebranch)
 
-    def visit_WhileBlock(self,block):
-        # Emit a conditional jump around the if-branch
-        #inst = ('while', block.condvar)
-        #block.append(inst)
-        self.visit_BasicBlock(block)
-        self.visit(block.truebranch)
 
 def gen_code(node):
     #adicionar teste sem erros lyasem
