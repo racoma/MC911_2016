@@ -205,6 +205,10 @@ class Visitor(NodeVisitor):
         nodetype = self.typemap.get(node.element_mode.mode.type, None)
         node.type = nodetype
 
+    def visit_Array2Mode(self, node):
+        nodetype = self.typemap.get(node.element_mode.mode.type, None)
+        node.type = nodetype
+
     def visit_Mode(self, node):
         self.visit(node.mode)
         node.type = node.mode.type

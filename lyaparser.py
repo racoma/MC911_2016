@@ -207,7 +207,7 @@ def p_array_mode(p):
   if len(p) == 6:
     p[0] = ArrayMode(p[3], p[5])
   else:
-    p[0] =  + ArrayMode(p[3]+[p[5]], p[7])
+    p[0] = Array2Mode([p[3]]+p[5], p[7])
 
 def p_index_mode_list(p):
   """ index_mode_list : index_mode
@@ -1240,6 +1240,22 @@ class ArrayMode(Node):
       if self.index_mode is not None: nodelist.append(("index_mode", self.index_mode))
       if self.element_mode is not None: nodelist.append(("element_mode", self.element_mode))
       return tuple(nodelist)
+
+class Array2Mode(Node):
+    def __init__(self, index_mode, element_mode):
+        self.ttype = "arraymode"
+        self.index_mode = index_mode
+        self.element_mode = element_mode
+    attr_names = ()
+
+    def children(self):
+      nodelist = []
+      for i, child in enumerate(self.index_mode or []):
+          nodelist.append(("exprs[%d]" % i, child))
+      # if self.index_mode is not None: nodelist.append(("index_mode", self.index_mode))
+      if self.element_mode is not None: nodelist.append(("element_mode", self.element_mode))
+      return tuple(nodelist)
+
 
 class Array(Node):
     def __init__(self, location, expr):

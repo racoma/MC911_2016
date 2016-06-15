@@ -84,6 +84,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         # Dictionary to save Procs and params
         self.procs = {}
 
+        self.bounds = {}
+
         self.countLabels = 0
         self.param_init = 0
 
@@ -100,6 +102,14 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.procs[proc].update({"_ret": loc})
         else:
             self.procs[proc] = {"_ret": loc}
+
+    def insert_bounds(self, array, lower, upper):
+        if array in self.bounds:
+            self.bounds[array].update({"l2": lower})
+            self.bounds[array].update({"u2": upper})
+        else:
+            self.bounds[array] = {"l1": lower}
+            self.bounds[array].update({"u1": upper})
             
     #Funcao para contar variaveis por escopo
     def var_scope(self,scope, crange):
@@ -124,12 +134,20 @@ class GenerateCode(lyaparser.NodeVisitor):
         for value, obj in node.symtab.items():
             if isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype != 'arraymode' :
                 count += 1
-            elif isinstance(obj, lyaparser.Decl) and obj.mode.mode.ttype == 'arraymode' :
+            elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, ArrayMode) :
                 self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
                 self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
                 crange = self.bounddict['upper'] - self.bounddict['lower']             
                 count = count + crange
                 count += 1
+                print(obj.mode.mode)
+            elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, Array2Mode) :
+                count = 1
+                for i, child in enumerate(obj.mode.mode.index_mode or []):
+                    self.insert_bounds(obj.identifier_list[0], child.i1.exp.exp, child.i2.exp.exp)
+                    crange = child.i2.exp.exp - child.i1.exp.exp + 1
+                    count *= crange
+
             elif isinstance(obj, lyaparser.ModeDef):
                 self.bounddict['lower'] = obj.mode.mode.index_mode.i1.exp.exp
                 self.bounddict['upper'] = obj.mode.mode.index_mode.i2.exp.exp
@@ -171,9 +189,16 @@ class GenerateCode(lyaparser.NodeVisitor):
         for i, child in enumerate(node.identifier_list or []):
             #count var number
             if node.mode is not None:
-                 if node.mode.mode.ttype == 'arraymode':
+                 if isinstance(node.mode.mode, ArrayMode):
                     crange = self.bounddict['upper'] - self.bounddict['lower']                    
                     print (self.bounddict)
+                    nvar = self.var_scope(node.scope_level, crange)
+                 elif isinstance(node.mode.mode, Array2Mode):
+                    bounds = self.bounds[node.identifier_list[0]]
+                    print(bounds)
+                    crange1 = bounds["u1"] - bounds["l1"] + 1
+                    crange2 = bounds["u2"] - bounds["l2"] + 1
+                    crange = crange1*crange2 - 1
                     nvar = self.var_scope(node.scope_level, crange)
                  else:
                     nvar = self.var_scope(node.scope_level, 0)
