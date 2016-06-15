@@ -214,6 +214,8 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.scopedict[child.char] = node.scope_level
             self.visit(child)
 
+    def visit_ModeDef(self,node):
+        print ("modedef")    
 
     def visit_Constant(self,node):
         target = self.new_temp()
@@ -671,9 +673,12 @@ class GenerateCode(lyaparser.NodeVisitor):
 
 
     def visit_WhileControl(self, node):
-
-        # inst = "('ldv', {}, {})".format(node.scope_level-1,self.vardict[node.bool_exp.exp.exp.char])
-        # self.code.append(inst)
+        
+        if (node.bool_exp.exp.exp.ttype == 'binop'):
+                self.visit(node.bool_exp)
+        elif (node.bool_exp.exp.exp.ttype == 'ID'):
+                inst = "('ldv', {}, {})".format(node.scope_level-1,self.vardict[node.bool_exp.exp.exp.char])
+                self.code.append(inst)
         # self.visit(node.bool_exp)
 
         inst = "('jof', %d)" % self.countLabels
