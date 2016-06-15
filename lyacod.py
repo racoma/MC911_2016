@@ -259,8 +259,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         count = 0
         for i, child in enumerate(node.expr or []):
             self.visit(child)
-            varscop = self.scopedict[child.exp.char]
+            
             if (child.exp.ttype == 'ID'):
+                varscop = self.scopedict[child.exp.char]
                 inst = "('ldv', {}, {})".format(varscop-1, self.vardict[child.exp.char])
                 self.code.append(inst)        
 
@@ -272,7 +273,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('sub')"
             self.code.append(inst)              
 
-            if(len(bounds) >= 2 and count == 0):
+            if(len(bounds) >= 3 and count == 0):
                 a = int(self.vardict[node.location.char]) + int(bounds['u2'])
                 inst = "('idx', {})".format(a)
                 self.code.append(inst)  
