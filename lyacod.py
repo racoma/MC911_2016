@@ -586,7 +586,6 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.code.append(inst)
 
     def visit_DoAction(self, node):
-      
         if ((node.control.whilecontrol is not None) and (node.control.forcontrol is None)):
                 self.countLabels += 1
                 inst = "('lbl', %d)" % self.countLabels
