@@ -175,7 +175,7 @@ class Visitor(NodeVisitor):
         raw_type = self.raw_type_binary(node, node.op, node.left, node.right)
         # Assign the result type
         node.type = raw_type
-        # print(node.type.name)
+        print(node.type)
         node.scope_level = self.environment.scope_level()
 
     def visit_Constant(self,node):
@@ -353,6 +353,7 @@ class Visitor(NodeVisitor):
         
     def visit_WhileControl(self,node):
         node.scope_level = self.environment.scope_level()
+        self.visit(node.bool_exp)
     
     '''    
     def visit_FormalParam(self,node):
