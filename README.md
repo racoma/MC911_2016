@@ -26,3 +26,11 @@ python3 lyacod.py exemple.lya
 	- problemas com 'ret' e 'alc'
 - arrays_02.lya
 - slices_n_builtins.lya
+
+
+*REFACTOR*
+- Feito troca de vardict e scopedict para a enviroment stack do lyasym
+
+TODO:
+
+Verificar param_init

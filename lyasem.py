@@ -8,8 +8,9 @@ class SymbolTable(dict):
     def __init__(self, decl=None):
         super().__init__()
         self.decl = decl
-    def insert(self, name, value):
-        self[name] = value
+    def insert(self, name, value, scope, number=None):
+        self[name] = {"node": value, "scope": scope, "number": number}
+
     def lookup(self, name):
         return self.get(name, None)
     def return_type(self):
@@ -67,6 +68,8 @@ class Environment(object):
         })
     def push(self, enclosure):
         self.stack.append(SymbolTable(decl=enclosure))
+    def pushSymtab(self, symtab):
+        self.stack.append(symtab)
     def pop(self):
         self.stack.pop()
     def peek(self):
@@ -74,9 +77,9 @@ class Environment(object):
     def scope_level(self):
         return len(self.stack)
     def insert_local(self, name, value):
-        self.peek().insert(name, value)
+        self.peek().insert(name, value, self.scope_level()-1)
     def insert_root(self, name, value):
-        self.root.insert(name, value)
+        self.root.insert(name, value, self.scope_level()-1)
     def lookup(self, name):
         for scope in reversed(self.stack):
             hit = scope.lookup(name)
@@ -146,7 +149,6 @@ class Visitor(NodeVisitor):
             if isinstance(stmts, Assignment):
                 self.environment.insert_local(stmts.location.char, stmts.expr)
             # print(node.symtab)
-        node.symtab = self.environment.peek()
         # print(len(self.environment.peek())
 
     def visit_Syn(self, node):
@@ -187,14 +189,14 @@ class Visitor(NodeVisitor):
     def visit_ID(self, node):
         e = self.environment.lookup(node.char)
 
-        if e is not None:
-            node.type = e.type
+        if e["node"] is not None:
+            node.type = e["node"].type
         else:
             node.type = None
 
     def visit_Array(self, node):
         self.visit(node.location)
-        e = self.environment.lookup(node.location.char)
+        e = self.environment.lookup(node.location.char)["node"]
 
         if e is not None:
             node.type = e.type
