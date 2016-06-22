@@ -91,6 +91,13 @@ class Environment(object):
             return True
         else:
             return False
+    def countVars(self):
+        count = 0
+        for value, obj in self.peek().items():
+            if not isinstance(obj, ExprType):
+                if isinstance(obj["node"], Decl):
+                    count += 1
+        return count
 
 ########################################### ERROR ###############################################
 
@@ -276,6 +283,7 @@ class Visitor(NodeVisitor):
 
     def visit_Returns(self, node):
         node.scope_level = self.environment.scope_level()
+        self.environment.insert_local("_ret", node)
 
     def visit_FormalParam(self, node):
         for i, child in enumerate(node.id_list or []):
@@ -303,6 +311,7 @@ class Visitor(NodeVisitor):
 
         self.visit(node.location)
         if hasattr(node.location, "type") and node.location.type != None and hasattr(node.expr, "type") and node.expr.type != None:
+            print(node.location)
             declared_type = node.location.type.name
             value_type = node.expr.type.name
             if declared_type != value_type:

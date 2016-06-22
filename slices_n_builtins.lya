@@ -1,4 +1,3 @@
-/**/
 dcl i, j, k int;
 dcl a, b array [2:9] int;
 j = lower(a);
@@ -21,7 +20,8 @@ Scope level for Program : 0
   i : 0
   a : 3
   b : 11
- '''
+
+
 [
   ('stp'),
   ('alc', 19),
@@ -49,30 +49,34 @@ Scope level for Program : 0
   ('jof', 2),
   ('jmp', 1),
   ('lbl', 2),
+
   ('ldr', 0, 11),
   ('ldr', 0, 3),
+  ('lmv', 8),
   ('smv', 8),
+
   ('ldr', 0, 11),
   ('ldc', 2),
   ('ldc', 2),
   ('sub'),
   ('idx', 1),
+
   ('ldr', 0, 3),
   ('ldc', 6),
   ('ldc', 2),
   ('sub'),
   ('idx', 1),
+  ('lmv', 4),
   ('smv', 4),
+
   ('ldr', 0, 3),
   ('ldc', 3),
   ('ldc', 2),
   ('sub'),
   ('idx', 1),
   ('lmv', 4),
-  ('prv'),
-  ('prv'),
-  ('prv'),
-  ('prv'),
+
+  ('prt', 4),
   ('ldc', 8),
   ('prv'),
   ('dlc', 19),

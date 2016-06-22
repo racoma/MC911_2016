@@ -63,13 +63,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
         # dictionary for storing global var number
-        self.vardict = defaultdict(int)
-        # dictionary for storing global var number
         self.varloc = defaultdict(str)
-        # dictionary to store variables scope
-        self.scopedict = defaultdict(int)
-        # dictionary for storing funciton number
-        self.func = defaultdict(int)
         # dictionary for storing label numbers
         self.labeldict = defaultdict(int)
         # dictionary for storing array bounds
@@ -85,7 +79,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.bounds = {}
 
         self.countLabels = 0
-        self.param_init = 0
+        self.param_init = -3
 
     def insert_param(self, proc, loc):
         if proc in self.procs:
@@ -115,11 +109,11 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.number[scope] = self.number[scope] + crange + 1
         return count
 
-    def param_number(self,varnumber):
-        paramnumber = - varnumber
-        count = "%d" % (paramnumber)
+    # def param_number(self,varnumber):
+    #     paramnumber = - varnumber
+    #     count = "%d" % (paramnumber)
 
-        return count
+    #     return count
 
     def new_temp(self):
         #Creates new temporary variable of a given type
@@ -132,14 +126,22 @@ class GenerateCode(lyaparser.NodeVisitor):
         for value, obj in node.symtab.items():
             if not isinstance(obj, ExprType):
                 obj = obj["node"]
-            if isinstance(obj, lyaparser.Decl) and not isinstance(obj.mode.mode, ArrayMode) and not isinstance(obj.mode.mode, Array2Mode) :
+
+            if isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, ID):
+                modedef = self.environment.lookup(obj.mode.mode.char)["node"]
+                self.insert_bounds(modedef.idents[0].char, modedef.mode.mode.index_mode.i1.exp.exp, modedef.mode.mode.index_mode.i2.exp.exp)
+                crange = modedef.mode.mode.index_mode.i2.exp.exp - modedef.mode.mode.index_mode.i1.exp.exp           
+                count = count + crange   
+                count += 1
+
+            elif isinstance(obj, lyaparser.Decl) and not isinstance(obj.mode.mode, ArrayMode) and not isinstance(obj.mode.mode, Array2Mode) :
                 count += 1
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, ArrayMode) :
                 self.insert_bounds(obj.identifier_list[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
                 crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
                 count = count + crange
                 count += 1
-                print(obj.mode.mode)
+                # print(obj.mode.mode)
             elif isinstance(obj, lyaparser.Decl) and isinstance(obj.mode.mode, Array2Mode) :
                 count2 = 1
                 for i, child in enumerate(obj.mode.mode.index_mode or []):
@@ -148,10 +150,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                     count2 *= crange
 
                 count += count2
-            elif isinstance(obj, lyaparser.ModeDef):
-                self.insert_bounds(obj.idents[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
-                crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
-                count = count + crange   
+            # elif isinstance(obj, lyaparser.ModeDef):
+            #     self.insert_bounds(obj.idents[0].char, obj.mode.mode.index_mode.i1.exp.exp, obj.mode.mode.index_mode.i2.exp.exp)
+            #     crange = obj.mode.mode.index_mode.i2.exp.exp - obj.mode.mode.index_mode.i1.exp.exp           
+            #     count = count + crange   
         return count
 
     def which_code(self, op):
@@ -189,14 +191,19 @@ class GenerateCode(lyaparser.NodeVisitor):
         for i, child in enumerate(node.identifier_list or []):
             #count var number
             if node.mode is not None:
-                 if isinstance(node.mode.mode, ArrayMode):
+                 if isinstance(node.mode.mode, ID):
+                    bounds = self.bounds[node.mode.mode.char]
+                    crange = bounds['u1'] - bounds['l1']
+                    # print (bounds)
+                    nvar = self.var_scope(node.scope_level, crange)
+                 elif isinstance(node.mode.mode, ArrayMode):
                     bounds = self.bounds[node.identifier_list[0].char]
-                    crange = bounds['u1'] - bounds['l1']                    
-                    print (bounds)
+                    crange = bounds['u1'] - bounds['l1']
+                    # print (bounds)
                     nvar = self.var_scope(node.scope_level, crange)
                  elif isinstance(node.mode.mode, Array2Mode):
                     bounds = self.bounds[node.identifier_list[0].char]
-                    print(bounds)
+                    # print(bounds)
                     crange1 = bounds["u1"] - bounds["l1"] + 1
                     crange2 = bounds["u2"] - bounds["l2"] + 1
                     crange = crange1*crange2 - 1
@@ -206,7 +213,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             #stores var number
             var = self.environment.lookup(child.char)
             var["number"] = nvar
-            self.scopedict[child.char] = node.scope_level
+            # self.scopedict[child.char] = node.scope_level
             self.visit(child)
             #inst = "('stv', {}, {})".format(node.scope_level-1, child.gen_location)
             #self.code.append(inst)
@@ -234,13 +241,11 @@ class GenerateCode(lyaparser.NodeVisitor):
             # nvar = self.var_scope(node.scope_level-1, param=1)
             #count param number
             # nparam = self.param_number(self.number[node.scope_level-1]-1)
-            nparam = self.param_number(self.param_init)
-            self.param_init += 1
+            nparam = self.param_init
+            self.param_init -= 1
             #stores param number
             var = self.environment.lookup(child.char)
             var["number"] = nparam
-            self.vardict[child.char] = nparam
-            self.scopedict[child.char] = node.scope_level
             self.visit(child)
 
     def visit_Range(self,node):
@@ -272,7 +277,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = "('ldv', {}, {})".format(scope, num)
                 self.code.append(inst)        
 
-            print(self.bounds)
+            # print(self.bounds)
             bounds = self.bounds[node.location.char]   
 
             inst = "('ldc', {})".format(bounds['l1'])
@@ -320,7 +325,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             else:
                 code = 'ldv'
             nvar2 = self.environment.lookup(node.location.char)["number"]
-            varscop = elf.environment.lookup(node.location.char)["scope"]
+            varscop = self.environment.lookup(node.location.char)["scope"]
             inst = "('{}', {}, {})".format(code, varscop,nvar2)
             self.code.append(inst)
 
@@ -444,9 +449,11 @@ class GenerateCode(lyaparser.NodeVisitor):
         self.countLabels += 1
         self.labeldict[node.identifier.char] = self.countLabels
 
+
+        self.param_init = -3
+
         self.environment.pushSymtab(node.symtab)
         # Pega qual o valor da proxima variavel para parametros
-        self.param_init = self.number[node.scope_level]
 
         self.visit(node.procedure)
 
@@ -463,7 +470,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         print(node.symtab)
         self.environment.pop()
-        print("ProcStmt",self.procs)
+        # print("ProcStmt",self.procs)
     #ideia: talvez criar outro dict para labels
     #precisa subir o enf para o procstmt e consequentemente o lbl e alc
     def visit_ProcDef(self, node):
@@ -547,8 +554,8 @@ class GenerateCode(lyaparser.NodeVisitor):
         if(node.op.op == 'print'):
             for i, expr in enumerate(node.param.param or []):
                 if (isinstance(expr.exp, ID)):
-                    varscop = self.scopedict[expr.exp.char]
-                    self.code.append("('ldv', {}, {})".format(varscop-1,self.vardict[expr.exp.char]) )
+                    varscop = self.environment.lookup(expr.exp.char)["scope"]
+                    self.code.append("('ldv', {}, {})".format(varscop,self.environment.lookup(expr.exp.char)["number"]) )
 
                 elif isinstance(expr.exp, RefLoc):
                     var = expr.exp.loc
@@ -589,7 +596,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
             if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):
                  varscop = self.environment.lookup(child.exp.char)["scope"]
-                 lista.append( ["('ldv', {}, {})".format(varscop,self.vardict[child.exp.char]), self.vardict[child.exp.char] ] )
+                 lista.append( ["('ldv', {}, {})".format(varscop,self.environment.lookup(child.exp.char)["number"]), self.environment.lookup(child.exp.char)["number"] ] )
 
             elif isinstance(child.exp, RefLoc):
                 var = child.exp.loc
@@ -602,7 +609,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         lista = sorted(lista, key=lambda ins: ins[1], reverse=True)
         for inst, i in lista:
-            print(lista)
+            # print(lista)
             self.code.append(inst)
 
     def visit_DoAction(self, node):
@@ -623,7 +630,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
  
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
-                print("aquiii")
+                # print("aquiii")
                 inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
                 inst = "('stv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
@@ -703,7 +710,7 @@ class GenerateCode(lyaparser.NodeVisitor):
  
                 inst = "('lbl', %d)" % self.labeldict['od']
                 self.code.append(inst)
-        print (self.vardict)
+        # print (self.vardict)
 
     def visit_IfAction(self, node):
         self.visit(node.bool_exp)
@@ -772,20 +779,21 @@ class GenerateCode(lyaparser.NodeVisitor):
             inst = "('{}', {}, {})".format(code, varscop,self.environment.lookup(node.expr.exp.char)["number"])
         self.code.append(inst)
 
-        inst = "('stv', {}, {})".format(node.scope_level-1,self.vardict["_ret"])
+        nvar = self.environment.lookup("_ret")["number"]
+        inst = "('stv', {}, {})".format(node.scope_level-1,nvar)
         self.code.append(inst)
 
     def visit_Returns(self, node):
-        nparam = self.param_number(self.param_init)
-        self.param_init += 1
+        nparam = self.param_init
+        self.param_init -= 1
         #stores param number
-        self.vardict["_ret"] = nparam
-        self.scopedict["_ret"] = node.scope_level
+        var = self.environment.lookup("_ret")
+        var["number"] = nparam
 
         # save return loc if location
         if node.param is not None:
             self.varloc["_ret"] = node.param.attr
-        print(self.vardict)
+        # print(self.vardict)
 
     def visit_Exit(self, node):
         inst = "('jmp', {})".format(self.labeldict[node.ident.char])

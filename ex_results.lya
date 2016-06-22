@@ -1,10 +1,10 @@
 /*
 Scope level for ProcStmt p: 1
   formal parameters & their offsets
-  x : -2
-  b : -4
-  _ret : -5
-  y : -3
+  x : -3
+  b : -5
+  _ret : -6
+  y : -4
   variables & their offsets
   s : 0
 '''
@@ -17,14 +17,6 @@ Scope level for Program : 0
   functions, return types & labels
   p : int, labels start=1, end=3
 '''
-
-m:     0 
-n:     1
-x:    -2
-y:    -3
-b:    -4
-ret:  -5
-s:     0
 
 */
 
