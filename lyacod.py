@@ -105,7 +105,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             
     #Funcao para contar variaveis por escopo
     def var_scope(self,scope, crange):
-        count = "%d" % (self.number[scope])
+        count = self.number[scope]
         self.number[scope] = self.number[scope] + crange + 1
         return count
 
@@ -164,9 +164,9 @@ class GenerateCode(lyaparser.NodeVisitor):
         #self.code = lyablock.BasicBlock()
         self.program = self.code
         self.environment = node.environment
-        inst = "["
-        self.code.append(inst)
-        inst = "('stp')"
+        # inst = "["
+        # self.code.append(inst)
+        inst = ('stp',)
         self.code.append(inst)
         # Allocate variables
         inst = ('alc', self.numVariables(node))
@@ -176,10 +176,10 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.visit(stmts)
         inst = ('dlc', self.numVariables(node))
         self.code.append(inst)
-        inst2 = "('end')"
+        inst2 = ('end',)
         self.code.append(inst2)
-        inst = "]"
-        self.code.append(inst)
+        # inst = "]"
+        # self.code.append(inst)
         print("Program", node.symtab)
 
 
@@ -222,12 +222,12 @@ class GenerateCode(lyaparser.NodeVisitor):
                     nvar2 = self.environment.lookup(node.initialization.exp.char)["number"]
                     scope = var["scope"]
                     if self.varloc[node.initialization.exp.char] == "loc":
-                        inst = "('lrv', {}, {})".format(scope, nvar2)
+                        inst = ('lrv', scope, nvar2)
                     else:
-                        inst = "('ldv', {}, {})".format(scope, nvar2)
+                        inst = ('ldv', scope, nvar2)
                     self.code.append(inst)
                  self.visit(node.initialization.exp)
-                 inst = "('stv', {}, {})".format(node.scope_level-1, nvar)
+                 inst = ('stv', node.scope_level-1, nvar)
                  self.code.append(inst)
     
 
@@ -258,14 +258,14 @@ class GenerateCode(lyaparser.NodeVisitor):
             node.exp = 0
         elif node.exp == 'true':
             node.exp = 1
-        inst = "('ldc', {})".format(node.exp)
+        inst = ('ldc', node.exp)
         self.code.append(inst)
 
     def visit_Array(self,node):
         var = self.environment.lookup(node.location.char)
         scope = var["scope"]
         num = var["number"]
-        inst = "('ldr', {}, {})".format(scope, num)
+        inst = ('ldr', scope, num)
         self.code.append(inst)       
         count = 0
         for i, child in enumerate(node.expr or []):
@@ -274,24 +274,24 @@ class GenerateCode(lyaparser.NodeVisitor):
                 var = self.environment.lookup(child.exp.char)
                 scope = var["scope"]
                 num = var["number"]
-                inst = "('ldv', {}, {})".format(scope, num)
+                inst = ('ldv', scope, num)
                 self.code.append(inst)        
 
             # print(self.bounds)
             bounds = self.bounds[node.location.char]   
 
-            inst = "('ldc', {})".format(bounds['l1'])
+            inst = ('ldc', bounds['l1'])
             self.code.append(inst)      
-            inst = "('sub')"
+            inst = ('sub',)
             self.code.append(inst)              
 
             if(len(bounds) > 2 and count == 0):
                 a = int(bounds['u2'])
-                inst = "('idx', {})".format(a)
+                inst = ('idx', a)
                 self.code.append(inst)  
             else:    
                 a = 1
-                inst = "('idx', {})".format(a)
+                inst = ('idx', a)
                 self.code.append(inst)            
 
             count += 1
@@ -314,10 +314,10 @@ class GenerateCode(lyaparser.NodeVisitor):
                     code = 'ldv'
                 nvar = self.environment.lookup(var.char)["number"]
                 varscop = self.environment.lookup(var.char)["scope"]
-                inst = "('{}', {}, {})".format(code, varscop,nvar)
+                inst = ('{}'.format(code), varscop, nvar)
                 self.code.append(inst)
             elif (var.ttype == 'Constant'):
-                inst = "('ldc', {})".format(var.exp)
+                inst = ('ldc', var.exp)
                 self.code.append(inst)
 
             if self.varloc[node.location.char] == "loc":
@@ -326,23 +326,23 @@ class GenerateCode(lyaparser.NodeVisitor):
                 code = 'ldv'
             nvar2 = self.environment.lookup(node.location.char)["number"]
             varscop = self.environment.lookup(node.location.char)["scope"]
-            inst = "('{}', {}, {})".format(code, varscop,nvar2)
+            inst = ('{}'.format(code), varscop, nvar2)
             self.code.append(inst)
 
             opcode = self.which_code(node.op)
-            inst = "('" + opcode + "')"
+            inst = ('{}'.format(opcode),)
             self.code.append(inst)
         else:
             if isinstance(node.expr.exp, RefLoc):
                 var = node.expr.exp.loc
                 nvar = self.environment.lookup(var.char)["number"]
                 varscop = self.environment.lookup(var.char)["scope"]
-                inst = "('ldr', {}, {})".format(varscop,nvar)
+                inst = ('ldr', varscop, nvar)
                 self.code.append(inst)
             elif isinstance(node.expr.exp, ID):
                 nvar2 = self.environment.lookup(node.expr.exp.char)["number"]
                 varscop = self.environment.lookup(node.expr.exp.char)["scope"]
-                inst = "('ldv', {}, {})".format(varscop,nvar2)
+                inst = ('ldv', varscop, nvar)
                 self.code.append(inst)
 
         ret = None
@@ -354,7 +354,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         if isinstance(node.location, ProcCall):
             #get function number
             nvar = self.labeldict[node.location.op.char]
-            inst = "('smv', {})".format(nvar)
+            inst = ('smv', nvar)
             self.code.append(inst)
 
         elif (node.location.ttype != 'array'):
@@ -364,11 +364,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 code = 'stv'
             #get var number
             nvar = self.environment.lookup(node.location.char)["number"]
-            inst = "('{}', {}, {})".format(code, node.scope_level-1,nvar)
+            inst = ('{}'.format(code), node.scope_level-1, nvar)
             self.code.append(inst)
         
         elif (node.location.ttype == 'array'):          
-            inst = "('smv', 1)"
+            inst = ('smv', 1)
             self.code.append(inst)                
 
     def visit_ID(self, node):
@@ -390,7 +390,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             if(hasattr(node.exp.exp, "ttype") and node.exp.exp.ttype == "ID"):
                 nvar = self.environment.lookup(node.exp.exp.char)["number"]
                 varscop = self.environment.lookup(node.exp.exp.char)["scope"]
-                inst = "('ldv', {}, {})".format(varscop,nvar)
+                inst = ('ldv', varscop, nvar)
                 self.code.append(inst)
 
     def visit_Binop(self,node):
@@ -401,34 +401,34 @@ class GenerateCode(lyaparser.NodeVisitor):
         if (node.left.ttype == 'ID'):
             nvar = self.environment.lookup(node.left.char)["number"]
             varscop = self.environment.lookup(node.left.char)["scope"]
-            inst = "('ldv', {}, {})".format(varscop,nvar)
+            inst = ('ldv', varscop, nvar)
             self.code.append(inst)
         elif (node.left.ttype == 'Constant'):
-            inst = "('ldc', {})".format(node.left.exp)
+            inst = ('ldc', node.left.exp)
             self.code.append(inst)
 
         if (node.right.ttype == 'ID'):
             nvar = self.environment.lookup(node.right.char)["number"]
             varscop = self.environment.lookup(node.right.char)["scope"]
             #print("Varscope", varscop, node.right.char)
-            inst = "('ldv', {}, {})".format(varscop,nvar)
+            inst = ('ldv', varscop, nvar)
             self.code.append(inst)
         elif (node.right.ttype == 'Constant'):
-            inst = "('ldc', {})".format(node.right.exp)
+            inst = ('ldc', node.right.exp)
             self.code.append(inst)
 
         # self.visit(node.left)
         # self.visit(node.right)
         print(node.type)
         opcode = node.type.bin_opc[node.op]
-        inst = "('" + opcode + "')"
+        inst = ('{}'.format(opcode),)
         self.code.append(inst)
 
     def visit_Operand(self,node):
         self.visit(node.expr)
         target = self.new_temp()
         opcode = node.type.un_opc[node.op]
-        inst = "('" + opcode + "')"
+        inst = ('{}'.format(opcode),)
         #inst2 = "('ldv', {}, {})".format(target, node.ident)
         #self.code.append(inst2)
         self.code.append(inst)
@@ -436,10 +436,10 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_Func(self,node):
         if (node.op == 'read'):
-            inst = "('rdv')"
+            inst = ('rdv',)
             self.code.append(inst)
         if (node.op == 'print'):
-            inst = "('prv')"
+            inst = ('prv',)
             self.code.append(inst)
 
     ##### PROC #####
@@ -477,17 +477,17 @@ class GenerateCode(lyaparser.NodeVisitor):
         li = self.countLabels
         if node.result_spec is not None:
                 self.countLabels += 1
-                lp = "('lbl', %d)" % self.countLabels
+                lp = ('lbl', self.countLabels)
        
         self.countLabels += 1
         nlf = self.countLabels
 
-        inst = "('jmp', %d)"% nlf
+        inst = ('jmp', nlf)
         self.code.append(inst)
 
-        inst = "('lbl', %d)" % li
+        inst = ('lbl', li)
         self.code.append(inst)
-        inst = "('enf', %d)" % li
+        inst = ('enf', li)
         self.code.append(inst)
         inst = ('alc', self.numVariables(node))
         if self.numVariables(node) >0:
@@ -508,13 +508,13 @@ class GenerateCode(lyaparser.NodeVisitor):
         if node.result_spec is not None:
                 self.code.append(lp)
         if(self.numVariables(node) > 0):
-            dlc = "('dlc', %d)" % (self.numVariables(node))
+            dlc = ('dlc', self.numVariables(node))
             self.code.append(dlc)
         
 
-        ret = "('ret', %d, %d)" % (li,nparam)
+        ret = ('ret', li, nparam)
         self.code.append(ret)
-        lf = "('lbl', %d)" % nlf
+        lf = ('lbl', nlf)
         self.code.append(lf)
 
 
@@ -537,16 +537,16 @@ class GenerateCode(lyaparser.NodeVisitor):
                 else:
                     code = 'ldv'
                 varscop = self.environment.lookup(expr.exp.char)["scope"]
-                self.code.append("('{}', {}, {})".format(code,varscop, self.environment.lookup(expr.exp.char)["number"]) )
+                self.code.append( ('{}'.format(code), varscop,  self.environment.lookup(expr.exp.char)["number"]) )
 
             elif isinstance(expr.exp, RefLoc):
                 var = expr.exp.loc
                 nvar = self.environment.lookup(var.char)["number"]
                 varscop = self.environment.lookup(var.char)["scope"]
-                inst = "('ldr', {}, {})".format(varscop,nvar)
+                inst = ('ldr', varscop, nvar)
                 self.code.append(inst)
 
-        inst = "('cfu', %d)" % self.labeldict[node.op.char]
+        inst = ('cfu', self.labeldict[node.op.char])
         self.code.append(inst)
 
     def visit_Call(self, node):
@@ -555,20 +555,20 @@ class GenerateCode(lyaparser.NodeVisitor):
             for i, expr in enumerate(node.param.param or []):
                 if (isinstance(expr.exp, ID)):
                     varscop = self.environment.lookup(expr.exp.char)["scope"]
-                    self.code.append("('ldv', {}, {})".format(varscop,self.environment.lookup(expr.exp.char)["number"]) )
+                    self.code.append( ('ldv', varscop, self.environment.lookup(expr.exp.char)["number"]) )
 
                 elif isinstance(expr.exp, RefLoc):
                     var = expr.exp.loc
                     nvar = self.environment.lookup(var.char)["number"]
                     varscop = self.environment.lookup(var.char)["scope"]
-                    inst = "('ldr', {}, {})".format(varscop,nvar)
+                    inst = ('ldr', varscop, nvar)
                     lista.append([inst, self.environment.lookup(var.char)["number"]])
 
                     self.visit(node.op)
                     
                 elif isinstance(expr.exp, Array):
                     self.visit(expr.exp)
-                    inst = "('grc')"
+                    inst = ('grc',)
                     self.code.append(inst)
                                 
                 else:
@@ -584,10 +584,10 @@ class GenerateCode(lyaparser.NodeVisitor):
              child = node.param.param[0]
              if (child.exp.ttype != 'array'):
                  varscop = self.environment.lookup(child.exp.char)["scope"]
-                 inst = "('stv', {}, {})".format(varscop,self.environment.lookup(child.exp.char)["number"])
+                 inst = ('stv', varscop, self.environment.lookup(child.exp.char)["number"])
              else:
                  varscop = self.environment.lookup(child.exp.location.char)["scope"]
-                 inst = "('stv', {}, {})".format(varscop,self.environment.lookup(child.exp.location.char)["number"])
+                 inst = ('stv', varscop, self.environment.lookup(child.exp.location.char)["number"])
              self.code.append(inst)
 
     def visit_Param(self, node):
@@ -596,13 +596,13 @@ class GenerateCode(lyaparser.NodeVisitor):
 
             if (hasattr(child.exp, "ttype") and child.exp.ttype == 'ID'):
                  varscop = self.environment.lookup(child.exp.char)["scope"]
-                 lista.append( ["('ldv', {}, {})".format(varscop,self.environment.lookup(child.exp.char)["number"]), self.environment.lookup(child.exp.char)["number"] ] )
+                 lista.append( [('ldv', varscop, self.environment.lookup(child.exp.char)["number"]), self.environment.lookup(child.exp.char)["number"] ] )
 
             elif isinstance(child.exp, RefLoc):
                 var = child.exp.loc
                 nvar = self.environment.lookup(var.char)["number"]
                 varscop = self.environment.lookup(var.char)["scope"]
-                inst = "('ldr', {}, {})".format(varscop,nvar)
+                inst = ('ldr', varscop, nvar)
                 lista.append([inst, self.environment.lookup(var.char)["scope"]])
 
             self.visit(child)
@@ -615,9 +615,9 @@ class GenerateCode(lyaparser.NodeVisitor):
     def visit_DoAction(self, node):
         if ((node.control.whilecontrol is not None) and (node.control.forcontrol is None)):
                 self.countLabels += 1
-                inst = "('lbl', %d)" % self.countLabels
+                inst = ('lbl', self.countLabels)
                 self.code.append(inst)
-                inst2 = "('jmp', %d)" % self.countLabels
+                inst2 = ('jmp', self.countLabels)
                 self.countLabels += 1
                 dlabel = self.countLabels
                 self.visit(node.control)
@@ -626,40 +626,40 @@ class GenerateCode(lyaparser.NodeVisitor):
                     self.visit(child)
  
                 self.code.append(inst2)
-                inst = "('lbl', %d)" % dlabel
+                inst = ('lbl', dlabel)
                 self.code.append(inst)
  
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
                 # print("aquiii")
-                inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
+                inst = ('ldc', node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('stv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
                 self.countLabels += 1
                 self.labeldict[node.control.ttype] = self.countLabels
-                inst = "('lbl', %d)" % self.countLabels
+                inst = ('lbl', self.countLabels)
                 self.code.append(inst)
-                instjmp = "('jmp', %d)" % self.countLabels
+                instjmp = ('jmp', self.countLabels)
                 self.countLabels += 1
-                instlabel = "('lbl', %d)" % self.countLabels                
-                instjof = "('jof', %d)"% self.countLabels
+                instlabel = ('lbl',self.countLabels)
+                instjof = ('jof', self.countLabels)
  
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
  
-                inst = "('ldv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('ldv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
-                inst = "('ldc', 1)"
+                inst = ('ldc', 1)
                 self.code.append(inst)
-                inst = "('add')"
+                inst = ('add',)
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('stv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
-                inst = "('ldv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('ldv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
-                inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
+                inst = ('ldc', node.control.forcontrol.iteration.end.exp.exp)
                 self.code.append(inst)
-                inst = "('leq')"
+                inst = ('leq',)
                 self.code.append(inst)
  
                 self.code.append(instjof)
@@ -668,64 +668,64 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(instlabel)
  
         else:
-                inst = "('ldc', {})".format(node.control.forcontrol.iteration.start.exp.exp)
+                inst = ('ldc', node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.start.exp)["number"])
+                inst = ('stv', 0, self.environment.lookup(node.control.forcontrol.iteration.start.exp)["number"])
                 self.code.append(inst)
                 self.countLabels += 1
                 self.labeldict[node.control.ttype] = self.countLabels
-                inst = "('lbl', %d)" % self.countLabels
+                inst = ('lbl', self.countLabels)
                 self.code.append(inst)
                 self.countLabels += 1
                 self.labeldict['od'] = self.countLabels
-                inst = "('ldv', 0, {})".format(self.environment.lookup(node.control.whilecontrol.bool_exp.exp.exp.char)["number"])
+                inst = ('ldv', 0, self.environment.lookup(node.control.whilecontrol.bool_exp.exp.exp.char)["number"])
                 self.code.append(inst)
-                inst = "('jof', %d)"% self.labeldict['od']
+                inst = ('jof', self.labeldict['od'])
                 self.code.append(inst)
  
                 for i, child in enumerate(node.action_list or []):
                     self.visit(child)
  
                 #update for
-                inst = "('ldv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('ldv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
-                inst = "('ldc', 1)"
+                inst = ('ldc', 1)
                 self.code.append(inst)
-                inst = "('add')"
+                inst = ('add',)
                 self.code.append(inst)
-                inst = "('stv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('stv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
                 #test for
-                inst = "('ldv', 0, {})".format(self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
+                inst = ('ldv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
                 self.code.append(inst)
-                inst = "('ldc', {})".format (node.control.forcontrol.iteration.end.exp.exp)
+                inst = ('ldc', node.control.forcontrol.iteration.end.exp.exp)
                 self.code.append(inst)
-                inst = "('leq')"
+                inst = ('leq',)
                 self.code.append(inst)
                 self.countLabels += 1
-                inst = "('jof', %d)"% self.labeldict['od']
+                inst = ('jof', self.labeldict['od'])
                 self.code.append(inst)
-                inst = "('jmp', {})".format(self.labeldict[node.control.ttype])
+                inst = ('jmp', self.labeldict[node.control.ttype])
                 self.code.append(inst)
  
-                inst = "('lbl', %d)" % self.labeldict['od']
+                inst = ('lbl', self.labeldict['od'])
                 self.code.append(inst)
         # print (self.vardict)
 
     def visit_IfAction(self, node):
         self.visit(node.bool_exp)
-        inst = "('jof', %d)" % (self.countLabels+1)
+        inst = ('jof', self.countLabels+1 )
         self.code.append(inst)
         if node.then_c is not None:
             self.visit(node.then_c)
             if node.else_c is not None:
                 label = self.countLabels+2
-                inst = "('jmp', {})".format(label)
+                inst = ('jmp', label)
                 self.code.append(inst)
         if node.else_c is not None:
             self.visit(node.else_c)
         self.countLabels += 1
-        inst2 = "('lbl', %d)" % self.countLabels
+        inst2 = ('lbl', self.countLabels)
         self.code.append(inst2)
 
     def visit_ThenClause(self, node):
@@ -734,7 +734,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
     def visit_ElseClause(self, node):
         self.countLabels += 1
-        inst2 = "('lbl', %d)" % self.countLabels
+        inst2 = ('lbl', self.countLabels) 
         self.code.append(inst2)
         for i, child in enumerate(node.action_list or []):
             self.visit(child)
@@ -745,11 +745,11 @@ class GenerateCode(lyaparser.NodeVisitor):
         if (node.bool_exp.exp.exp.ttype == 'binop'):
                 self.visit(node.bool_exp)
         elif (node.bool_exp.exp.exp.ttype == 'ID'):
-                inst = "('ldv', {}, {})".format(node.scope_level-1,self.environment.lookup(node.bool_exp.exp.exp.char)["number"])
+                inst = ('ldv', node.scope_level-1, self.environment.lookup(node.bool_exp.exp.exp.char)["number"])
                 self.code.append(inst)
         # self.visit(node.bool_exp)
 
-        inst = "('jof', %d)" % self.countLabels
+        inst = ('jof', self.countLabels)
         self.code.append(inst)
 
     def visit_ActionStmt(self, node):
@@ -757,7 +757,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         if node.identifier is not None:
             self.countLabels += 1
             self.labeldict[node.identifier.char] = self.countLabels
-            flabel = "('lbl', %d)" % self.countLabels
+            flabel = ('lbl', self.countLabels) 
 
         if node.action is not None:
             self.visit(node.action)
@@ -768,7 +768,7 @@ class GenerateCode(lyaparser.NodeVisitor):
     def visit_Result(self, node):
         if isinstance(node.expr.exp, DerefRef):
             varscop = self.environment.lookup(node.expr.exp.location.char)["scope"]
-            inst = "('lrv', {}, {})".format(varscop,self.environment.lookup(node.expr.exp.location.char)["number"])
+            inst = ('lrv', varscop, self.environment.lookup(node.expr.exp.location.char)["number"])
         elif isinstance(node.expr.exp, ID):
             varscop = self.environment.lookup(node.expr.exp.char)["scope"]
             if self.varloc["_ret"] == "loc":
@@ -776,11 +776,11 @@ class GenerateCode(lyaparser.NodeVisitor):
             else:
                 code = 'ldv'
             # print(node.expr.exp.char)
-            inst = "('{}', {}, {})".format(code, varscop,self.environment.lookup(node.expr.exp.char)["number"])
+            inst = ('{}'.format(code), varscop, self.environment.lookup(node.expr.exp.char)["number"])
         self.code.append(inst)
 
         nvar = self.environment.lookup("_ret")["number"]
-        inst = "('stv', {}, {})".format(node.scope_level-1,nvar)
+        inst = ('stv', node.scope_level-1, nvar)
         self.code.append(inst)
 
     def visit_Returns(self, node):
@@ -796,15 +796,17 @@ class GenerateCode(lyaparser.NodeVisitor):
         # print(self.vardict)
 
     def visit_Exit(self, node):
-        inst = "('jmp', {})".format(self.labeldict[node.ident.char])
+        inst = ('jmp', self.labeldict[node.ident.char])
         self.code.append(inst)
 
 
 class JumpGenerator(lyablock.BlockVisitor):
     def visit_BasicBlock(self,block):
         # print("Block:[%s]" % block)
+        print("[")
         for inst in block.instructions:
             print("    %s," % (inst,))
+        print("]")
         print("")
 
 

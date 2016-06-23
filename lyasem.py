@@ -196,7 +196,7 @@ class Visitor(NodeVisitor):
     def visit_ID(self, node):
         e = self.environment.lookup(node.char)
 
-        if e["node"] is not None:
+        if e is not None and e["node"] is not None:
             node.type = e["node"].type
         else:
             node.type = None

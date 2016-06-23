@@ -34,3 +34,5 @@ python3 lyacod.py exemple.lya
 TODO:
 
 Verificar param_init
+
+* Implementado LVM *
