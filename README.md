@@ -30,9 +30,6 @@ python3 lyacod.py exemple.lya
 
 *REFACTOR*
 - Feito troca de vardict e scopedict para a enviroment stack do lyasym
-
-TODO:
-
-Verificar param_init
+- Consertado param_init
 
 * Implementado LVM *
