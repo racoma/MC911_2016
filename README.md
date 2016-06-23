@@ -18,12 +18,10 @@ python3 lyacod.py exemple.lya
 - references.lya
 - arrays.lya
 - 2dim_arrays.lya
+- returning_location.lya 
 
 
 *Tests NOK:*
-- returning_location.lya 
-	- problema com numeracao de variaveis (acho que a variavel b de 'dcl b bool = false;' deve valer 2, e a de 'b bool' deve valer 3)
-	- problemas com 'ret' e 'alc'
 - arrays_02.lya
 - slices_n_builtins.lya
 
@@ -32,4 +30,4 @@ python3 lyacod.py exemple.lya
 - Feito troca de vardict e scopedict para a enviroment stack do lyasym
 - Consertado param_init
 
-* Implementado LVM *
+*Implementado LVM*
