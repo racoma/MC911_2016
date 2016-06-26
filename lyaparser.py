@@ -835,7 +835,7 @@ class StmtList(Node):
 
 class DclStmt(Node):
     def __init__(self, declarations):
-        self.type = "DclStmt"
+        self.ttype = "DclStmt"
         self.declarations = declarations
     attr_names = ()
 
@@ -992,7 +992,7 @@ class ProcDef(Node):
 
 class ActionStmt(Node):
     def __init__(self, identifier, action):
-        self.type = "action_statement"
+        self.ttype = "action_statement"
         self.identifier = identifier
         self.action = action
     attr_names = ()
@@ -1019,7 +1019,7 @@ class ActionStmt_List(Node):
 
 class Assignment(Node):
     def __init__(self, location, op, expr):
-        self.type = "assignment"
+        self.ttype = "assignment"
         self.location = location
         self.op = op
         self.expr = expr
@@ -1048,7 +1048,7 @@ class Binop(Node):
 
 class Call(Node):
     def __init__(self, op, param=None):
-        self.type = "call"
+        self.ttype = "call"
         self.op = op
         self.param = param
     attr_names = ()
@@ -1061,7 +1061,7 @@ class Call(Node):
 
 class Func(Node):
     def __init__(self, op):
-        self.type = "func"
+        self.ttype = "func"
         self.op = op
     attr_names = ("op",)
 
@@ -1071,7 +1071,7 @@ class Func(Node):
 
 class ProcCall(Node):
     def __init__(self, op, param):
-        self.type = "proccall"
+        self.ttype = "proccall"
         self.op = op
         self.param = param
     attr_names = ()
@@ -1084,7 +1084,7 @@ class ProcCall(Node):
 
 class Param(Node):
     def __init__(self, param):
-        self.type = "param"
+        self.ttype = "param"
         self.param = param
     attr_names = ()
 
@@ -1097,7 +1097,7 @@ class Param(Node):
 
 class IfAction(Node):
     def __init__(self, bool_exp, then_c, else_c=None):
-        self.type = "ifaction"
+        self.ttype = "ifaction"
         self.bool_exp = bool_exp
         self.then_c = then_c
         self.else_c = else_c
@@ -1112,7 +1112,7 @@ class IfAction(Node):
 
 class ThenClause(Node):
     def __init__(self, action_list):
-        self.type = "thenclause"
+        self.ttype = "thenclause"
         self.action_list = action_list
     attr_names = ()
 
@@ -1124,7 +1124,7 @@ class ThenClause(Node):
 
 class Result(Node):
     def __init__(self, expr):
-        self.type = "result"
+        self.ttype = "result"
         self.expr = expr
     attr_names = ()
 
@@ -1135,7 +1135,7 @@ class Result(Node):
 
 class ElseClause(Node):
     def __init__(self, action_list):
-        self.type = "elseclause"
+        self.ttype = "elseclause"
         self.action_list = action_list
     attr_names = ()
 
@@ -1147,7 +1147,7 @@ class ElseClause(Node):
 
 class DoAction(Node):
     def __init__(self, control, action_list):
-        self.type = "doaction"
+        self.ttype = "doaction"
         self.action_list = action_list
         self.control = control
     attr_names = ()
@@ -1196,7 +1196,7 @@ class WhileControl(Node):
 
 class Returns(Node):
     def __init__(self, param):
-        self.type = "returns"
+        self.ttype = "returns"
         self.param = param
     attr_names = ()
 
@@ -1207,7 +1207,7 @@ class Returns(Node):
 
 class Return(Node):
     def __init__(self, param):
-        self.type = "return"
+        self.ttype = "return"
         self.param = param
     attr_names = ()
 
@@ -1218,7 +1218,7 @@ class Return(Node):
 
 class Operand(Node):
     def __init__(self, op, ident):
-        self.type = "operand"
+        self.ttype = "operand"
         self.op = op
         self.ident = ident
     attr_names = ("op",)
