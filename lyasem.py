@@ -284,7 +284,11 @@ class Visitor(NodeVisitor):
     def visit_Returns(self, node):
         node.scope_level = self.environment.scope_level()
         self.environment.insert_local("_ret", node)
-
+        
+    def visit_Return(self, node):
+        node.scope_level = self.environment.scope_level()
+        self.environment.insert_local("_ret", node)
+        
     def visit_FormalParam(self, node):
         for i, child in enumerate(node.id_list or []):
             self.environment.insert_local(child.char, node)
