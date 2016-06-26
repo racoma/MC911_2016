@@ -59,7 +59,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         super(GenerateCode, self).__init__()
 
         self.temp_count = 0
-
+        self.arraytype = 'false'
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
         # dictionary for storing global var number
@@ -67,7 +67,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         # dictionary for storing label numbers
         self.labeldict = defaultdict(int)
         # dictionary for storing array bounds
-        self.bounddict = defaultdict(int)
+        self.varmode = defaultdict(int)
 
         ''' The generated code (list of tuples)'''
         self.code = lyablock.BasicBlock()
@@ -194,8 +194,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                  if isinstance(node.mode.mode, ID):
                     bounds = self.bounds[node.mode.mode.char]
                     crange = bounds['u1'] - bounds['l1']
-                    # print (bounds)
+                    print (bounds)
                     nvar = self.var_scope(node.scope_level, crange)
+                    vmode = node.mode.mode.char
+                    for i, child in enumerate(node.identifier_list or []):
+                        self.varmode[child.char] = vmode   
                  elif isinstance(node.mode.mode, ArrayMode):
                     bounds = self.bounds[node.identifier_list[0].char]
                     crange = bounds['u1'] - bounds['l1']
@@ -265,7 +268,10 @@ class GenerateCode(lyaparser.NodeVisitor):
         var = self.environment.lookup(node.location.char)
         scope = var["scope"]
         num = var["number"]
-        inst = ('ldr', scope, num)
+        if self.arraytype == 'false':
+            inst = ('ldr', scope, num)
+        else:
+            inst = ('ldv', scope, num)
         self.code.append(inst)       
         count = 0
         for i, child in enumerate(node.expr or []):
@@ -277,9 +283,11 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = ('ldv', scope, num)
                 self.code.append(inst)        
 
-            # print(self.bounds)
-            bounds = self.bounds[node.location.char]   
-
+            if self.arraytype == 'false':        
+                 bounds = self.bounds[node.location.char]   
+            else:        
+                 tmode = self.varmode[node.location.char]
+                 bounds = self.bounds[tmode]   
             inst = ('ldc', bounds['l1'])
             self.code.append(inst)      
             inst = ('sub',)
@@ -406,7 +414,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         elif (node.left.ttype == 'Constant'):
             inst = ('ldc', node.left.exp)
             self.code.append(inst)
-
+        elif (node.left.ttype == 'array'):
+            self.arraytype = 'true'
+            self.visit(node.left)
+            self.arraytype = 'false'
+            inst = "('grc')"
+            self.code.append(inst)
         if (node.right.ttype == 'ID'):
             nvar = self.environment.lookup(node.right.char)["number"]
             varscop = self.environment.lookup(node.right.char)["scope"]
@@ -416,7 +429,12 @@ class GenerateCode(lyaparser.NodeVisitor):
         elif (node.right.ttype == 'Constant'):
             inst = ('ldc', node.right.exp)
             self.code.append(inst)
-
+        elif (node.right.ttype == 'array'):
+            self.arraytype = 'true'
+            self.visit(node.right)
+            self.arraytype = 'false'
+            inst = "('grc')"
+            self.code.append(inst)
         # self.visit(node.left)
         # self.visit(node.right)
         print(node.type)
