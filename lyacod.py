@@ -60,6 +60,7 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         self.temp_count = 0
         self.arraytype = 'false'
+        self.readtype = 'false'
         # dictionary for counting var numbers per scope
         self.number = defaultdict(int)
         # dictionary for storing global var number
@@ -194,7 +195,6 @@ class GenerateCode(lyaparser.NodeVisitor):
                  if isinstance(node.mode.mode, ID):
                     bounds = self.bounds[node.mode.mode.char]
                     crange = bounds['u1'] - bounds['l1']
-                    print (bounds)
                     nvar = self.var_scope(node.scope_level, crange)
                     vmode = node.mode.mode.char
                     for i, child in enumerate(node.identifier_list or []):
@@ -283,7 +283,7 @@ class GenerateCode(lyaparser.NodeVisitor):
                 inst = ('ldv', scope, num)
                 self.code.append(inst)        
 
-            if self.arraytype == 'false':        
+            if self.arraytype == 'false' and self.readtype == 'false':        
                  bounds = self.bounds[node.location.char]   
             else:        
                  tmode = self.varmode[node.location.char]
@@ -350,7 +350,7 @@ class GenerateCode(lyaparser.NodeVisitor):
             elif isinstance(node.expr.exp, ID):
                 nvar2 = self.environment.lookup(node.expr.exp.char)["number"]
                 varscop = self.environment.lookup(node.expr.exp.char)["scope"]
-                inst = ('ldv', varscop, nvar)
+                inst = ('ldv', varscop, nvar2)
                 self.code.append(inst)
 
         ret = None
@@ -486,7 +486,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         if node.procedure.result_spec is not None and node.procedure.result_spec.param is not None:
             self.insert_ret(node.identifier.char, node.procedure.result_spec.param.attr)
 
-        print(node.symtab)
+        #print(node.symtab)
         self.environment.pop()
         # print("ProcStmt",self.procs)
     #ideia: talvez criar outro dict para labels
@@ -495,6 +495,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         li = self.countLabels
         if node.result_spec is not None:
                 self.countLabels += 1
+                jumplb = self.countLabels
                 lp = ('lbl', self.countLabels)
        
         self.countLabels += 1
@@ -522,7 +523,9 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         for stmts in node.statement_list.statements:
             self.visit(stmts)
-
+            if(stmts.ttype == 'action_statement') and (stmts.action.ttype == 'return'):
+                inst = ('jmp', jumplb)
+                self.code.append(inst)
         if node.result_spec is not None:
                 self.code.append(lp)
         if(self.numVariables(node) > 0):
@@ -597,15 +600,18 @@ class GenerateCode(lyaparser.NodeVisitor):
         elif(node.op.op != 'read'):
              self.visit(node.param)
 
-        if(node.op.op == 'read'):
-             self.visit(node.op)
+        if(node.op.op == 'read'):            
              child = node.param.param[0]
              if (child.exp.ttype != 'array'):
+                 self.visit(node.op)
                  varscop = self.environment.lookup(child.exp.char)["scope"]
                  inst = ('stv', varscop, self.environment.lookup(child.exp.char)["number"])
              else:
+                 self.readtype = 'true'
+                 self.visit(node.param)
                  varscop = self.environment.lookup(child.exp.location.char)["scope"]
-                 inst = ('stv', varscop, self.environment.lookup(child.exp.location.char)["number"])
+                 inst = ('smv', 1)
+                 self.visit(node.op)
              self.code.append(inst)
 
     def visit_Param(self, node):
@@ -627,7 +633,6 @@ class GenerateCode(lyaparser.NodeVisitor):
 
         lista = sorted(lista, key=lambda ins: ins[1], reverse=True)
         for inst, i in lista:
-            # print(lista)
             self.code.append(inst)
 
     def visit_DoAction(self, node):
@@ -648,7 +653,6 @@ class GenerateCode(lyaparser.NodeVisitor):
                 self.code.append(inst)
  
         elif ((node.control.whilecontrol is None) and (node.control.forcontrol is not None)):
-                # print("aquiii")
                 inst = ('ldc', node.control.forcontrol.iteration.start.exp.exp)
                 self.code.append(inst)
                 inst = ('stv', 0, self.environment.lookup(node.control.forcontrol.iteration.loop.char)["number"])
@@ -820,7 +824,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         nparam = var['number']
         inst = ('stv', node.scope_level-1, nparam)
         self.code.append(inst)
-
+        
     def visit_Exit(self, node):
         inst = ('jmp', self.labeldict[node.ident.char])
         self.code.append(inst)
