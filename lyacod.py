@@ -813,6 +813,14 @@ class GenerateCode(lyaparser.NodeVisitor):
             self.varloc["_ret"] = node.param.attr
         # print(self.vardict)
 
+    def visit_Return(self, node):
+        inst = ('ldv', node.scope_level-1, self.environment.lookup(node.param.exp.char)["number"])
+        self.code.append(inst)
+        var = self.environment.lookup("_ret")
+        nparam = var['number']
+        inst = ('stv', node.scope_level-1, nparam)
+        self.code.append(inst)
+
     def visit_Exit(self, node):
         inst = ('jmp', self.labeldict[node.ident.char])
         self.code.append(inst)
