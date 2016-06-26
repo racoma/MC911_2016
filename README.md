@@ -12,17 +12,18 @@ python3 lyacod.py exemple.lya
 - ex_proc.lya (existe um dlc que não está na resolução do professor, mas acredito que está certo)
 - ex_do_for.lya
 - do_while.lya (duvida com um 'ldc', true)
-- for_while.lya
 - ex_results.lya
 - locs.lya 
 - references.lya
 - arrays.lya
 - 2dim_arrays.lya
 - returning_location.lya 
+- arrays_02.lya
 
 
 *Tests NOK:*
-- arrays_02.lya
+- for_while.lya (Erro lyacod.py line 695: "'NoneType' object is not subscriptable
+") 
 - slices_n_builtins.lya
 
 
