@@ -274,7 +274,7 @@ class GenerateCode(lyaparser.NodeVisitor):
         var = self.environment.lookup(node.location.char)
         scope = var["scope"]
         num = var["number"]
-        if self.arraytype == 'false' :
+        if num >= 0 :
             inst = ('ldr', scope, num)
         else:
             inst = ('ldv', scope, num)
@@ -866,10 +866,12 @@ class JumpGenerator(lyablock.BlockVisitor):
         # print("Block:[%s]" % block)
         print("[")
         for inst in block.instructions:
-            print("    %s," % (inst,))
+            if(len(inst) == 1):
+                print("    (\'%s\')," % (inst[0]))
+            else:
+                print("    %s," % (inst,))
         print("]")
         print("")
-
 
 
 def gen_code(node):

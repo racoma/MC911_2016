@@ -166,194 +166,72 @@
 <                     ID: c (at line: 27)
 <               Expr: 
 <                 Constant: " ", string (at line: 27)
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyaparser.ID object at 0x101458d30>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyaparser.Array object at 0x1014583c8>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyaparser.Array object at 0x10364d2b0>
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyaparser.ID object at 0x101d49d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyaparser.Array object at 0x101d49278>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyaparser.Array object at 0x10364d240>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
 < true
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
-< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
-< <lyasem.ExprType object at 0x101217d68>
-< Program {'bool': <lyasem.ExprType object at 0x10126f6a0>, 'string': <lyasem.ExprType object at 0x101217e48>, 'n': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 101}, 'c': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 102}, 'd': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 103}, 'swap': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 104}, 'char': <lyasem.ExprType object at 0x101217dd8>, 'v': {'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654518>, 'number': 0}, 'int': <lyasem.ExprType object at 0x101217d68>}
-199c2
-<     ('stp',),
----
->     ('stp'),
-201,203c4,5
+< <lyasem.ExprType object at 0x101c09d30>
+< Program {'swap': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 104}, 'v': {'scope': 0, 'node': <lyaparser.Decl object at 0x1036544e0>, 'type': 'array', 'number': 0}, 'string': <lyasem.ExprType object at 0x101c09e10>, 'int': <lyasem.ExprType object at 0x101c09d30>, 'bool': <lyasem.ExprType object at 0x101c60550>, 'c': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 102}, 'd': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 103}, 'char': <lyasem.ExprType object at 0x101c09da0>, 'n': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 101}}
+201,202c4
 <     ('ldc', '"Enter number of elements: "'),
-<     ('prv',),
-<     ('rdv',),
+<     ('prv'),
 ---
 >     ('prc', 0),
->     ('rdv'),
 205,206c7
 <     ('ldc', '"Enter "'),
-<     ('prv',),
+<     ('prv'),
 ---
 >     ('prc', 1),
-208,210c9,10
-<     ('prv',),
+209,210c10
 <     ('ldc', '" integers\\n"'),
-<     ('prv',),
+<     ('prv'),
 ---
->     ('prv'),
 >     ('prc', 2),
-217c17
-<     ('sub',),
----
->     ('sub'),
-219c19
-<     ('rdv',),
----
->     ('rdv'),
-223c23
-<     ('add',),
----
->     ('add'),
-228,229c28,29
-<     ('sub',),
-<     ('leq',),
----
->     ('sub'),
->     ('leq'),
 239c39
-<     ('ldv', 0, 0),
+<     ('ldr', 0, 0),
 ---
 >     ('ldr', 0, 0), ------ ldv
-242c42
-<     ('sub',),
+245c45
+<     ('ldr', 0, 0),
 ---
->     ('sub'),
-244,245c44,45
-<     ('grc',),
-<     ('ldv', 0, 0),
----
->     ('grc'),
 >     ('ldr', 0, 0),   ---- ldv
-248c48
-<     ('add',),
----
->     ('add'),
-250c50
-<     ('sub',),
----
->     ('sub'),
-252,253c52,53
-<     ('grc',),
-<     ('grt',),
----
->     ('grc'),
->     ('grt'),
-258c58
-<     ('sub',),
----
->     ('sub'),
-260c60
-<     ('grc',),
----
->     ('grc'),
-265c65
-<     ('sub',),
----
->     ('sub'),
-270c70
-<     ('add',),
----
->     ('add'),
-272c72
-<     ('sub',),
----
->     ('sub'),
-274c74
-<     ('grc',),
----
->     ('grc'),
-279c79
-<     ('add',),
----
->     ('add'),
-281c81
-<     ('sub',),
----
->     ('sub'),
-288c88
-<     ('add',),
----
->     ('add'),
-293c93
-<     ('sub',),
----
->     ('sub'),
-295,296c95,96
-<     ('sub',),
-<     ('leq',),
----
->     ('sub'),
->     ('leq'),
-302c102
-<     ('add',),
----
->     ('add'),
-307,308c107,108
-<     ('sub',),
-<     ('leq',),
----
->     ('sub'),
->     ('leq'),
 312,313c112
 <     ('ldc', '"Sorted list in ascending order:\\n"'),
-<     ('prv',),
+<     ('prv'),
 ---
 >     ('prc', 3),
-320c119
-<     ('sub',),
----
->     ('sub'),
-322,325c121,123
-<     ('grc',),
-<     ('prv',),
+324,325c123
 <     ('ldc', '" "'),
-<     ('prv',),
+<     ('prv'),
 ---
->     ('grc'),
->     ('prv'),
 >     ('prc', 4),
-328c126
-<     ('add',),
----
->     ('add'),
-333,334c131,132
-<     ('sub',),
-<     ('leq',),
----
->     ('sub'),
->     ('leq'),
-339,341c137,138
-<     ('end',),
+340,341c138
 < ]
 < 
 ---
->     ('end'),
 > ]
 \ No newline at end of file

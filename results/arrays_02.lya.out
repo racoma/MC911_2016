@@ -109,18 +109,18 @@ Program:
                   ID: v (at line: 20)
 <lyaparser.ID object at 0x103654dd8>
 <lyaparser.ID object at 0x103654d68>
-<lyasem.ExprType object at 0x10140ad68>
-<lyasem.ExprType object at 0x10140ad68>
-<lyaparser.ID object at 0x10154a668>
-<lyaparser.ID object at 0x10154a748>
-<lyasem.ExprType object at 0x10140ad68>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyaparser.ID object at 0x101d4a5c0>
+<lyaparser.ID object at 0x101d4a668>
+<lyasem.ExprType object at 0x101c09d30>
 false
-<lyasem.ExprType object at 0x10140ad68>
+<lyasem.ExprType object at 0x101c09d30>
 true
 {0: None, '_ret': None}
-Program {'i': {'node': <lyaparser.Decl object at 0x103654550>, 'scope': 0, 'number': 10, 'type': None}, 'sum': {'node': <lyaparser.ProcStmt object at 0x103654828>, 'scope': 1, 'number': None, 'type': None}, 'char': <lyasem.ExprType object at 0x10140add8>, 'bool': <lyasem.ExprType object at 0x1014605f8>, 'string': <lyasem.ExprType object at 0x10140ae48>, 'vector': {'node': <lyaparser.ModeDef object at 0x103654588>, 'scope': 0, 'number': None, 'type': None}, 'int': <lyasem.ExprType object at 0x10140ad68>, 'v': {'node': <lyaparser.Decl object at 0x103654630>, 'scope': 0, 'number': 0, 'type': 'array'}}
+Program {'int': <lyasem.ExprType object at 0x101c09d30>, 'vector': {'node': <lyaparser.ModeDef object at 0x1036545c0>, 'type': None, 'scope': 0, 'number': None}, 'bool': <lyasem.ExprType object at 0x101c60668>, 'char': <lyasem.ExprType object at 0x101c09da0>, 'i': {'node': <lyaparser.Decl object at 0x103654550>, 'type': None, 'scope': 0, 'number': 10}, 'sum': {'node': <lyaparser.ProcStmt object at 0x103654828>, 'type': None, 'scope': 1, 'number': None}, 'string': <lyasem.ExprType object at 0x101c09e10>, 'v': {'node': <lyaparser.Decl object at 0x103654630>, 'type': 'array', 'scope': 0, 'number': 0}}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 11),
     ('jmp', 3),
     ('lbl', 1),
@@ -133,20 +133,20 @@ Program {'i': {'node': <lyaparser.Decl object at 0x103654550>, 'scope': 0, 'numb
     ('lbl', 4),
     ('ldv', 1, 1),
     ('ldc', 10),
-    ('les',),
+    ('les'),
     ('jof', 5),
     ('ldv', 1, 0),
     ('ldv', 1, -3),
     ('ldv', 1, 1),
     ('ldc', 1),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
-    ('add',),
+    ('grc'),
+    ('add'),
     ('stv', 1, 0),
     ('ldc', 1),
     ('ldv', 1, 1),
-    ('add',),
+    ('add'),
     ('stv', 1, 1),
     ('jmp', 4),
     ('lbl', 5),
@@ -163,25 +163,25 @@ Program {'i': {'node': <lyaparser.Decl object at 0x103654550>, 'scope': 0, 'numb
     ('ldr', 0, 0),
     ('ldv', 0, 10),
     ('ldc', 1),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('rdv',),
+    ('rdv'),
     ('smv', 1),
     ('ldv', 0, 10),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 10),
     ('ldv', 0, 10),
     ('ldc', 10),
-    ('leq',),
+    ('leq'),
     ('jof', 7),
     ('jmp', 6),
     ('lbl', 7),
     ('alc', 1),
     ('ldr', 0, 0),
     ('cfu', 1),
-    ('prv',),
+    ('prv'),
     ('dlc', 11),
-    ('end',),
+    ('end'),
 ]
 

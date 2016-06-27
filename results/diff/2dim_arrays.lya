@@ -56,51 +56,19 @@
 <                   Binop: * (at line: 8)
 <                     ID: i (at line: 8)
 <                     ID: j (at line: 8)
-< <lyasem.ExprType object at 0x101308d68>
-< <lyaparser.Array object at 0x102e54d68>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyaparser.Array object at 0x103654e10>
 < false
 < false
-< <lyasem.ExprType object at 0x101308d68>
-< Program {'i': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 50}, 'string': <lyasem.ExprType object at 0x101308e48>, 'char': <lyasem.ExprType object at 0x101308dd8>, 'int': <lyasem.ExprType object at 0x101308d68>, 'a': {'scope': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x102e54630>, 'number': 0}, 'bool': <lyasem.ExprType object at 0x102d637b8>, 'j': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 51}}
-65c2
-<     ('stp',),
----
->     ('stp'),
-76,77c13,14
-<     ('sub',),
+< <lyasem.ExprType object at 0x101c09d30>
+< Program {'j': {'number': 51, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654390>}, 'char': <lyasem.ExprType object at 0x101c09da0>, 'i': {'number': 50, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654390>}, 'bool': <lyasem.ExprType object at 0x101c60668>, 'string': <lyasem.ExprType object at 0x101c09e10>, 'int': <lyasem.ExprType object at 0x101c09d30>, 'a': {'number': 0, 'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654668>}}
+77c14
 <     ('idx', 5),
 ---
->     ('sub'),
 >     ('idx', 10),
-80c17
-<     ('sub',),
----
->     ('sub'),
-84c21
-<     ('mul',),
----
->     ('mul'),
-88c25
-<     ('add',),
----
->     ('add'),
-92c29
-<     ('leq',),
----
->     ('leq'),
-98c35
-<     ('add',),
----
->     ('add'),
-102c39
-<     ('leq',),
----
->     ('leq'),
-107,109c44,45
-<     ('end',),
+108,109c45
 < ]
 < 
 ---
->     ('end'),
 > ]
 \ No newline at end of file

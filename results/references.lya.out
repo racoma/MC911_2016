@@ -96,19 +96,19 @@ Program:
                 Expr: 
                   RefLoc: ->
                     ID: j (at line: 20)
-<lyaparser.ID object at 0x103654e80>
-<lyaparser.ID object at 0x103654ef0>
-<lyaparser.ID object at 0x1036542b0>
+<lyaparser.ID object at 0x103653ef0>
+<lyaparser.ID object at 0x103653f60>
+<lyaparser.ID object at 0x103653438>
 {0: None, 1: None, '_ret': None}
-Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'scope': 1, 'type': None, 'number': None, 'node': <lyaparser.ProcStmt object at 0x1036541d0>}, 'char': <lyasem.ExprType object at 0x10140add8>, 'j': {'scope': 0, 'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'i': {'scope': 0, 'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'string': <lyasem.ExprType object at 0x10140ae48>, 'bool': <lyasem.ExprType object at 0x103654940>, 'r': {'scope': 0, 'type': None, 'number': 2, 'node': <lyaparser.Decl object at 0x103654320>}}
+Program {'i': {'type': None, 'node': <lyaparser.Decl object at 0x1036532e8>, 'scope': 0, 'number': 0}, 'bool': <lyasem.ExprType object at 0x103653a20>, 'j': {'type': None, 'node': <lyaparser.Decl object at 0x1036532e8>, 'scope': 0, 'number': 1}, 'int': <lyasem.ExprType object at 0x101c0bd30>, 'string': <lyasem.ExprType object at 0x101c0be10>, 'p': {'type': None, 'node': <lyaparser.ProcStmt object at 0x103653208>, 'scope': 1, 'number': None}, 'char': <lyasem.ExprType object at 0x101c0bda0>, 'r': {'type': None, 'node': <lyaparser.Decl object at 0x1036534a8>, 'scope': 0, 'number': 2}}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 3),
     ('jmp', 3),
     ('lbl', 1),
     ('enf', 1),
     ('alc', 1),
-    ('rdv',),
+    ('rdv'),
     ('stv', 1, 0),
     ('ldv', 1, 0),
     ('jof', 4),
@@ -127,7 +127,7 @@ Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'scope': 1, 'type
     ('dlc', 1),
     ('ret', 1, 2),
     ('lbl', 3),
-    ('rdv',),
+    ('rdv'),
     ('stv', 0, 0),
     ('ldr', 0, 0),
     ('stv', 0, 2),
@@ -135,8 +135,8 @@ Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'scope': 1, 'type
     ('ldr', 0, 1),
     ('ldv', 0, 0),
     ('cfu', 1),
-    ('prv',),
+    ('prv'),
     ('dlc', 3),
-    ('end',),
+    ('end'),
 ]
 

@@ -1,4 +1,4 @@
-1,65c1,2
+1,64c1
 < Program: 
 <   StmtList: 
 <     DclStmt: 
@@ -57,52 +57,29 @@
 <         Param: 
 <           Expr: 
 <             ID: soma (at line: 13)
-< <lyaparser.ID object at 0x103654470>
-< <lyasem.ExprType object at 0x101319d68>
+< <lyaparser.ID object at 0x103654358>
+< <lyasem.ExprType object at 0x1015308d0>
 < <lyaparser.ID object at 0x103654da0>
-< <lyasem.ExprType object at 0x101319d68>
-< Program {'bool': <lyasem.ExprType object at 0x1035637b8>, 'soma': {'scope': 0, 'number': 1, 'type': None, 'node': <lyaparser.Decl object at 0x1036542e8>}, 'string': <lyasem.ExprType object at 0x101319e48>, 'i': {'scope': 0, 'number': 0, 'type': None, 'node': <lyaparser.Decl object at 0x10136f7f0>}, 'char': <lyasem.ExprType object at 0x101319dd8>, 'int': <lyasem.ExprType object at 0x101319d68>, 'b': {'scope': 0, 'number': 2, 'type': None, 'node': <lyaparser.Decl object at 0x103654588>}}
+< <lyasem.ExprType object at 0x1015308d0>
+< Program {'bool': <lyasem.ExprType object at 0x10140be10>, 'string': <lyasem.ExprType object at 0x10140bda0>, 'char': <lyasem.ExprType object at 0x10140bd30>, 'soma': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x103654278>, 'number': 1}, 'int': <lyasem.ExprType object at 0x1015308d0>, 'b': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x103654588>, 'number': 2}, 'i': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x101460668>, 'number': 0}}
 < [
-<     ('stp',),
 ---
 >     [
->     ('stp'),
 69c6
 <     ('ldc', 1),
 ---
 >     ('ldc', true),
 76d12
 <     ('ldv', 0, 0),
-78c14,15
-<     ('add',),
----
+77a14
 >     ('ldv', 0, 0),
->     ('add'),
-82c19
-<     ('grt',),
----
->     ('grt'),
 84c21
 <     ('ldc', 0),
 ---
 >     ('ldc', false),
-89c26
-<     ('add',),
----
->     ('add'),
-93c30
-<     ('leq',),
----
->     ('leq'),
-98c35
-<     ('prv',),
----
->     ('prv'),
-100,102c37,38
-<     ('end',),
+101,102c38
 < ]
 < 
 ---
->     ('end'),
 >     ]
 \ No newline at end of file

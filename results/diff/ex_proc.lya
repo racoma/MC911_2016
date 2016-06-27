@@ -41,24 +41,14 @@
 <         Param: 
 <           Expr: 
 <             ID: n (at line: 8)
-< <lyasem.ExprType object at 0x10140ad68>
-< <lyaparser.ID object at 0x103653940>
-< <lyasem.ExprType object at 0x10140ad68>
+< <lyasem.ExprType object at 0x10141ad30>
+< <lyaparser.ID object at 0x1036539b0>
+< <lyasem.ExprType object at 0x10141ad30>
 < {0: None}
-< Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'node': <lyaparser.ProcStmt object at 0x1036534e0>, 'type': None, 'number': None, 'scope': 1}, 'bool': <lyasem.ExprType object at 0x1014606a0>, 'string': <lyasem.ExprType object at 0x10140ae48>, 'n': {'node': <lyaparser.Decl object at 0x1036532e8>, 'type': None, 'number': 1, 'scope': 0}, 'm': {'node': <lyaparser.Decl object at 0x1036530b8>, 'type': None, 'number': 0, 'scope': 0}, 'char': <lyasem.ExprType object at 0x10140add8>}
-49c2
-<     ('stp',),
----
->     ('stp'),
-61c14
-<     ('mul',),
----
->     ('mul'),
-69,71c22,23
-<     ('end',),
+< Program {'bool': <lyasem.ExprType object at 0x103563780>, 'char': <lyasem.ExprType object at 0x10141ada0>, 'string': <lyasem.ExprType object at 0x10141ae10>, 'n': {'node': <lyaparser.Decl object at 0x1036532b0>, 'number': 1, 'scope': 0, 'type': None}, 'm': {'node': <lyaparser.Decl object at 0x103653668>, 'number': 0, 'scope': 0, 'type': None}, 'int': <lyasem.ExprType object at 0x10141ad30>, 'p': {'node': <lyaparser.ProcStmt object at 0x103653470>, 'number': None, 'scope': 1, 'type': None}}
+70,71c23
 < ]
 < 
 ---
->     ('end'),
 > ]
 \ No newline at end of file

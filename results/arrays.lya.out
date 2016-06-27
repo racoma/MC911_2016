@@ -63,29 +63,29 @@ Program:
               ID: a (at line: 11)
               Expr: 
                 ID: j (at line: 11)
-<lyasem.ExprType object at 0x101419d68>
-<lyaparser.Array object at 0x1036545c0>
-<lyasem.ExprType object at 0x101419d68>
-<lyaparser.Array object at 0x103654cf8>
+<lyasem.ExprType object at 0x10130bd30>
+<lyaparser.Array object at 0x103654630>
+<lyasem.ExprType object at 0x10130bd30>
+<lyaparser.Array object at 0x103654d30>
 false
-<lyasem.ExprType object at 0x101419d68>
+<lyasem.ExprType object at 0x10130bd30>
 false
-<lyasem.ExprType object at 0x101419d68>
+<lyasem.ExprType object at 0x10130bd30>
 false
-Program {'i': {'number': 8, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}, 'a': {'number': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x103654358>, 'scope': 0}, 'int': <lyasem.ExprType object at 0x101419d68>, 'bool': <lyasem.ExprType object at 0x10146f588>, 'char': <lyasem.ExprType object at 0x101419dd8>, 'string': <lyasem.ExprType object at 0x101419e48>, 'j': {'number': 9, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}}
+Program {'i': {'number': 8, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>}, 'int': <lyasem.ExprType object at 0x10130bd30>, 'a': {'number': 0, 'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654470>}, 'char': <lyasem.ExprType object at 0x10130bda0>, 'j': {'number': 9, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>}, 'string': <lyasem.ExprType object at 0x10130be10>, 'bool': <lyasem.ExprType object at 0x1013606a0>}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 10),
-    ('rdv',),
+    ('rdv'),
     ('stv', 0, 9),
     ('ldr', 0, 0),
     ('ldc', 3),
     ('ldc', 3),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
     ('ldc', 2),
     ('ldv', 0, 9),
-    ('mul',),
+    ('mul'),
     ('smv', 1),
     ('ldc', 4),
     ('stv', 0, 8),
@@ -93,30 +93,30 @@ Program {'i': {'number': 8, 'type': None, 'node': <lyaparser.Decl object at 0x10
     ('ldr', 0, 0),
     ('ldv', 0, 8),
     ('ldc', 3),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
     ('ldc', 5),
     ('ldv', 0, 8),
-    ('add',),
+    ('add'),
     ('smv', 1),
     ('ldv', 0, 8),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 8),
     ('ldv', 0, 8),
     ('ldc', 10),
-    ('leq',),
+    ('leq'),
     ('jof', 2),
     ('jmp', 1),
     ('lbl', 2),
     ('ldr', 0, 0),
     ('ldv', 0, 9),
     ('ldc', 3),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
-    ('prv',),
+    ('grc'),
+    ('prv'),
     ('dlc', 10),
-    ('end',),
+    ('end'),
 ]
 

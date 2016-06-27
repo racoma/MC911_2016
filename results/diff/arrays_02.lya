@@ -110,66 +110,23 @@
 <                   ID: v (at line: 20)
 < <lyaparser.ID object at 0x103654dd8>
 < <lyaparser.ID object at 0x103654d68>
-< <lyasem.ExprType object at 0x10140ad68>
-< <lyasem.ExprType object at 0x10140ad68>
-< <lyaparser.ID object at 0x10154a668>
-< <lyaparser.ID object at 0x10154a748>
-< <lyasem.ExprType object at 0x10140ad68>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyasem.ExprType object at 0x101c09d30>
+< <lyaparser.ID object at 0x101d4a5c0>
+< <lyaparser.ID object at 0x101d4a668>
+< <lyasem.ExprType object at 0x101c09d30>
 < false
-< <lyasem.ExprType object at 0x10140ad68>
+< <lyasem.ExprType object at 0x101c09d30>
 < true
 < {0: None, '_ret': None}
-< Program {'i': {'node': <lyaparser.Decl object at 0x103654550>, 'scope': 0, 'number': 10, 'type': None}, 'sum': {'node': <lyaparser.ProcStmt object at 0x103654828>, 'scope': 1, 'number': None, 'type': None}, 'char': <lyasem.ExprType object at 0x10140add8>, 'bool': <lyasem.ExprType object at 0x1014605f8>, 'string': <lyasem.ExprType object at 0x10140ae48>, 'vector': {'node': <lyaparser.ModeDef object at 0x103654588>, 'scope': 0, 'number': None, 'type': None}, 'int': <lyasem.ExprType object at 0x10140ad68>, 'v': {'node': <lyaparser.Decl object at 0x103654630>, 'scope': 0, 'number': 0, 'type': 'array'}}
-123c2
-<     ('stp',),
----
->     ('stp'),
-136c15
-<     ('les',),
----
->     ('les'),
-142c21
-<     ('sub',),
----
->     ('sub'),
-144,145c23,24
-<     ('grc',),
-<     ('add',),
----
->     ('grc'),
->     ('add'),
+< Program {'int': <lyasem.ExprType object at 0x101c09d30>, 'vector': {'node': <lyaparser.ModeDef object at 0x1036545c0>, 'type': None, 'scope': 0, 'number': None}, 'bool': <lyasem.ExprType object at 0x101c60668>, 'char': <lyasem.ExprType object at 0x101c09da0>, 'i': {'node': <lyaparser.Decl object at 0x103654550>, 'type': None, 'scope': 0, 'number': 10}, 'sum': {'node': <lyaparser.ProcStmt object at 0x103654828>, 'type': None, 'scope': 1, 'number': None}, 'string': <lyasem.ExprType object at 0x101c09e10>, 'v': {'node': <lyaparser.Decl object at 0x103654630>, 'type': 'array', 'scope': 0, 'number': 0}}
 147d25
 <     ('ldc', 1),
-149c27,28
-<     ('add',),
----
+148a27
 >     ('ldc', 1),
->     ('add'),
-166c45
-<     ('sub',),
----
->     ('sub'),
-168c47
-<     ('rdv',),
----
->     ('rdv'),
-172c51
-<     ('add',),
----
->     ('add'),
-176c55
-<     ('leq',),
----
->     ('leq'),
-183c62
-<     ('prv',),
----
->     ('prv'),
-185,187c64,65
-<     ('end',),
+186,187c65
 < ]
 < 
 ---
->     ('end'),
 > ]
 \ No newline at end of file

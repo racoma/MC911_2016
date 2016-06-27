@@ -1,4 +1,4 @@
-1,105c1,2
+1,104c1
 < Program: 
 <   StmtList: 
 <     DclStmt: 
@@ -97,33 +97,17 @@
 <                 Expr: 
 <                   RefLoc: ->
 <                     ID: j (at line: 20)
-< <lyaparser.ID object at 0x103654e80>
-< <lyaparser.ID object at 0x103654ef0>
-< <lyaparser.ID object at 0x1036542b0>
+< <lyaparser.ID object at 0x103653ef0>
+< <lyaparser.ID object at 0x103653f60>
+< <lyaparser.ID object at 0x103653438>
 < {0: None, 1: None, '_ret': None}
-< Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'scope': 1, 'type': None, 'number': None, 'node': <lyaparser.ProcStmt object at 0x1036541d0>}, 'char': <lyasem.ExprType object at 0x10140add8>, 'j': {'scope': 0, 'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'i': {'scope': 0, 'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'string': <lyasem.ExprType object at 0x10140ae48>, 'bool': <lyasem.ExprType object at 0x103654940>, 'r': {'scope': 0, 'type': None, 'number': 2, 'node': <lyaparser.Decl object at 0x103654320>}}
+< Program {'i': {'type': None, 'node': <lyaparser.Decl object at 0x1036532e8>, 'scope': 0, 'number': 0}, 'bool': <lyasem.ExprType object at 0x103653a20>, 'j': {'type': None, 'node': <lyaparser.Decl object at 0x1036532e8>, 'scope': 0, 'number': 1}, 'int': <lyasem.ExprType object at 0x101c0bd30>, 'string': <lyasem.ExprType object at 0x101c0be10>, 'p': {'type': None, 'node': <lyaparser.ProcStmt object at 0x103653208>, 'scope': 1, 'number': None}, 'char': <lyasem.ExprType object at 0x101c0bda0>, 'r': {'type': None, 'node': <lyaparser.Decl object at 0x1036534a8>, 'scope': 0, 'number': 2}}
 < [
-<     ('stp',),
 ---
 >     [
->     ('stp'),
-111c8
-<     ('rdv',),
----
->     ('rdv'),
-130c27
-<     ('rdv',),
----
->     ('rdv'),
-138c35
-<     ('prv',),
----
->     ('prv'),
-140,142c37,38
-<     ('end',),
+141,142c38
 < ]
 < 
 ---
->     ('end'),
 >     ]
 \ No newline at end of file

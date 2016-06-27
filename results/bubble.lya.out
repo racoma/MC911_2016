@@ -165,68 +165,68 @@ Program:
                     ID: c (at line: 27)
               Expr: 
                 Constant: " ", string (at line: 27)
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyaparser.ID object at 0x101458d30>
-<lyasem.ExprType object at 0x101217d68>
-<lyaparser.Array object at 0x1014583c8>
-<lyasem.ExprType object at 0x101217d68>
-<lyaparser.Array object at 0x10364d2b0>
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyaparser.ID object at 0x101d49d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyaparser.Array object at 0x101d49278>
+<lyasem.ExprType object at 0x101c09d30>
+<lyaparser.Array object at 0x10364d240>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
 true
 true
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
-<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
+<lyasem.ExprType object at 0x101c09d30>
 true
-<lyasem.ExprType object at 0x101217d68>
-Program {'bool': <lyasem.ExprType object at 0x10126f6a0>, 'string': <lyasem.ExprType object at 0x101217e48>, 'n': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 101}, 'c': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 102}, 'd': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 103}, 'swap': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 104}, 'char': <lyasem.ExprType object at 0x101217dd8>, 'v': {'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654518>, 'number': 0}, 'int': <lyasem.ExprType object at 0x101217d68>}
+<lyasem.ExprType object at 0x101c09d30>
+Program {'swap': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 104}, 'v': {'scope': 0, 'node': <lyaparser.Decl object at 0x1036544e0>, 'type': 'array', 'number': 0}, 'string': <lyasem.ExprType object at 0x101c09e10>, 'int': <lyasem.ExprType object at 0x101c09d30>, 'bool': <lyasem.ExprType object at 0x101c60550>, 'c': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 102}, 'd': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 103}, 'char': <lyasem.ExprType object at 0x101c09da0>, 'n': {'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>, 'type': None, 'number': 101}}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 105),
     ('ldc', '"Enter number of elements: "'),
-    ('prv',),
-    ('rdv',),
+    ('prv'),
+    ('rdv'),
     ('stv', 0, 101),
     ('ldc', '"Enter "'),
-    ('prv',),
+    ('prv'),
     ('ldv', 0, 101),
-    ('prv',),
+    ('prv'),
     ('ldc', '" integers\\n"'),
-    ('prv',),
+    ('prv'),
     ('ldc', 0),
     ('stv', 0, 102),
     ('lbl', 1),
     ('ldr', 0, 0),
     ('ldv', 0, 102),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('rdv',),
+    ('rdv'),
     ('smv', 1),
     ('ldv', 0, 102),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 102),
     ('ldv', 0, 102),
     ('ldv', 0, 101),
     ('ldc', 1),
-    ('sub',),
-    ('leq',),
+    ('sub'),
+    ('leq'),
     ('jof', 2),
     ('jmp', 1),
     ('lbl', 2),
@@ -236,106 +236,106 @@ Program {'bool': <lyasem.ExprType object at 0x10126f6a0>, 'string': <lyasem.Expr
     ('ldc', 0),
     ('stv', 0, 103),
     ('lbl', 5),
-    ('ldv', 0, 0),
+    ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
-    ('ldv', 0, 0),
+    ('grc'),
+    ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
-    ('grt',),
+    ('grc'),
+    ('grt'),
     ('jof', 7),
     ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
+    ('grc'),
     ('stv', 0, 104),
     ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
     ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
+    ('grc'),
     ('smv', 1),
     ('ldr', 0, 0),
     ('ldv', 0, 103),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
     ('ldv', 0, 104),
     ('smv', 1),
     ('lbl', 7),
     ('ldv', 0, 103),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 103),
     ('ldv', 0, 103),
     ('ldv', 0, 101),
     ('ldv', 0, 102),
-    ('sub',),
+    ('sub'),
     ('ldc', 2),
-    ('sub',),
-    ('leq',),
+    ('sub'),
+    ('leq'),
     ('jof', 6),
     ('jmp', 5),
     ('lbl', 6),
     ('ldv', 0, 102),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 102),
     ('ldv', 0, 102),
     ('ldv', 0, 101),
     ('ldc', 2),
-    ('sub',),
-    ('leq',),
+    ('sub'),
+    ('leq'),
     ('jof', 4),
     ('jmp', 3),
     ('lbl', 4),
     ('ldc', '"Sorted list in ascending order:\\n"'),
-    ('prv',),
+    ('prv'),
     ('ldc', 0),
     ('stv', 0, 102),
     ('lbl', 8),
     ('ldr', 0, 0),
     ('ldv', 0, 102),
     ('ldc', 0),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
-    ('grc',),
-    ('prv',),
+    ('grc'),
+    ('prv'),
     ('ldc', '" "'),
-    ('prv',),
+    ('prv'),
     ('ldv', 0, 102),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 102),
     ('ldv', 0, 102),
     ('ldv', 0, 101),
     ('ldc', 1),
-    ('sub',),
-    ('leq',),
+    ('sub'),
+    ('leq'),
     ('jof', 9),
     ('jmp', 8),
     ('lbl', 9),
     ('dlc', 105),
-    ('end',),
+    ('end'),
 ]
 

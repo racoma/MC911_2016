@@ -64,63 +64,19 @@
 <               ID: a (at line: 11)
 <               Expr: 
 <                 ID: j (at line: 11)
-< <lyasem.ExprType object at 0x101419d68>
-< <lyaparser.Array object at 0x1036545c0>
-< <lyasem.ExprType object at 0x101419d68>
-< <lyaparser.Array object at 0x103654cf8>
+< <lyasem.ExprType object at 0x10130bd30>
+< <lyaparser.Array object at 0x103654630>
+< <lyasem.ExprType object at 0x10130bd30>
+< <lyaparser.Array object at 0x103654d30>
 < false
-< <lyasem.ExprType object at 0x101419d68>
+< <lyasem.ExprType object at 0x10130bd30>
 < false
-< <lyasem.ExprType object at 0x101419d68>
+< <lyasem.ExprType object at 0x10130bd30>
 < false
-< Program {'i': {'number': 8, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}, 'a': {'number': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x103654358>, 'scope': 0}, 'int': <lyasem.ExprType object at 0x101419d68>, 'bool': <lyasem.ExprType object at 0x10146f588>, 'char': <lyasem.ExprType object at 0x101419dd8>, 'string': <lyasem.ExprType object at 0x101419e48>, 'j': {'number': 9, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}}
-77c2
-<     ('stp',),
----
->     ('stp'),
-79c4
-<     ('rdv',),
----
->     ('rdv'),
-84c9
-<     ('sub',),
----
->     ('sub'),
-88c13
-<     ('mul',),
----
->     ('mul'),
-96c21
-<     ('sub',),
----
->     ('sub'),
-100c25
-<     ('add',),
----
->     ('add'),
-104c29
-<     ('add',),
----
->     ('add'),
-108c33
-<     ('leq',),
----
->     ('leq'),
-115c40
-<     ('sub',),
----
->     ('sub'),
-117,118c42,43
-<     ('grc',),
-<     ('prv',),
----
->     ('grc'),
->     ('prv'),
-120,122c45,46
-<     ('end',),
+< Program {'i': {'number': 8, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>}, 'int': <lyasem.ExprType object at 0x10130bd30>, 'a': {'number': 0, 'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654470>}, 'char': <lyasem.ExprType object at 0x10130bda0>, 'j': {'number': 9, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654438>}, 'string': <lyasem.ExprType object at 0x10130be10>, 'bool': <lyasem.ExprType object at 0x1013606a0>}
+121,122c46
 < ]
 < 
 ---
->     ('end'),
 > ]
 \ No newline at end of file

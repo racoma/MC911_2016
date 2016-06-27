@@ -84,11 +84,11 @@ Program:
                   ID: n (at line: 18)
                 Expr: 
                   ID: b (at line: 18)
-<lyaparser.ID object at 0x103654cf8>
+<lyaparser.ID object at 0x103654cc0>
 {0: None, 1: None, 2: None, '_ret': None}
-Program {'bool': <lyasem.ExprType object at 0x103654978>, 'n': {'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x1036542b0>, 'scope': 0}, 'b': {'type': None, 'number': 2, 'node': <lyaparser.Decl object at 0x103654940>, 'scope': 0}, 'p': {'type': None, 'number': None, 'node': <lyaparser.ProcStmt object at 0x1036544e0>, 'scope': 1}, 'int': <lyasem.ExprType object at 0x101c0ad68>, 'm': {'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x103654358>, 'scope': 0}, 'string': <lyasem.ExprType object at 0x101c0ae48>, 'char': <lyasem.ExprType object at 0x101c0add8>}
+Program {'string': <lyasem.ExprType object at 0x101a0be10>, 'p': {'number': None, 'type': None, 'node': <lyaparser.ProcStmt object at 0x1036544a8>, 'scope': 1}, 'int': <lyasem.ExprType object at 0x101a0bd30>, 'n': {'number': 1, 'type': None, 'node': <lyaparser.Decl object at 0x103654278>, 'scope': 0}, 'char': <lyasem.ExprType object at 0x101a0bda0>, 'bool': <lyasem.ExprType object at 0x1036549b0>, 'b': {'number': 2, 'type': None, 'node': <lyaparser.Decl object at 0x103654978>, 'scope': 0}, 'm': {'number': 0, 'type': None, 'node': <lyaparser.Decl object at 0x103654470>, 'scope': 0}}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 3),
     ('ldc', 2),
     ('stv', 0, 0),
@@ -104,7 +104,7 @@ Program {'bool': <lyasem.ExprType object at 0x103654978>, 'n': {'type': None, 'n
     ('jof', 4),
     ('ldv', 1, -4),
     ('ldv', 1, 0),
-    ('add',),
+    ('add'),
     ('stv', 1, 0),
     ('ldv', 1, 0),
     ('stv', 1, -6),
@@ -117,15 +117,15 @@ Program {'bool': <lyasem.ExprType object at 0x103654978>, 'n': {'type': None, 'n
     ('dlc', 1),
     ('ret', 1, 3),
     ('lbl', 3),
-    ('rdv',),
+    ('rdv'),
     ('stv', 0, 2),
     ('alc', 1),
     ('ldv', 0, 2),
     ('ldv', 0, 1),
     ('ldv', 0, 0),
     ('cfu', 1),
-    ('prv',),
+    ('prv'),
     ('dlc', 3),
-    ('end',),
+    ('end'),
 ]
 

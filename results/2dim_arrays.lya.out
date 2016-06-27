@@ -55,14 +55,14 @@ Program:
                   Binop: * (at line: 8)
                     ID: i (at line: 8)
                     ID: j (at line: 8)
-<lyasem.ExprType object at 0x101308d68>
-<lyaparser.Array object at 0x102e54d68>
+<lyasem.ExprType object at 0x101c09d30>
+<lyaparser.Array object at 0x103654e10>
 false
 false
-<lyasem.ExprType object at 0x101308d68>
-Program {'i': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 50}, 'string': <lyasem.ExprType object at 0x101308e48>, 'char': <lyasem.ExprType object at 0x101308dd8>, 'int': <lyasem.ExprType object at 0x101308d68>, 'a': {'scope': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x102e54630>, 'number': 0}, 'bool': <lyasem.ExprType object at 0x102d637b8>, 'j': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 51}}
+<lyasem.ExprType object at 0x101c09d30>
+Program {'j': {'number': 51, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654390>}, 'char': <lyasem.ExprType object at 0x101c09da0>, 'i': {'number': 50, 'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654390>}, 'bool': <lyasem.ExprType object at 0x101c60668>, 'string': <lyasem.ExprType object at 0x101c09e10>, 'int': <lyasem.ExprType object at 0x101c09d30>, 'a': {'number': 0, 'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654668>}}
 [
-    ('stp',),
+    ('stp'),
     ('alc', 52),
     ('ldc', 1),
     ('stv', 0, 50),
@@ -73,37 +73,37 @@ Program {'i': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102
     ('ldr', 0, 0),
     ('ldv', 0, 50),
     ('ldc', 1),
-    ('sub',),
+    ('sub'),
     ('idx', 5),
     ('ldv', 0, 51),
     ('ldc', 1),
-    ('sub',),
+    ('sub'),
     ('idx', 1),
     ('ldv', 0, 50),
     ('ldv', 0, 51),
-    ('mul',),
+    ('mul'),
     ('smv', 1),
     ('ldv', 0, 51),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 51),
     ('ldv', 0, 51),
     ('ldc', 5),
-    ('leq',),
+    ('leq'),
     ('jof', 4),
     ('jmp', 3),
     ('lbl', 4),
     ('ldv', 0, 50),
     ('ldc', 1),
-    ('add',),
+    ('add'),
     ('stv', 0, 50),
     ('ldv', 0, 50),
     ('ldc', 10),
-    ('leq',),
+    ('leq'),
     ('jof', 2),
     ('jmp', 1),
     ('lbl', 2),
     ('dlc', 52),
-    ('end',),
+    ('end'),
 ]
 
