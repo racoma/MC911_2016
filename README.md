@@ -1,11 +1,17 @@
 # MC911_2016
 
-Second fase: semantic processing and code generation for LVM, the Lya Virtual Machine.
+## Para rodar a máquina virtual fazemos:
+
+python3 lyalvm.py example.lya
+
+------------
+
+Second phase: semantic processing and code generation for LVM, the Lya Virtual Machine.
 Main files: lyalex.py lyaparser.py lyasem.py lyacod.py
 
 Running:
 
-python3 lyacod.py exemple.lya
+python3 lyacod.py example.lya
 
 *Tests OK:*
 
@@ -25,8 +31,6 @@ python3 lyacod.py exemple.lya
 *Tests NOK:*
 - 2dim_arrays.lya  --     ('idx', 5) ---> ('idx', 10) na resolução
 - slices_n_builtins.lya
-
-
 
 *REFACTOR*
 - Feito troca de vardict e scopedict para a enviroment stack do lyasym

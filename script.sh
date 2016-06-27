@@ -9,6 +9,6 @@ ELEMENTS=${#ARRAY[@]}
 # for loop
 for (( i=0;i<$ELEMENTS;i++)); do
     echo "Running for:" ${ARRAY[${i}]}
-    python3 lyacod.py ${ARRAY[${i}]} > ./results/${ARRAY[${i}]}.out
+    python3 lyacod.py ./examples/${ARRAY[${i}]} > ./results/${ARRAY[${i}]}.out
     diff ./results/${ARRAY[${i}]}.out ./results/${ARRAY[${i}]}.res > ./results/diff/${ARRAY[${i}]}
 done 
