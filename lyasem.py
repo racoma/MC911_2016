@@ -8,8 +8,8 @@ class SymbolTable(dict):
     def __init__(self, decl=None):
         super().__init__()
         self.decl = decl
-    def insert(self, name, value, scope, number=None):
-        self[name] = {"node": value, "scope": scope, "number": number}
+    def insert(self, name, value, scope, number=None, type=None):
+        self[name] = {"node": value, "scope": scope, "number": number, "type": type}
 
     def lookup(self, name):
         return self.get(name, None)
@@ -203,6 +203,8 @@ class Visitor(NodeVisitor):
 
     def visit_Array(self, node):
         self.visit(node.location)
+        for i, child in enumerate(node.expr or []):
+            self.visit(child)
         e = self.environment.lookup(node.location.char)["node"]
 
         if e is not None:

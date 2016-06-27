@@ -1,0 +1,64 @@
+1,47d0
+< Program: 
+<   StmtList: 
+<     DclStmt: 
+<       Decl: 
+<         ID: m (at line: 3)
+<         Mode: 
+<           DiscreteMode: int (at line: 3)
+<         Expr: 
+<           Constant: 2, int (at line: 3)
+<       Decl: 
+<         ID: n (at line: 3)
+<         Mode: 
+<           DiscreteMode: int (at line: 3)
+<         Expr: 
+<           Constant: 3, int (at line: 3)
+<     ProcStmt: 
+<       ID: p (at line: 4)
+<       ProcDef:  (at line: 4)
+<         FormalParam: 
+<           ID: x (at line: 4)
+<           ParamSpec: None
+<             Mode: 
+<               DiscreteMode: int (at line: 4)
+<         StmtList: 
+<           DclStmt: 
+<             Decl: 
+<               ID: s (at line: 5)
+<               Mode: 
+<                 DiscreteMode: int (at line: 5)
+<           ActionStmt: 
+<             Assignment: =
+<               ID: s (at line: 6)
+<               Expr: 
+<                 Binop: * (at line: 6)
+<                   ID: m (at line: 6)
+<                   ID: x (at line: 6)
+<     ActionStmt: 
+<       ProcCall: 
+<         ID: p (at line: 8)
+<         Param: 
+<           Expr: 
+<             ID: n (at line: 8)
+< <lyasem.ExprType object at 0x10140ad68>
+< <lyaparser.ID object at 0x103653940>
+< <lyasem.ExprType object at 0x10140ad68>
+< {0: None}
+< Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'node': <lyaparser.ProcStmt object at 0x1036534e0>, 'type': None, 'number': None, 'scope': 1}, 'bool': <lyasem.ExprType object at 0x1014606a0>, 'string': <lyasem.ExprType object at 0x10140ae48>, 'n': {'node': <lyaparser.Decl object at 0x1036532e8>, 'type': None, 'number': 1, 'scope': 0}, 'm': {'node': <lyaparser.Decl object at 0x1036530b8>, 'type': None, 'number': 0, 'scope': 0}, 'char': <lyasem.ExprType object at 0x10140add8>}
+49c2
+<     ('stp',),
+---
+>     ('stp'),
+61c14
+<     ('mul',),
+---
+>     ('mul'),
+69,71c22,23
+<     ('end',),
+< ]
+< 
+---
+>     ('end'),
+> ]
+\ No newline at end of file

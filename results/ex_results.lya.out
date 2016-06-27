@@ -84,11 +84,11 @@ Program:
                   ID: n (at line: 18)
                 Expr: 
                   ID: b (at line: 18)
-defaultdict(<class 'int'>, {'x': '-2', 'b': '-4', '_ret': '-5', 'y': '-3', 'n': '1', 'm': '0'})
-ProcStmt {'p': {0: None, 1: None, 2: None, '_ret': None}}
+<lyaparser.ID object at 0x103654cf8>
 {0: None, 1: None, 2: None, '_ret': None}
-    [,
-    ('stp'),
+Program {'bool': <lyasem.ExprType object at 0x103654978>, 'n': {'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x1036542b0>, 'scope': 0}, 'b': {'type': None, 'number': 2, 'node': <lyaparser.Decl object at 0x103654940>, 'scope': 0}, 'p': {'type': None, 'number': None, 'node': <lyaparser.ProcStmt object at 0x1036544e0>, 'scope': 1}, 'int': <lyasem.ExprType object at 0x101c0ad68>, 'm': {'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x103654358>, 'scope': 0}, 'string': <lyasem.ExprType object at 0x101c0ae48>, 'char': <lyasem.ExprType object at 0x101c0add8>}
+[
+    ('stp',),
     ('alc', 3),
     ('ldc', 2),
     ('stv', 0, 0),
@@ -98,33 +98,34 @@ ProcStmt {'p': {0: None, 1: None, 2: None, '_ret': None}}
     ('lbl', 1),
     ('enf', 1),
     ('alc', 1),
-    ('ldv', 1, -2),
-    ('stv', 1, 0),
-    ('ldv', 1, -4),
-    ('jof', 4),
     ('ldv', 1, -3),
+    ('stv', 1, 0),
+    ('ldv', 1, -5),
+    ('jof', 4),
+    ('ldv', 1, -4),
     ('ldv', 1, 0),
-    ('add'),
+    ('add',),
     ('stv', 1, 0),
     ('ldv', 1, 0),
-    ('stv', 1, -5),
+    ('stv', 1, -6),
     ('jmp', 5),
     ('lbl', 4),
-    ('ldv', 1, -3),
-    ('stv', 1, -5),
+    ('ldv', 1, -4),
+    ('stv', 1, -6),
     ('lbl', 5),
     ('lbl', 2),
     ('dlc', 1),
-    ('ret', 1, 1),
+    ('ret', 1, 3),
     ('lbl', 3),
-    ('rdv'),
+    ('rdv',),
     ('stv', 0, 2),
+    ('alc', 1),
     ('ldv', 0, 2),
     ('ldv', 0, 1),
     ('ldv', 0, 0),
     ('cfu', 1),
-    ('prv'),
+    ('prv',),
     ('dlc', 3),
-    ('end'),
-    ],
+    ('end',),
+]
 

@@ -1,0 +1,341 @@
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: v (at line: 3)
+        Mode: 
+          ArrayMode: 
+            Range: 
+              Expr: 
+                Constant: 0, int (at line: 3)
+              Expr: 
+                Constant: 100, int (at line: 3)
+            Mode: 
+              DiscreteMode: int (at line: 3)
+    DclStmt: 
+      Decl: 
+        ID: n (at line: 4)
+        ID: c (at line: 4)
+        ID: d (at line: 4)
+        ID: swap (at line: 4)
+        Mode: 
+          DiscreteMode: int (at line: 4)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            Constant: "Enter number of elements: ", string (at line: 5)
+    ActionStmt: 
+      Call: 
+        Func: read
+        Param: 
+          Expr: 
+            ID: n (at line: 6)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            Constant: "Enter ", string (at line: 7)
+          Expr: 
+            ID: n (at line: 7)
+          Expr: 
+            Constant: " integers\n", string (at line: 7)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: c (at line: 9)
+              Expr: 
+                Constant: 0, int (at line: 9)
+              Expr: 
+                Binop: - (at line: 9)
+                  ID: n (at line: 9)
+                  Constant: 1, int (at line: 9)
+        ActionStmt: 
+          Call: 
+            Func: read
+            Param: 
+              Expr: 
+                Array: 
+                  ID: v (at line: 10)
+                  Expr: 
+                    ID: c (at line: 10)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: c (at line: 13)
+              Expr: 
+                Constant: 0, int (at line: 13)
+              Expr: 
+                Binop: - (at line: 13)
+                  ID: n (at line: 13)
+                  Constant: 2, int (at line: 13)
+        ActionStmt: 
+          DoAction: 
+            Control: 
+              ForControl: 
+                StepEnum: =
+                  ID: d (at line: 15)
+                  Expr: 
+                    Constant: 0, int (at line: 15)
+                  Expr: 
+                    Binop: - (at line: 15)
+                      Binop: - (at line: 15)
+                        ID: n (at line: 15)
+                        ID: c (at line: 15)
+                      Constant: 2, int (at line: 15)
+            ActionStmt: 
+              IfAction: 
+                BoolExpr: 
+                  Expr: 
+                    Binop: > (at line: 17)
+                      Array: 
+                        ID: v (at line: 17)
+                        Expr: 
+                          ID: d (at line: 17)
+                      Array: 
+                        ID: v (at line: 17)
+                        Expr: 
+                          Binop: + (at line: 17)
+                            ID: d (at line: 17)
+                            Constant: 1, int (at line: 17)
+                ThenClause: 
+                  ActionStmt: 
+                    Assignment: =
+                      ID: swap (at line: 18)
+                      Expr: 
+                        Array: 
+                          ID: v (at line: 18)
+                          Expr: 
+                            ID: d (at line: 18)
+                  ActionStmt: 
+                    Assignment: =
+                      Array: 
+                        ID: v (at line: 19)
+                        Expr: 
+                          ID: d (at line: 19)
+                      Expr: 
+                        Array: 
+                          ID: v (at line: 19)
+                          Expr: 
+                            Binop: + (at line: 19)
+                              ID: d (at line: 19)
+                              Constant: 1, int (at line: 19)
+                  ActionStmt: 
+                    Assignment: =
+                      Array: 
+                        ID: v (at line: 20)
+                        Expr: 
+                          Binop: + (at line: 20)
+                            ID: d (at line: 20)
+                            Constant: 1, int (at line: 20)
+                      Expr: 
+                        ID: swap (at line: 20)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            Constant: "Sorted list in ascending order:\n", string (at line: 24)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: c (at line: 26)
+              Expr: 
+                Constant: 0, int (at line: 26)
+              Expr: 
+                Binop: - (at line: 26)
+                  ID: n (at line: 26)
+                  Constant: 1, int (at line: 26)
+        ActionStmt: 
+          Call: 
+            Func: print
+            Param: 
+              Expr: 
+                Array: 
+                  ID: v (at line: 27)
+                  Expr: 
+                    ID: c (at line: 27)
+              Expr: 
+                Constant: " ", string (at line: 27)
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyaparser.ID object at 0x101458d30>
+<lyasem.ExprType object at 0x101217d68>
+<lyaparser.Array object at 0x1014583c8>
+<lyasem.ExprType object at 0x101217d68>
+<lyaparser.Array object at 0x10364d2b0>
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+true
+true
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+<lyasem.ExprType object at 0x101217d68>
+true
+<lyasem.ExprType object at 0x101217d68>
+Program {'bool': <lyasem.ExprType object at 0x10126f6a0>, 'string': <lyasem.ExprType object at 0x101217e48>, 'n': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 101}, 'c': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 102}, 'd': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 103}, 'swap': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 104}, 'char': <lyasem.ExprType object at 0x101217dd8>, 'v': {'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654518>, 'number': 0}, 'int': <lyasem.ExprType object at 0x101217d68>}
+[
+    ('stp',),
+    ('alc', 105),
+    ('ldc', '"Enter number of elements: "'),
+    ('prv',),
+    ('rdv',),
+    ('stv', 0, 101),
+    ('ldc', '"Enter "'),
+    ('prv',),
+    ('ldv', 0, 101),
+    ('prv',),
+    ('ldc', '" integers\\n"'),
+    ('prv',),
+    ('ldc', 0),
+    ('stv', 0, 102),
+    ('lbl', 1),
+    ('ldr', 0, 0),
+    ('ldv', 0, 102),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('rdv',),
+    ('smv', 1),
+    ('ldv', 0, 102),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 102),
+    ('ldv', 0, 102),
+    ('ldv', 0, 101),
+    ('ldc', 1),
+    ('sub',),
+    ('leq',),
+    ('jof', 2),
+    ('jmp', 1),
+    ('lbl', 2),
+    ('ldc', 0),
+    ('stv', 0, 102),
+    ('lbl', 3),
+    ('ldc', 0),
+    ('stv', 0, 103),
+    ('lbl', 5),
+    ('ldv', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('ldv', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 1),
+    ('add',),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('grt',),
+    ('jof', 7),
+    ('ldr', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('stv', 0, 104),
+    ('ldr', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('ldr', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 1),
+    ('add',),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('smv', 1),
+    ('ldr', 0, 0),
+    ('ldv', 0, 103),
+    ('ldc', 1),
+    ('add',),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('ldv', 0, 104),
+    ('smv', 1),
+    ('lbl', 7),
+    ('ldv', 0, 103),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 103),
+    ('ldv', 0, 103),
+    ('ldv', 0, 101),
+    ('ldv', 0, 102),
+    ('sub',),
+    ('ldc', 2),
+    ('sub',),
+    ('leq',),
+    ('jof', 6),
+    ('jmp', 5),
+    ('lbl', 6),
+    ('ldv', 0, 102),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 102),
+    ('ldv', 0, 102),
+    ('ldv', 0, 101),
+    ('ldc', 2),
+    ('sub',),
+    ('leq',),
+    ('jof', 4),
+    ('jmp', 3),
+    ('lbl', 4),
+    ('ldc', '"Sorted list in ascending order:\\n"'),
+    ('prv',),
+    ('ldc', 0),
+    ('stv', 0, 102),
+    ('lbl', 8),
+    ('ldr', 0, 0),
+    ('ldv', 0, 102),
+    ('ldc', 0),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('prv',),
+    ('ldc', '" "'),
+    ('prv',),
+    ('ldv', 0, 102),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 102),
+    ('ldv', 0, 102),
+    ('ldv', 0, 101),
+    ('ldc', 1),
+    ('sub',),
+    ('leq',),
+    ('jof', 9),
+    ('jmp', 8),
+    ('lbl', 9),
+    ('dlc', 105),
+    ('end',),
+]
+

@@ -71,12 +71,13 @@ Program:
             ID: i (at line: 14)
           Expr: 
             ID: j (at line: 14)
-defaultdict(<class 'int'>, {'i': '0', 'x': '-3', 'y': '-4', 'k': '2', 'j': '1', '_ret': '-5'})
-ProcStmt {'p': {0: None, 1: 'loc', '_ret': 'loc'}}
+<lyaparser.ID object at 0x103654978>
+<lyaparser.ID object at 0x103654a58>
 {0: None, 1: 'loc', '_ret': 'loc'}
 loc
-    [,
-    ('stp'),
+Program {'string': <lyasem.ExprType object at 0x101408e48>, 'int': <lyasem.ExprType object at 0x101408d68>, 'i': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1014605f8>, 'number': 0}, 'bool': <lyasem.ExprType object at 0x1036541d0>, 'j': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654320>, 'number': 1}, 'char': <lyasem.ExprType object at 0x101408dd8>, 'p': {'type': None, 'scope': 1, 'node': <lyaparser.ProcStmt object at 0x103654470>, 'number': None}, 'k': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654320>, 'number': 2}}
+[
+    ('stp',),
     ('alc', 3),
     ('ldc', 2),
     ('stv', 0, 1),
@@ -93,20 +94,21 @@ loc
     ('ldr', 0, 2),
     ('stv', 1, -5),
     ('ldv', 1, 0),
-    ('prv'),
+    ('prv',),
     ('lbl', 2),
     ('dlc', 1),
-    ('ret', 1, 1),
+    ('ret', 1, 2),
     ('lbl', 3),
+    ('alc', 1),
     ('ldr', 0, 1),
     ('ldc', 3),
     ('cfu', 1),
     ('srv', 0, 0),
     ('ldv', 0, 0),
-    ('prv'),
+    ('prv',),
     ('ldv', 0, 1),
-    ('prv'),
+    ('prv',),
     ('dlc', 3),
-    ('end'),
-    ],
+    ('end',),
+]
 

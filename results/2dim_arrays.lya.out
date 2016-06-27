@@ -1,0 +1,109 @@
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: a (at line: 2)
+        Mode: 
+          Array2Mode: 
+            Range: 
+              Expr: 
+                Constant: 1, int (at line: 2)
+              Expr: 
+                Constant: 10, int (at line: 2)
+            Range: 
+              Expr: 
+                Constant: 1, int (at line: 2)
+              Expr: 
+                Constant: 5, int (at line: 2)
+            Mode: 
+              DiscreteMode: int (at line: 2)
+    DclStmt: 
+      Decl: 
+        ID: i (at line: 3)
+        ID: j (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: i (at line: 5)
+              Expr: 
+                Constant: 1, int (at line: 5)
+              Expr: 
+                Constant: 10, int (at line: 5)
+        ActionStmt: 
+          DoAction: 
+            Control: 
+              ForControl: 
+                StepEnum: =
+                  ID: j (at line: 7)
+                  Expr: 
+                    Constant: 1, int (at line: 7)
+                  Expr: 
+                    Constant: 5, int (at line: 7)
+            ActionStmt: 
+              Assignment: =
+                Array: 
+                  ID: a (at line: 8)
+                  Expr: 
+                    ID: i (at line: 8)
+                  Expr: 
+                    ID: j (at line: 8)
+                Expr: 
+                  Binop: * (at line: 8)
+                    ID: i (at line: 8)
+                    ID: j (at line: 8)
+<lyasem.ExprType object at 0x101308d68>
+<lyaparser.Array object at 0x102e54d68>
+false
+false
+<lyasem.ExprType object at 0x101308d68>
+Program {'i': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 50}, 'string': <lyasem.ExprType object at 0x101308e48>, 'char': <lyasem.ExprType object at 0x101308dd8>, 'int': <lyasem.ExprType object at 0x101308d68>, 'a': {'scope': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x102e54630>, 'number': 0}, 'bool': <lyasem.ExprType object at 0x102d637b8>, 'j': {'scope': 0, 'type': None, 'node': <lyaparser.Decl object at 0x102e542b0>, 'number': 51}}
+[
+    ('stp',),
+    ('alc', 52),
+    ('ldc', 1),
+    ('stv', 0, 50),
+    ('lbl', 1),
+    ('ldc', 1),
+    ('stv', 0, 51),
+    ('lbl', 3),
+    ('ldr', 0, 0),
+    ('ldv', 0, 50),
+    ('ldc', 1),
+    ('sub',),
+    ('idx', 5),
+    ('ldv', 0, 51),
+    ('ldc', 1),
+    ('sub',),
+    ('idx', 1),
+    ('ldv', 0, 50),
+    ('ldv', 0, 51),
+    ('mul',),
+    ('smv', 1),
+    ('ldv', 0, 51),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 51),
+    ('ldv', 0, 51),
+    ('ldc', 5),
+    ('leq',),
+    ('jof', 4),
+    ('jmp', 3),
+    ('lbl', 4),
+    ('ldv', 0, 50),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 50),
+    ('ldv', 0, 50),
+    ('ldc', 10),
+    ('leq',),
+    ('jof', 2),
+    ('jmp', 1),
+    ('lbl', 2),
+    ('dlc', 52),
+    ('end',),
+]
+

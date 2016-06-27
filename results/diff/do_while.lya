@@ -1,0 +1,93 @@
+1,59c1,2
+< Program: 
+<   StmtList: 
+<     DclStmt: 
+<       Decl: 
+<         ID: i (at line: 4)
+<         Mode: 
+<           DiscreteMode: int (at line: 4)
+<       Decl: 
+<         ID: b (at line: 4)
+<         Mode: 
+<           DiscreteMode: bool (at line: 4)
+<         Expr: 
+<           Constant: true, bool (at line: 4)
+<     ActionStmt: 
+<       ID: x (at line: 5)
+<       DoAction: 
+<         Control: 
+<           WhileControl: 
+<             BoolExpr: 
+<               Expr: 
+<                 ID: b (at line: 6)
+<         ActionStmt: 
+<           Call: 
+<             Func: read
+<             Param: 
+<               Expr: 
+<                 ID: i (at line: 7)
+<         ActionStmt: 
+<           IfAction: 
+<             BoolExpr: 
+<               Expr: 
+<                 Binop: <= (at line: 8)
+<                   ID: i (at line: 8)
+<                   Constant: 0, int (at line: 8)
+<             ThenClause: 
+<               ActionStmt: 
+<                 Exit: 
+<                   ID: x (at line: 9)
+<         ActionStmt: 
+<           Call: 
+<             Func: print
+<             Param: 
+<               Expr: 
+<                 Binop: * (at line: 11)
+<                   ID: i (at line: 11)
+<                   ID: i (at line: 11)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             Constant: 0, int (at line: 14)
+< <lyasem.ExprType object at 0x10130ad68>
+< <lyasem.ExprType object at 0x10130ad68>
+< <lyasem.ExprType object at 0x10130ad68>
+< <lyasem.ExprType object at 0x10130ad68>
+< Program {'char': <lyasem.ExprType object at 0x10130add8>, 'bool': <lyasem.ExprType object at 0x1013605f8>, 'int': <lyasem.ExprType object at 0x10130ad68>, 'string': <lyasem.ExprType object at 0x10130ae48>, 'i': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x101360828>, 'number': 0}, 'b': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x103654240>, 'number': 1}}
+< [
+<     ('stp',),
+---
+>     [
+>     ('stp'),
+61c4
+<     ('ldc', 1),
+---
+>     ('ldc', true),
+66c9
+<     ('rdv',),
+---
+>     ('rdv'),
+70c13
+<     ('leq',),
+---
+>     ('leq'),
+76,77c19,20
+<     ('mul',),
+<     ('prv',),
+---
+>     ('mul'),
+>     ('prv'),
+82c25
+<     ('prv',),
+---
+>     ('prv'),
+84,86c27,28
+<     ('end',),
+< ]
+< 
+---
+>     ('end'),
+>     ]
+\ No newline at end of file

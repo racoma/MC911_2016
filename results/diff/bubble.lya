@@ -1,0 +1,359 @@
+1,197d0
+< Program: 
+<   StmtList: 
+<     DclStmt: 
+<       Decl: 
+<         ID: v (at line: 3)
+<         Mode: 
+<           ArrayMode: 
+<             Range: 
+<               Expr: 
+<                 Constant: 0, int (at line: 3)
+<               Expr: 
+<                 Constant: 100, int (at line: 3)
+<             Mode: 
+<               DiscreteMode: int (at line: 3)
+<     DclStmt: 
+<       Decl: 
+<         ID: n (at line: 4)
+<         ID: c (at line: 4)
+<         ID: d (at line: 4)
+<         ID: swap (at line: 4)
+<         Mode: 
+<           DiscreteMode: int (at line: 4)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             Constant: "Enter number of elements: ", string (at line: 5)
+<     ActionStmt: 
+<       Call: 
+<         Func: read
+<         Param: 
+<           Expr: 
+<             ID: n (at line: 6)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             Constant: "Enter ", string (at line: 7)
+<           Expr: 
+<             ID: n (at line: 7)
+<           Expr: 
+<             Constant: " integers\n", string (at line: 7)
+<     ActionStmt: 
+<       DoAction: 
+<         Control: 
+<           ForControl: 
+<             StepEnum: =
+<               ID: c (at line: 9)
+<               Expr: 
+<                 Constant: 0, int (at line: 9)
+<               Expr: 
+<                 Binop: - (at line: 9)
+<                   ID: n (at line: 9)
+<                   Constant: 1, int (at line: 9)
+<         ActionStmt: 
+<           Call: 
+<             Func: read
+<             Param: 
+<               Expr: 
+<                 Array: 
+<                   ID: v (at line: 10)
+<                   Expr: 
+<                     ID: c (at line: 10)
+<     ActionStmt: 
+<       DoAction: 
+<         Control: 
+<           ForControl: 
+<             StepEnum: =
+<               ID: c (at line: 13)
+<               Expr: 
+<                 Constant: 0, int (at line: 13)
+<               Expr: 
+<                 Binop: - (at line: 13)
+<                   ID: n (at line: 13)
+<                   Constant: 2, int (at line: 13)
+<         ActionStmt: 
+<           DoAction: 
+<             Control: 
+<               ForControl: 
+<                 StepEnum: =
+<                   ID: d (at line: 15)
+<                   Expr: 
+<                     Constant: 0, int (at line: 15)
+<                   Expr: 
+<                     Binop: - (at line: 15)
+<                       Binop: - (at line: 15)
+<                         ID: n (at line: 15)
+<                         ID: c (at line: 15)
+<                       Constant: 2, int (at line: 15)
+<             ActionStmt: 
+<               IfAction: 
+<                 BoolExpr: 
+<                   Expr: 
+<                     Binop: > (at line: 17)
+<                       Array: 
+<                         ID: v (at line: 17)
+<                         Expr: 
+<                           ID: d (at line: 17)
+<                       Array: 
+<                         ID: v (at line: 17)
+<                         Expr: 
+<                           Binop: + (at line: 17)
+<                             ID: d (at line: 17)
+<                             Constant: 1, int (at line: 17)
+<                 ThenClause: 
+<                   ActionStmt: 
+<                     Assignment: =
+<                       ID: swap (at line: 18)
+<                       Expr: 
+<                         Array: 
+<                           ID: v (at line: 18)
+<                           Expr: 
+<                             ID: d (at line: 18)
+<                   ActionStmt: 
+<                     Assignment: =
+<                       Array: 
+<                         ID: v (at line: 19)
+<                         Expr: 
+<                           ID: d (at line: 19)
+<                       Expr: 
+<                         Array: 
+<                           ID: v (at line: 19)
+<                           Expr: 
+<                             Binop: + (at line: 19)
+<                               ID: d (at line: 19)
+<                               Constant: 1, int (at line: 19)
+<                   ActionStmt: 
+<                     Assignment: =
+<                       Array: 
+<                         ID: v (at line: 20)
+<                         Expr: 
+<                           Binop: + (at line: 20)
+<                             ID: d (at line: 20)
+<                             Constant: 1, int (at line: 20)
+<                       Expr: 
+<                         ID: swap (at line: 20)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             Constant: "Sorted list in ascending order:\n", string (at line: 24)
+<     ActionStmt: 
+<       DoAction: 
+<         Control: 
+<           ForControl: 
+<             StepEnum: =
+<               ID: c (at line: 26)
+<               Expr: 
+<                 Constant: 0, int (at line: 26)
+<               Expr: 
+<                 Binop: - (at line: 26)
+<                   ID: n (at line: 26)
+<                   Constant: 1, int (at line: 26)
+<         ActionStmt: 
+<           Call: 
+<             Func: print
+<             Param: 
+<               Expr: 
+<                 Array: 
+<                   ID: v (at line: 27)
+<                   Expr: 
+<                     ID: c (at line: 27)
+<               Expr: 
+<                 Constant: " ", string (at line: 27)
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyaparser.ID object at 0x101458d30>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyaparser.Array object at 0x1014583c8>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyaparser.Array object at 0x10364d2b0>
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< <lyasem.ExprType object at 0x101217d68>
+< true
+< <lyasem.ExprType object at 0x101217d68>
+< Program {'bool': <lyasem.ExprType object at 0x10126f6a0>, 'string': <lyasem.ExprType object at 0x101217e48>, 'n': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 101}, 'c': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 102}, 'd': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 103}, 'swap': {'type': None, 'scope': 0, 'node': <lyaparser.Decl object at 0x1036543c8>, 'number': 104}, 'char': <lyasem.ExprType object at 0x101217dd8>, 'v': {'type': 'array', 'scope': 0, 'node': <lyaparser.Decl object at 0x103654518>, 'number': 0}, 'int': <lyasem.ExprType object at 0x101217d68>}
+199c2
+<     ('stp',),
+---
+>     ('stp'),
+201,203c4,5
+<     ('ldc', '"Enter number of elements: "'),
+<     ('prv',),
+<     ('rdv',),
+---
+>     ('prc', 0),
+>     ('rdv'),
+205,206c7
+<     ('ldc', '"Enter "'),
+<     ('prv',),
+---
+>     ('prc', 1),
+208,210c9,10
+<     ('prv',),
+<     ('ldc', '" integers\\n"'),
+<     ('prv',),
+---
+>     ('prv'),
+>     ('prc', 2),
+217c17
+<     ('sub',),
+---
+>     ('sub'),
+219c19
+<     ('rdv',),
+---
+>     ('rdv'),
+223c23
+<     ('add',),
+---
+>     ('add'),
+228,229c28,29
+<     ('sub',),
+<     ('leq',),
+---
+>     ('sub'),
+>     ('leq'),
+239c39
+<     ('ldv', 0, 0),
+---
+>     ('ldr', 0, 0), ------ ldv
+242c42
+<     ('sub',),
+---
+>     ('sub'),
+244,245c44,45
+<     ('grc',),
+<     ('ldv', 0, 0),
+---
+>     ('grc'),
+>     ('ldr', 0, 0),   ---- ldv
+248c48
+<     ('add',),
+---
+>     ('add'),
+250c50
+<     ('sub',),
+---
+>     ('sub'),
+252,253c52,53
+<     ('grc',),
+<     ('grt',),
+---
+>     ('grc'),
+>     ('grt'),
+258c58
+<     ('sub',),
+---
+>     ('sub'),
+260c60
+<     ('grc',),
+---
+>     ('grc'),
+265c65
+<     ('sub',),
+---
+>     ('sub'),
+270c70
+<     ('add',),
+---
+>     ('add'),
+272c72
+<     ('sub',),
+---
+>     ('sub'),
+274c74
+<     ('grc',),
+---
+>     ('grc'),
+279c79
+<     ('add',),
+---
+>     ('add'),
+281c81
+<     ('sub',),
+---
+>     ('sub'),
+288c88
+<     ('add',),
+---
+>     ('add'),
+293c93
+<     ('sub',),
+---
+>     ('sub'),
+295,296c95,96
+<     ('sub',),
+<     ('leq',),
+---
+>     ('sub'),
+>     ('leq'),
+302c102
+<     ('add',),
+---
+>     ('add'),
+307,308c107,108
+<     ('sub',),
+<     ('leq',),
+---
+>     ('sub'),
+>     ('leq'),
+312,313c112
+<     ('ldc', '"Sorted list in ascending order:\\n"'),
+<     ('prv',),
+---
+>     ('prc', 3),
+320c119
+<     ('sub',),
+---
+>     ('sub'),
+322,325c121,123
+<     ('grc',),
+<     ('prv',),
+<     ('ldc', '" "'),
+<     ('prv',),
+---
+>     ('grc'),
+>     ('prv'),
+>     ('prc', 4),
+328c126
+<     ('add',),
+---
+>     ('add'),
+333,334c131,132
+<     ('sub',),
+<     ('leq',),
+---
+>     ('sub'),
+>     ('leq'),
+339,341c137,138
+<     ('end',),
+< ]
+< 
+---
+>     ('end'),
+> ]
+\ No newline at end of file

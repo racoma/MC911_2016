@@ -1,0 +1,70 @@
+1,43c1,2
+< Program: 
+<   StmtList: 
+<     DclStmt: 
+<       Decl: 
+<         ID: i (at line: 3)
+<         ID: soma (at line: 3)
+<         Mode: 
+<           DiscreteMode: int (at line: 3)
+<     ActionStmt: 
+<       Assignment: =
+<         ID: soma (at line: 4)
+<         Expr: 
+<           Constant: 0, int (at line: 4)
+<     ActionStmt: 
+<       DoAction: 
+<         Control: 
+<           ForControl: 
+<             StepEnum: =
+<               ID: i (at line: 5)
+<               Expr: 
+<                 Constant: 1, int (at line: 5)
+<               Expr: 
+<                 Constant: 10, int (at line: 5)
+<         ActionStmt: 
+<           Assignment: =
+<             ID: soma (at line: 6)
+<             Expr: 
+<               Binop: + (at line: 6)
+<                 ID: soma (at line: 6)
+<                 ID: i (at line: 6)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             ID: soma (at line: 8)
+< <lyaparser.ID object at 0x1036542b0>
+< <lyasem.ExprType object at 0x101419d68>
+< <lyaparser.ID object at 0x1036544a8>
+< <lyasem.ExprType object at 0x101419d68>
+< Program {'char': <lyasem.ExprType object at 0x101419dd8>, 'i': {'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x10146f6a0>, 'scope': 0}, 'string': <lyasem.ExprType object at 0x101419e48>, 'soma': {'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x10146f6a0>, 'scope': 0}, 'bool': <lyasem.ExprType object at 0x1035637b8>, 'int': <lyasem.ExprType object at 0x101419d68>}
+< [
+<     ('stp',),
+---
+>     [
+>     ('stp'),
+52c11
+<     ('add',),
+---
+>     ('add'),
+56c15
+<     ('add',),
+---
+>     ('add'),
+60c19
+<     ('leq',),
+---
+>     ('leq'),
+65c24
+<     ('prv',),
+---
+>     ('prv'),
+67,69c26,27
+<     ('end',),
+< ]
+< 
+---
+>     ('end'),
+>     ]

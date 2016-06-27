@@ -1,0 +1,142 @@
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: i (at line: 3)
+        ID: j (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+      Decl: 
+        ID: r (at line: 3)
+        Mode: 
+          Ref: 
+            Mode: 
+              DiscreteMode: int (at line: 3)
+    ProcStmt: 
+      ID: p (at line: 5)
+      ProcDef:  (at line: 5)
+        FormalParam: 
+          ID: x (at line: 5)
+          ParamSpec: None
+            Mode: 
+              DiscreteMode: int (at line: 5)
+        FormalParam: 
+          ID: y (at line: 5)
+          ParamSpec: None
+            Mode: 
+              Ref: 
+                Mode: 
+                  DiscreteMode: int (at line: 5)
+        Returns: 
+          ParamSpec: None
+            Mode: 
+              DiscreteMode: int (at line: 5)
+        StmtList: 
+          DclStmt: 
+            Decl: 
+              ID: b (at line: 6)
+              Mode: 
+                DiscreteMode: bool (at line: 6)
+          ActionStmt: 
+            Call: 
+              Func: read
+              Param: 
+                Expr: 
+                  ID: b (at line: 7)
+          ActionStmt: 
+            IfAction: 
+              BoolExpr: 
+                Expr: 
+                  ID: b (at line: 8)
+              ThenClause: 
+                ActionStmt: 
+                  Assignment: =
+                    ID: y (at line: 9)
+                    Expr: 
+                      RefLoc: ->
+                        ID: i (at line: 9)
+                ActionStmt: 
+                  Result: 
+                    Expr: 
+                      DerefRef: ->
+                        ID: y (at line: 10)
+              ElseClause: 
+                ActionStmt: 
+                  Assignment: =
+                    ID: y (at line: 12)
+                    Expr: 
+                      ID: r (at line: 12)
+                ActionStmt: 
+                  Result: 
+                    Expr: 
+                      DerefRef: ->
+                        ID: r (at line: 13)
+    ActionStmt: 
+      Call: 
+        Func: read
+        Param: 
+          Expr: 
+            ID: i (at line: 18)
+    ActionStmt: 
+      Assignment: =
+        ID: r (at line: 19)
+        Expr: 
+          RefLoc: ->
+            ID: i (at line: 19)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            ProcCall: 
+              ID: p (at line: 20)
+              Param: 
+                Expr: 
+                  ID: i (at line: 20)
+                Expr: 
+                  RefLoc: ->
+                    ID: j (at line: 20)
+<lyaparser.ID object at 0x103654e80>
+<lyaparser.ID object at 0x103654ef0>
+<lyaparser.ID object at 0x1036542b0>
+{0: None, 1: None, '_ret': None}
+Program {'int': <lyasem.ExprType object at 0x10140ad68>, 'p': {'scope': 1, 'type': None, 'number': None, 'node': <lyaparser.ProcStmt object at 0x1036541d0>}, 'char': <lyasem.ExprType object at 0x10140add8>, 'j': {'scope': 0, 'type': None, 'number': 1, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'i': {'scope': 0, 'type': None, 'number': 0, 'node': <lyaparser.Decl object at 0x1014605f8>}, 'string': <lyasem.ExprType object at 0x10140ae48>, 'bool': <lyasem.ExprType object at 0x103654940>, 'r': {'scope': 0, 'type': None, 'number': 2, 'node': <lyaparser.Decl object at 0x103654320>}}
+[
+    ('stp',),
+    ('alc', 3),
+    ('jmp', 3),
+    ('lbl', 1),
+    ('enf', 1),
+    ('alc', 1),
+    ('rdv',),
+    ('stv', 1, 0),
+    ('ldv', 1, 0),
+    ('jof', 4),
+    ('ldr', 0, 0),
+    ('stv', 1, -4),
+    ('lrv', 1, -4),
+    ('stv', 1, -5),
+    ('jmp', 5),
+    ('lbl', 4),
+    ('ldv', 0, 2),
+    ('stv', 1, -4),
+    ('lrv', 0, 2),
+    ('stv', 1, -5),
+    ('lbl', 5),
+    ('lbl', 2),
+    ('dlc', 1),
+    ('ret', 1, 2),
+    ('lbl', 3),
+    ('rdv',),
+    ('stv', 0, 0),
+    ('ldr', 0, 0),
+    ('stv', 0, 2),
+    ('alc', 1),
+    ('ldr', 0, 1),
+    ('ldv', 0, 0),
+    ('cfu', 1),
+    ('prv',),
+    ('dlc', 3),
+    ('end',),
+]
+

@@ -1,0 +1,96 @@
+1,76c1,2
+< Program: 
+<   StmtList: 
+<     DclStmt: 
+<       Decl: 
+<         ID: x (at line: 2)
+<         ID: y (at line: 2)
+<         Mode: 
+<           DiscreteMode: int (at line: 2)
+<     ProcStmt: 
+<       ID: p (at line: 4)
+<       ProcDef:  (at line: 4)
+<         FormalParam: 
+<           ID: b (at line: 4)
+<           ParamSpec: None
+<             Mode: 
+<               DiscreteMode: bool (at line: 4)
+<         Returns: 
+<           ParamSpec: loc
+<             Mode: 
+<               DiscreteMode: int (at line: 4)
+<         StmtList: 
+<           ActionStmt: 
+<             IfAction: 
+<               BoolExpr: 
+<                 Expr: 
+<                   ID: b (at line: 5)
+<               ThenClause: 
+<                 ActionStmt: 
+<                   Result: 
+<                     Expr: 
+<                       ID: x (at line: 6)
+<               ElseClause: 
+<                 ActionStmt: 
+<                   Result: 
+<                     Expr: 
+<                       ID: y (at line: 8)
+<     DclStmt: 
+<       Decl: 
+<         ID: b (at line: 12)
+<         Mode: 
+<           DiscreteMode: bool (at line: 12)
+<         Expr: 
+<           Constant: false, bool (at line: 12)
+<     ActionStmt: 
+<       Assignment: =
+<         ProcCall: 
+<           ID: p (at line: 13)
+<           Param: 
+<             Expr: 
+<               ID: b (at line: 13)
+<         Expr: 
+<           Constant: 20, int (at line: 13)
+<     ActionStmt: 
+<       Assignment: =
+<         ProcCall: 
+<           ID: p (at line: 14)
+<           Param: 
+<             Expr: 
+<               Constant: true, bool (at line: 14)
+<         Expr: 
+<           Constant: 10, int (at line: 14)
+<     ActionStmt: 
+<       Call: 
+<         Func: print
+<         Param: 
+<           Expr: 
+<             ID: x (at line: 15)
+<           Expr: 
+<             ID: y (at line: 15)
+< <lyaparser.ProcCall object at 0x1036548d0>
+< <lyaparser.ProcCall object at 0x103654ef0>
+< {0: None, '_ret': 'loc'}
+< {0: None, '_ret': 'loc'}
+< Program {'b': {'number': 2, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}, 'x': {'number': 0, 'type': None, 'node': <lyaparser.Decl object at 0x103654128>, 'scope': 0}, 'y': {'number': 1, 'type': None, 'node': <lyaparser.Decl object at 0x103654128>, 'scope': 0}, 'p': {'number': None, 'type': None, 'node': <lyaparser.ProcStmt object at 0x1036542b0>, 'scope': 1}, 'string': <lyasem.ExprType object at 0x101419e48>, 'int': <lyasem.ExprType object at 0x101419d68>, 'bool': <lyasem.ExprType object at 0x103654dd8>, 'char': <lyasem.ExprType object at 0x101419dd8>}
+< [
+<     ('stp',),
+---
+>   [
+>     ('stp'),
+106c32
+<     ('prv',),
+---
+>     ('prv'),
+108c34
+<     ('prv',),
+---
+>     ('prv'),
+110,112c36,37
+<     ('end',),
+< ]
+< 
+---
+>     ('end'),
+>   ]
+\ No newline at end of file

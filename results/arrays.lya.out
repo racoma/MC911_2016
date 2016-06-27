@@ -1,0 +1,122 @@
+Program: 
+  StmtList: 
+    DclStmt: 
+      Decl: 
+        ID: a (at line: 2)
+        Mode: 
+          ArrayMode: 
+            Range: 
+              Expr: 
+                Constant: 3, int (at line: 2)
+              Expr: 
+                Constant: 10, int (at line: 2)
+            Mode: 
+              DiscreteMode: int (at line: 2)
+    DclStmt: 
+      Decl: 
+        ID: i (at line: 3)
+        ID: j (at line: 3)
+        Mode: 
+          DiscreteMode: int (at line: 3)
+    ActionStmt: 
+      Call: 
+        Func: read
+        Param: 
+          Expr: 
+            ID: j (at line: 5)
+    ActionStmt: 
+      Assignment: =
+        Array: 
+          ID: a (at line: 6)
+          Expr: 
+            Constant: 3, int (at line: 6)
+        Expr: 
+          Binop: * (at line: 6)
+            Constant: 2, int (at line: 6)
+            ID: j (at line: 6)
+    ActionStmt: 
+      DoAction: 
+        Control: 
+          ForControl: 
+            StepEnum: =
+              ID: i (at line: 8)
+              Expr: 
+                Constant: 4, int (at line: 8)
+              Expr: 
+                Constant: 10, int (at line: 8)
+        ActionStmt: 
+          Assignment: =
+            Array: 
+              ID: a (at line: 9)
+              Expr: 
+                ID: i (at line: 9)
+            Expr: 
+              Binop: + (at line: 9)
+                Constant: 5, int (at line: 9)
+                ID: i (at line: 9)
+    ActionStmt: 
+      Call: 
+        Func: print
+        Param: 
+          Expr: 
+            Array: 
+              ID: a (at line: 11)
+              Expr: 
+                ID: j (at line: 11)
+<lyasem.ExprType object at 0x101419d68>
+<lyaparser.Array object at 0x1036545c0>
+<lyasem.ExprType object at 0x101419d68>
+<lyaparser.Array object at 0x103654cf8>
+false
+<lyasem.ExprType object at 0x101419d68>
+false
+<lyasem.ExprType object at 0x101419d68>
+false
+Program {'i': {'number': 8, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}, 'a': {'number': 0, 'type': 'array', 'node': <lyaparser.Decl object at 0x103654358>, 'scope': 0}, 'int': <lyasem.ExprType object at 0x101419d68>, 'bool': <lyasem.ExprType object at 0x10146f588>, 'char': <lyasem.ExprType object at 0x101419dd8>, 'string': <lyasem.ExprType object at 0x101419e48>, 'j': {'number': 9, 'type': None, 'node': <lyaparser.Decl object at 0x103654390>, 'scope': 0}}
+[
+    ('stp',),
+    ('alc', 10),
+    ('rdv',),
+    ('stv', 0, 9),
+    ('ldr', 0, 0),
+    ('ldc', 3),
+    ('ldc', 3),
+    ('sub',),
+    ('idx', 1),
+    ('ldc', 2),
+    ('ldv', 0, 9),
+    ('mul',),
+    ('smv', 1),
+    ('ldc', 4),
+    ('stv', 0, 8),
+    ('lbl', 1),
+    ('ldr', 0, 0),
+    ('ldv', 0, 8),
+    ('ldc', 3),
+    ('sub',),
+    ('idx', 1),
+    ('ldc', 5),
+    ('ldv', 0, 8),
+    ('add',),
+    ('smv', 1),
+    ('ldv', 0, 8),
+    ('ldc', 1),
+    ('add',),
+    ('stv', 0, 8),
+    ('ldv', 0, 8),
+    ('ldc', 10),
+    ('leq',),
+    ('jof', 2),
+    ('jmp', 1),
+    ('lbl', 2),
+    ('ldr', 0, 0),
+    ('ldv', 0, 9),
+    ('ldc', 3),
+    ('sub',),
+    ('idx', 1),
+    ('grc',),
+    ('prv',),
+    ('dlc', 10),
+    ('end',),
+]
+
