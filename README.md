@@ -19,13 +19,13 @@ python3 lyacod.py exemple.lya
 - arrays.lya
 - returning_location.lya 
 - arrays_02.lya
-
+- bubble.lya
 
 
 *Tests NOK:*
 - 2dim_arrays.lya  --     ('idx', 5) ---> ('idx', 10) na resolução
 - slices_n_builtins.lya
-- bubble.lya -- ldv ou ldr depende do self.arraytype no visit_Array. Se deixarmos sempre ldr, passará em bubble, e não passará em arrays_02
+
 
 
 *REFACTOR*
